@@ -8,7 +8,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
-    var handleButtonPress;
+    var buttons, handleButtonPress;
 
     var ColoredElement = function(element, color) {
         this.init(element, color);
@@ -16,6 +16,11 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     ColoredElement.prototype = {};
     ColoredElement.prototype.init = function(element, color) {
         this.domElement = element;
+        this.domElement.classList.add(color);
+        this.color = color;
+    };
+    ColoredElement.prototype.reset = function(color) {
+        this.domElement.classList.remove(this.color);
         this.domElement.classList.add(color);
         this.color = color;
     };
@@ -53,22 +58,35 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     };
 
     var Balloon = function(color) {
+        if (!color) {
+            color = buttons[random.uint32() % buttons.length].color;
+        }
         ColoredElement.prototype.init.call(this, document.createElement('div'),
                                            color);
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
+        this.domElement.style.top = '0px';
+        this.domElement.style.left = '0px';
+        this.reset(this.color); // set random bits.
+        this.refresh();
+    };
+    Balloon.prototype = Object.create(ColoredElement.prototype);
+    Balloon.prototype.reset = function(color) {
+        if (!color) {
+            color = buttons[random.uint32() % buttons.length].color;
+        }
+        if (color !== this.color) {
+            ColoredElement.prototype.reset.call(this, color);
+        }
         this.x = Math.floor(random() * this.maxx);
         this.y = balloonsElement.offsetHeight;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * INITIAL_BALLOON_Y_SPEED;
         this.speedx = (2*random()-1) * INITIAL_BALLOON_X_SPEED;
-        this.refresh();
-        this.domElement.style.top = '0px';
-        this.domElement.style.left = '0px';
+        this.popped = false;
     };
-    Balloon.prototype = Object.create(ColoredElement.prototype);
     Balloon.prototype.refresh = function() {
         // the 'translateZ' is actually very important here: it enables
         // GPU acceleration of this transform.
@@ -95,7 +113,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         this.popped = true;
     };
 
-    var buttons = [];
+    buttons = [];
     var createButtons = function() {
         // remove any existing buttons
         while (buttons.length > 0) {
@@ -112,14 +130,13 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
             // add event handlers
         });
     };
+    createButtons();
 
     var balloons = [];
-    var createBalloon = function() {
-        // pick a random color
-        var color = buttons[random.uint32() % buttons.length].color;
-        var b = new Balloon(color);
-        balloons.push(b);
-    };
+    while (balloons.length < NUM_BALLOONS) {
+        balloons.push(new Balloon());
+        // xxx spread out y starting locations
+    }
 
     // let accelerometer influence drift
     if (navigator.accelerometer && ENABLE_ACCEL) {
@@ -138,23 +155,25 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     var correctAnswer = function() {
     };
     var incorrectAnswer = function() {
-        balloons.forEach(function(b) { b.speedy *= 1.5; });
+        balloons.forEach(function(b) { b.speedy *= 2; });
     };
 
     handleButtonPress = function(color) {
         // remove the highest balloon of that color
-        // XXX performance would be better if we didn't detach and then
-        // create a new balloon but instead just recycled the existing
-        // balloon with a new color
-        var matching = balloons.filter(function(b) {
-            return b.color === color;
-        });
-        matching.sort(function(a, b) { return a.y - b.y; });
-        if (matching.length > 0) {
-            matching[0].pop();
-            correctAnswer(color);
-        } else {
+        var i, b, best=null;
+        for (i=0; i<balloons.length; i++) {
+            b = balloons[i];
+            if (b.color === color && !b.isGone()) {
+                if (best===null || b.y < best.y) {
+                    best = b;
+                }
+            }
+        }
+        if (best===null) {
             incorrectAnswer();
+        } else {
+            best.pop();
+            correctAnswer(color);
         }
     };
 
@@ -162,29 +181,19 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         var lastFrame = Date.now();
         return function() {
             var now = Date.now();
-            var i, j, b;
-            for (i=j=0; i<balloons.length; i++) {
+            var i, b;
+            for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
-                    b.detach();
-                } else {
-                    b.refresh();
-                    balloons[j++] = b;
+                    b.reset();
                 }
-            }
-            balloons.length = j;
-            // create new balloons to replace those lost off the top of the
-            // screen.
-            while (balloons.length < NUM_BALLOONS) {
-                createBalloon();
+                b.refresh();
             }
             lastFrame = now;
             Compat.requestAnimationFrame(refresh);
         };
     })();
 
-    createButtons();
-    createBalloon();
     refresh();
 });

@@ -2,6 +2,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ];
     var INITIAL_BALLOON_Y_SPEED = 100; // pixels per second
     var INITIAL_BALLOON_X_SPEED = 25;
+    var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = true;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');
@@ -29,8 +30,22 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
                                            color);
         this.domElement.href='#';
         this.attach(buttonsElement);
+        ['mousedown', 'touchstart'].forEach(function(evname) {
+            this.domElement.addEventListener(evname,this.highlight.bind(this));
+        }.bind(this));
+        ['mouseup','mouseout','touchcancel','touchend'].forEach(function(evname){
+            this.domElement.addEventListener(evname, this.unhighlight.bind(this));
+        }.bind(this));
     };
     Button.prototype = Object.create(ColoredElement.prototype);
+    Button.prototype.highlight = function(e) {
+        this.domElement.classList.add('hover');
+        e.preventDefault();
+    };
+    Button.prototype.unhighlight = function(e) {
+        this.domElement.classList.remove('hover');
+        e.preventDefault();
+    };
 
     var Balloon = function(color) {
         ColoredElement.prototype.init.call(this, document.createElement('div'),
@@ -41,7 +56,8 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
         this.x = Math.floor(random() * this.maxx);
         this.y = balloonsElement.offsetHeight;
-        this.speedy = INITIAL_BALLOON_Y_SPEED; // px per second
+        // speeds are in pixels / second.
+        this.speedy = (0.9+0.2*random()) * INITIAL_BALLOON_Y_SPEED;
         this.speedx = (2*random()-1) * INITIAL_BALLOON_X_SPEED;
         this.refresh();
         this.domElement.style.top = '0px';
@@ -92,7 +108,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         // pick a random color
         var color = buttons[random.uint32() % buttons.length].color;
         var b = new Balloon(color);
-        return b;
+        balloons.push(b);
     };
 
     // let accelerometer influence drift
@@ -113,22 +129,29 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         var lastFrame = Date.now();
         return function() {
             var now = Date.now();
-            balloons.forEach(function(b, i) {
+            var i, j, b;
+            for (i=j=0; i<balloons.length; i++) {
+                b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
-                    // remove/replace balloons off the top of screen
                     b.detach();
-                    balloons[i] = createBalloon();
                 } else {
                     b.refresh();
+                    balloons[j++] = b;
                 }
-            });
+            }
+            balloons.length = j;
+            // create new balloons to replace those lost off the top of the
+            // screen.
+            while (balloons.length < NUM_BALLOONS) {
+                createBalloon();
+            }
             lastFrame = now;
             Compat.requestAnimationFrame(refresh);
         };
     })();
 
     createButtons();
-        balloons.push(createBalloon());
+    createBalloon();
     refresh();
 });

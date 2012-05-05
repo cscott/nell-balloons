@@ -69,6 +69,14 @@ function Alea() {
       return random() + 
         (random() * 0x200000 | 0) * 1.1102230246251565e-16; // 2^-53
     };
+    random.choice = function(list) {
+        var i = Math.floor(random() * list.length);
+        return list[i];
+    };
+    var _randomsign = function() { return random() - 0.5; };
+    random.shuffle = function(list) {
+        list.sort(_randomsign);
+    };
     random.version = 'Alea 0.9';
     random.args = args;
     return random;

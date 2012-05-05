@@ -58,9 +58,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     };
 
     var Balloon = function(color) {
-        if (!color) {
-            color = buttons[random.uint32() % buttons.length].color;
-        }
+        color = color || random.choice(buttons).color;
         ColoredElement.prototype.init.call(this, document.createElement('div'),
                                            color);
         this.attach(balloonsElement);
@@ -74,9 +72,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     };
     Balloon.prototype = Object.create(ColoredElement.prototype);
     Balloon.prototype.reset = function(color) {
-        if (!color) {
-            color = buttons[random.uint32() % buttons.length].color;
-        }
+        color = color || random.choice(buttons).color;
         if (color !== this.color) {
             ColoredElement.prototype.reset.call(this, color);
         }
@@ -123,7 +119,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         }
         // now create four new buttons
         var c = COLORS.slice(0); // make a copy
-        c.sort(function() { return random()-0.5; }); // randomize
+        random.shuffle(c);
         c.forEach(function(color) {
             var b = new Button(color);
             buttons.push(b);

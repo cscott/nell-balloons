@@ -1,5 +1,5 @@
 define(['domReady!', './alea', './compat', './hammer'], function(document, Alea, Compat, Hammer) {
-    var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ];
+    var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var INITIAL_BALLOON_Y_SPEED = 100; // pixels per second
     var INITIAL_BALLOON_X_SPEED = 25;
     var NUM_BALLOONS = 2;
@@ -8,6 +8,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
+    var handleButtonPress;
 
     var ColoredElement = function(element, color) {
         this.init(element, color);
@@ -45,6 +46,10 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     Button.prototype.unhighlight = function(e) {
         this.domElement.classList.remove('hover');
         e.preventDefault();
+        if (event.type !== 'touchcancel' &&
+            event.type !== 'mouseout') {
+            handleButtonPress(this.color);
+        }
     };
 
     var Balloon = function(color) {
@@ -70,6 +75,7 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         this.domElement.style['-webkit-transform'] = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
     };
     Balloon.prototype.update = function(dt /* milliseconds */) {
+        if (this.popped) { return; /* don't move after it's popped */ }
         this.y -= dt * this.speedy / 1000;
         this.x += dt * this.speedx / 1000;
         if (this.x < 0) {
@@ -82,7 +88,11 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     };
     Balloon.prototype.isGone = function() {
         // returns true if balloon has floated past top of screen
-        return (this.y < -this.domElement.offsetHeight);
+        return (this.y < -this.domElement.offsetHeight) || this.popped;
+    };
+    Balloon.prototype.pop = function() {
+        // XXX run popping animation & sound effect
+        this.popped = true;
     };
 
     var buttons = [];
@@ -124,6 +134,29 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
                                                   function() {},
                                                   { frequency: 80 });
     }
+
+    var correctAnswer = function() {
+    };
+    var incorrectAnswer = function() {
+        balloons.forEach(function(b) { b.speedy *= 1.5; });
+    };
+
+    handleButtonPress = function(color) {
+        // remove the highest balloon of that color
+        // XXX performance would be better if we didn't detach and then
+        // create a new balloon but instead just recycled the existing
+        // balloon with a new color
+        var matching = balloons.filter(function(b) {
+            return b.color === color;
+        });
+        matching.sort(function(a, b) { return a.y - b.y; });
+        if (matching.length > 0) {
+            matching[0].pop();
+            correctAnswer(color);
+        } else {
+            incorrectAnswer();
+        }
+    };
 
     var refresh = (function() {
         var lastFrame = Date.now();

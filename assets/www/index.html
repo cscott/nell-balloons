@@ -1,10 +1,29 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>PhoneGap</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<title>Balloons for Nell</title>
+<link rel="stylesheet" href="style.css" />
 <script type="text/javascript" charset="utf-8" src="cordova-1.7.0.js"></script>
+<script src="require.js" data-main="index.js" type="text/javascript"></script>
 </head>
 <body>
-<h1>Hello World</h1>
+<div id="game" class="grass">
+ <div id="background"></div>
+ <div id="nell"></div>
+ <div id="balloons">
+   <div id="balloon1" class="black"></div>
+ </div>
+ <div id="hero"></div>
+ <div id="foreground"></div>
+ <div id="clouds"></div>
+</div>
+<div id="buttons">
+ <div id="button1" class="yellow"></div><div id="button2" class="black"></div><div id="button3" class="orange"></div><div id="button4" class="lilac"></div>
+</div>
+  
 </body>
 </html>

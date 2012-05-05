@@ -1,0 +1,89 @@
+html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
+
+/* Positioning */
+#game, #buttons, #balloons {
+ position: absolute;
+ left: 0; right: 0;
+ overflow: hidden;
+}
+#game { top: 0; bottom: 160px; }
+#buttons { bottom: 0; height: 160px; }
+#balloons { top:0; bottom: 0; }
+#buttons {
+ background: black;
+ text-align: center;
+ white-space: nowrap;
+}
+#buttons > div {
+ display: inline-block;
+ width: 200px; height: 160px;
+}
+#buttons > div {
+ background-image: url('images/button-overlay.png');
+ background-repeat: no-repeat;
+ padding:0; margin: 0;
+}
+#buttons > div.black  { background-color: #030303; }
+#buttons > div.lilac  { background-color: #ce72b9; }
+#buttons > div.orange { background-color: #ef7c11; }
+#buttons > div.white  { background-color: #cacaca; }
+#buttons > div.yellow { background-color: #ebb002; }
+
+
+/* Graphics */
+.grass #background {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+  background-color: #00f;
+  background-image: url('images/grass-back.png');
+  background-repeat: repeat-x;
+  background-position: bottom;
+}
+.grass #foreground {
+  position: absolute;
+  bottom: 0; height:243px;
+  left: 0; right: 0;
+  background: url('images/grass-front.png') repeat-x;
+}
+.grass #hero {
+  position: absolute;
+  bottom: 0; height: 388px;
+  left: 227px; width: 151px;
+  background: url('images/grass-hero.png') no-repeat;
+}
+.grass #nell {
+  position: absolute;
+  width: 321px; height: 466px;
+  right: -124px; bottom: 15px;
+  background: url('images/nell.png') no-repeat;
+}
+.grass #clouds {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; height: 162px;
+  background: url('images/clouds.png') repeat-x;
+  background-position-x: -200px;
+}
+
+#balloons > div {
+  position: absolute;
+  width: 140px; height: 275px;
+  background-repeat: no-repeat;
+}
+#balloons > .black {
+  background-image: url('images/balloon-black.png');
+}
+#balloons > .lilac {
+  background-image: url('images/balloon-lilac.png');
+}
+#balloons > .orange {
+  background-image: url('images/balloon-orange.png');
+}
+#balloons > .white {
+  background-image: url('images/balloon-white.png');
+}
+#balloons > .yellow {
+  background-image: url('images/balloon-yellow.png');
+}
+#balloon1 { top: 100px; left: 100px; }

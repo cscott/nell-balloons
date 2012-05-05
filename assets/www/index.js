@@ -86,7 +86,10 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
     Balloon.prototype.refresh = function() {
         // the 'translateZ' is actually very important here: it enables
         // GPU acceleration of this transform.
-        this.domElement.style['-webkit-transform'] = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
+        var transform = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
+        this.domElement.style.WebkitTransform =
+            this.domElement.style.MozTransform =
+            this.domElement.style.transform = transform;
     };
     Balloon.prototype.update = function(dt /* milliseconds */) {
         if (this.popped) { return; /* don't move after it's popped */ }

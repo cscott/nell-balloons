@@ -1588,8 +1588,12 @@ define('src/compat',[], function() {
             return fBound;
         };
     }
+    // Android's embedded webkit doesn't have Object.freeze
+    if (!Object.freeze) {
+        Object.freeze = function(o) { return o; };
+    }
     // Android non-Chrome doesn't have Web Workers
-    var FakeWorker = function() { };
+    var FakeWorker = function() { console.log('faking worker'); };
     FakeWorker.prototype = {
         postMessage: function(msg) { },
         addEventListener: function(msg, func) { }
@@ -1751,7 +1755,7 @@ define('src/dom',[], function() {
   trailing:true, es5:true
  */
 /*global define:false, console:false, Uint8Array:false */
-define('src/drawcommand',['./color','./brush'], function(Color, Brush) {
+define('src/drawcommand',['./color','./compat', './brush'], function(Color, Compat, Brush) {
     
 
     // draw commands
@@ -1764,6 +1768,7 @@ define('src/drawcommand',['./color','./brush'], function(Color, Brush) {
         DRAW_START: 4,
         NUM_COMMAND_TYPES: 5
     };
+    // the Compat module ensures that Object.freeze is defined (maybe a no-op)
     Object.freeze(CommandType);
 
     var DrawCommand = function(type) {

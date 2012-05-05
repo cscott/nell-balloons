@@ -71,6 +71,10 @@ define('compat',[], function() {
             return fBound;
         };
     }
+    // Android's embedded webkit doesn't have Object.freeze
+    if (!Object.freeze) {
+        Object.freeze = function(o) { return o; };
+    }
     // Android non-Chrome doesn't have Web Workers
     var FakeWorker = function() { };
     FakeWorker.prototype = {

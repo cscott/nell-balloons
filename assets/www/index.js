@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './compat', './hammer'], function(document, Alea, Compat, Hammer) {
+define(['domReady!', './alea', './buzz', './compat', './hammer'], function(document, Alea, Buzz, Compat, Hammer) {
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var INITIAL_BALLOON_Y_SPEED = 100; // pixels per second
     var INITIAL_BALLOON_X_SPEED = 25;
@@ -151,7 +151,48 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
                                                   { frequency: 80 });
     }
 
+    var playMusicPhoneGap = function(src) {
+        var media;
+        var loop = function() {
+            console.log('reached end');
+            media.seekTo(0);
+            media.play();
+        };
+        media = new Media('/android_asset/www/'+src+'.ogg', loop);
+        media.play();
+    };
+    var playMusicHTML5 = function(src) {
+        var sound = new Buzz.sound(src, { formats: ['ogg','mp3'] });
+        sound.loop().play();
+    };
+    var playMusic = (typeof Media !== 'undefined') ? playMusicPhoneGap :
+        Buzz.isSupported() ? playMusicHTML5 : function() { /* ignore */ };
+
+    var playSoundClipPhoneGap = function(url) {
+        var media = new Media('/android_asset/www/'+url+'.ogg',
+                              function() { media.release(); },
+                              function(error) { console.error(error.code+": "+error.message); });
+        media.play();
+    };
+    var playSoundClipHTML5 = function(url) {
+        var sound = new Buzz.sound(url, { formats: ['ogg','mp3'] });
+        sound.play();
+    };
+    var playSoundClip = (typeof Media !== 'undefined') ? playSoundClipPhoneGap :
+        Buzz.isSupported() ? playSoundClipHTML5 : function() { /* ignore */ };
+
+    var BURST_SOUNDS = ['sounds/burst1',
+                        'sounds/burst2',
+                        'sounds/burst3'];
+    var WHIZ_SOUNDS = ['sounds/deflate1',
+                       'sounds/deflate2'];
     var correctAnswer = function() {
+        var isWhiz = (random() < (1/15)); // 1-in-15 chance of a whiz
+        // play balloon burst sound
+        playSoundClip(random.choice(isWhiz ? WHIZ_SOUNDS : BURST_SOUNDS));
+        // base speed increases as you get more correct
+        INITIAL_BALLOON_Y_SPEED *= 1.05;
+        INITIAL_BALLOON_X_SPEED *= 1.05;
     };
     var incorrectAnswer = function() {
         balloons.forEach(function(b) { b.speedy *= 2; });
@@ -180,19 +221,35 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         var lastFrame = Date.now();
         return function() {
             var now = Date.now();
+            var isBorn = false;
             var i, b;
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
+                    isBorn = true;
                     b.reset();
                 }
                 b.refresh();
             }
             lastFrame = now;
             Compat.requestAnimationFrame(refresh);
+            if (isBorn) {
+                // XXX too noisy
+                //playSoundClip('sounds/inflate');
+            }
         };
     })();
 
-    refresh();
+    function onDeviceReady() {
+        playMusic('sounds/barrios_gavota');
+        playSoundClip('sounds/inflate');
+        refresh();
+    }
+    if (window.Cordova && window.device) {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    } else {
+        console.log('not on phonegap');
+        onDeviceReady();
+    }
 });

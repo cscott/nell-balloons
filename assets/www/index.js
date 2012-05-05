@@ -1,6 +1,8 @@
 define(['domReady!', './alea', './compat', './hammer'], function(document, Alea, Compat, Hammer) {
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ];
-    var INITIAL_BALLOON_SPEED = 200; // pixels per second
+    var INITIAL_BALLOON_Y_SPEED = 100; // pixels per second
+    var INITIAL_BALLOON_X_SPEED = 25;
+    var ENABLE_ACCEL = true;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
@@ -36,19 +38,30 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
-        var w = balloonsElement.offsetWidth - this.domElement.offsetWidth;
-        this.x = Math.floor(random() * w);
+        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
+        this.x = Math.floor(random() * this.maxx);
         this.y = balloonsElement.offsetHeight;
-        this.speed = INITIAL_BALLOON_SPEED; // px per second
+        this.speedy = INITIAL_BALLOON_Y_SPEED; // px per second
+        this.speedx = (2*random()-1) * INITIAL_BALLOON_X_SPEED;
         this.refresh();
+        this.domElement.style.top = '0px';
+        this.domElement.style.left = '0px';
     };
     Balloon.prototype = Object.create(ColoredElement.prototype);
     Balloon.prototype.refresh = function() {
-        this.domElement.style.top = Math.round(this.y)+'px';
-        this.domElement.style.left = Math.round(this.x)+'px';
+        // the 'translateZ' is actually very important here: it enables
+        // GPU acceleration of this transform.
+        this.domElement.style['-webkit-transform'] = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
     };
     Balloon.prototype.update = function(dt /* milliseconds */) {
-        this.y -= dt * this.speed / 1000;
+        this.y -= dt * this.speedy / 1000;
+        this.x += dt * this.speedx / 1000;
+        if (this.x < 0) {
+            this.x = 0; this.speedx = 0;
+        }
+        if (this.x > this.maxx) {
+            this.x = this.maxx; this.speedx = 0;
+        }
         // XXX drift x left and right?
     };
     Balloon.prototype.isGone = function() {
@@ -81,6 +94,20 @@ define(['domReady!', './alea', './compat', './hammer'], function(document, Alea,
         var b = new Balloon(color);
         return b;
     };
+
+    // let accelerometer influence drift
+    if (navigator.accelerometer && ENABLE_ACCEL) {
+        var updateAcceleration = function(a) {
+            if (a.y < -4) {
+                balloons.forEach(function(b) { b.speedx -= 50; });
+            } else if (a.y > 4) {
+                balloons.forEach(function(b) { b.speedx += 50; });
+            }
+        };
+        navigator.accelerometer.watchAcceleration(updateAcceleration,
+                                                  function() {},
+                                                  { frequency: 80 });
+    }
 
     var refresh = (function() {
         var lastFrame = Date.now();

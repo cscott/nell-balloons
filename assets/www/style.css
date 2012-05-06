@@ -92,3 +92,6 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
 #balloons > .yellow {
   background-image: url('images/balloon-yellow.png');
 }
+#balloons > .popped {
+  background-image: url('images/bang.png') !important;
+}

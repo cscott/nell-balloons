@@ -86,7 +86,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
-        this.popped = false;
+        this.popped = this.popDone = false;
+        this.domElement.classList.remove('popped');
         // just in case element sizes change
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
     };
@@ -99,7 +100,14 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
             this.domElement.style.transform = transform;
     };
     Balloon.prototype.update = function(dt /* milliseconds */) {
-        if (this.popped) { return; /* don't move after it's popped */ }
+        if (this.popped) {
+            // don't move after it's popped.
+            this.popTimeout -= dt;
+            if (this.popTimeout < 0) {
+                this.popDone = true;
+            }
+            return;
+        }
         this.y -= dt * this.speedy / 1000;
         this.x += dt * this.speedx / 1000;
         if (this.x < 0) {
@@ -112,11 +120,18 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     };
     Balloon.prototype.isGone = function() {
         // returns true if balloon has floated past top of screen
-        return (this.y < -this.domElement.offsetHeight);
+        return (this.y < -this.domElement.offsetHeight) || this.popDone;
     };
     Balloon.prototype.pop = function() {
-        // XXX run popping animation & sound effect
         this.popped = true;
+        // run popping animation & sound effect
+        var isWhiz = (random() < (1/15)); // 1-in-15 chance of a whiz
+        // play balloon burst sound
+        playSoundClip(random.choice(isWhiz ? WHIZ_SOUNDS : BURST_SOUNDS));
+
+        // XXX special animation for 'whiz'
+        this.domElement.classList.add('popped');
+        this.popTimeout = 250; // ms
     };
 
     buttons = [];
@@ -236,10 +251,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     };
 
     var correctAnswer = function() {
-        var isWhiz = (random() < (1/15)); // 1-in-15 chance of a whiz
-        // play balloon burst sound
-        playSoundClip(random.choice(isWhiz ? WHIZ_SOUNDS : BURST_SOUNDS));
-
         // maintain weighted averages
         var now = Date.now();
         correctTime = CORRECT_SMOOTHING * correctTime +
@@ -321,8 +332,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
                 b.update(now-lastFrame);
-                if (b.isGone() || b.popped) {
-                    if (b.isGone()) { incorrectAnswer('escape'); }
+                if (b.isGone()) {
+                    if (!b.popped) { incorrectAnswer('escape'); }
                     isBorn = true;
                     b.reset();
                 }

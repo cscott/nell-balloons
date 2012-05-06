@@ -178,6 +178,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         music.loop().play();
     };
     var stopMusicHTML5 = function() {
+        console.log('stopping music');
         music.stop();
         music = null;
     };
@@ -304,6 +305,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         var wasHidden = document[hidden] || false;
         return function(e) {
             var isHidden = document[hidden] || false;
+            console.log('visibility change '+wasHidden+' -> '+isHidden);
             if (wasHidden === isHidden) { return; }
             wasHidden = isHidden;
             if (isHidden) { onPause(); } else { onResume(); }

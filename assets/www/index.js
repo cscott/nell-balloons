@@ -231,16 +231,31 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
 
     var onPause = function() { stopMusic(); };
     var onResume = function() { playMusic(MUSIC_URL); };
+    // Set the name of the hidden property and the change event for visibility
+    var hidden="hidden", visibilityChange="visibilitychange";
+    if (typeof document.hidden !== "undefined") {
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+    } else if (typeof document.mozHidden !== "undefined") {
+        hidden = "mozHidden";
+        visibilityChange = "mozvisibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+    }
     var onVisibilityChange = function() {
-        var wasHidden = document.webkitHidden || false;
+        var wasHidden = document[hidden] || false;
         return function(e) {
-            var isHidden = document.webkitHidden || false;
+            var isHidden = document[hidden] || false;
             if (wasHidden === isHidden) { return; }
             wasHidden = isHidden;
             if (isHidden) { onPause(); } else { onResume(); }
         };
     }();
-    document.addEventListener('webkitvisibilitychange', onVisibilityChange,
+    document.addEventListener(visibilityChange, onVisibilityChange,
                               false);
 
     var refresh = (function() {

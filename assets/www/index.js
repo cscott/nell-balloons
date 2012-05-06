@@ -49,13 +49,13 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         }.bind(this));
     };
     Button.prototype = Object.create(ColoredElement.prototype);
-    Button.prototype.highlight = function(e) {
+    Button.prototype.highlight = function(event) {
         this.domElement.classList.add('hover');
-        e.preventDefault();
+        event.preventDefault();
     };
-    Button.prototype.unhighlight = function(e) {
+    Button.prototype.unhighlight = function(event) {
         this.domElement.classList.remove('hover');
-        e.preventDefault();
+        event.preventDefault();
         if (event.type !== 'touchcancel' &&
             event.type !== 'mouseout') {
             handleButtonPress(this.color);

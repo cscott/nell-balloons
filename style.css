@@ -29,7 +29,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
 #buttons > a.lilac  { background-color: #ce72b9; }
 #buttons > a.orange { background-color: #ef7c11; }
 #buttons > a.white  { background-color: #cacaca; }
-#buttons > a.yellow { background-color: #ebb002; }
+#buttons > a.yellow { background-color: #ffff00; }
 
 #buttons > a.hover {
  background-image: url('images/button-overlay-hover.png');

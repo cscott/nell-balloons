@@ -175,10 +175,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     };
     var playMusicHTML5 = function(src) {
         music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
-        music/*.loop()*/.play();
+        music.loop().play();
     };
     var stopMusicHTML5 = function() {
-        console.log('stopping music');
+        console.log('stopping music', music.getStateMessage(), music.getNetworkStateMessage());
+        music.unloop(); // helps with a bug on firefox
         music.stop();
         music = null;
     };

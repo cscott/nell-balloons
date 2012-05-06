@@ -1,5 +1,5 @@
 define(['domReady!', './alea', './buzz', './compat', './hammer'], function(document, Alea, Buzz, Compat, Hammer) {
-    var MUSIC_URL = 'http://cscott.github.com/nell-balloons/sounds/barrios_gavota';
+    var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y = 50;
     var MAX_BALLOON_SPEED_Y = 1000;
@@ -161,7 +161,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     var music;
     var playMusicPhoneGap = function(src) {
         var loop = function() {
-            console.log('reached end');
             music.seekTo(0);
             music.play();
         };
@@ -174,13 +173,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         music = null;
     };
     var playMusicHTML5 = function(src) {
-        console.log('starting music');
         music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
         music.loop().play();
     };
     var stopMusicHTML5 = function() {
-        console.log('stopping music', music.getStateMessage(), music.getNetworkStateMessage());
-        music.unloop(); // helps with a bug on firefox
+        music.unloop(); // helps on firefox
         music.stop();
         music = null;
     };
@@ -307,13 +304,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         var wasHidden = true;
         return function(e) {
             var isHidden = document[hidden] || false;
-            console.log('visibility change '+wasHidden+' -> '+isHidden);
             if (wasHidden === isHidden) { return; }
             wasHidden = isHidden;
             if (isHidden) { onPause(); } else { onResume(); }
         };
     }();
-    console.log('ADDING VISIBILITY CHANGE LISTENER');
     document.addEventListener(visibilityChange, onVisibilityChange,
                               false);
 

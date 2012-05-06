@@ -1,4 +1,5 @@
 define(['domReady!', './alea', './buzz', './compat', './hammer'], function(document, Alea, Buzz, Compat, Hammer) {
+    var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var INITIAL_BALLOON_Y_SPEED = 100; // pixels per second
     var INITIAL_BALLOON_X_SPEED = 25;
@@ -151,22 +152,33 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
                                                   { frequency: 80 });
     }
 
+    var music;
     var playMusicPhoneGap = function(src) {
-        var media;
         var loop = function() {
             console.log('reached end');
-            media.seekTo(0);
-            media.play();
+            music.seekTo(0);
+            music.play();
         };
-        media = new Media('/android_asset/www/'+src+'.ogg', loop);
-        media.play();
+        music = new Media('/android_asset/www/'+src+'.ogg', loop);
+        music.play();
+    };
+    var stopMusicPhoneGap = function() {
+        music.stop();
+        music.release();
+        music = null;
     };
     var playMusicHTML5 = function(src) {
-        var sound = new Buzz.sound(src, { formats: ['ogg','mp3'] });
-        sound.loop().play();
+        music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
+        music.loop().play();
+    };
+    var stopMusicHTML5 = function() {
+        music.stop();
+        music = null;
     };
     var playMusic = (typeof Media !== 'undefined') ? playMusicPhoneGap :
         Buzz.isSupported() ? playMusicHTML5 : function() { /* ignore */ };
+    var stopMusic = (typeof Media !== 'undefined') ? stopMusicPhoneGap :
+        Buzz.isSupported() ? stopMusicHTML5 : function() { /* ignore */ };
 
     var playSoundClipPhoneGap = function(url) {
         var media = new Media('/android_asset/www/'+url+'.ogg',
@@ -217,6 +229,20 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         }
     };
 
+    var onPause = function() { stopMusic(); };
+    var onResume = function() { playMusic(MUSIC_URL); };
+    var onVisibilityChange = function() {
+        var wasHidden = document.webkitHidden || false;
+        return function(e) {
+            var isHidden = document.webkitHidden || false;
+            if (wasHidden === isHidden) { return; }
+            wasHidden = isHidden;
+            if (isHidden) { onPause(); } else { onResume(); }
+        };
+    }();
+    document.addEventListener('webkitvisibilitychange', onVisibilityChange,
+                              false);
+
     var refresh = (function() {
         var lastFrame = Date.now();
         return function() {
@@ -235,15 +261,17 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
             lastFrame = now;
             Compat.requestAnimationFrame(refresh);
             if (isBorn) {
-                // XXX too noisy
-                //playSoundClip('sounds/inflate');
+                /* XXX play sound? */
             }
         };
     })();
 
     function onDeviceReady() {
-        playMusic('sounds/barrios_gavota');
-        playSoundClip('sounds/inflate');
+        playMusic(MUSIC_URL);
+        // phonegap
+        document.addEventListener('pause', onPause, false);
+        document.addEventListener('result', onResume, false);
+
         refresh();
     }
     if (window.Cordova && window.device) {

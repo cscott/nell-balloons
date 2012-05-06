@@ -161,7 +161,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     var music;
     var playMusicPhoneGap = function(src) {
         var loop = function() {
-            console.log('reached end');
             music.seekTo(0);
             music.play();
         };
@@ -178,6 +177,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         music.loop().play();
     };
     var stopMusicHTML5 = function() {
+        music.unloop(); // helps on firefox
         music.stop();
         music = null;
     };
@@ -301,7 +301,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         visibilityChange = "webkitvisibilitychange";
     }
     var onVisibilityChange = function() {
-        var wasHidden = document[hidden] || false;
+        var wasHidden = true;
         return function(e) {
             var isHidden = document[hidden] || false;
             if (wasHidden === isHidden) { return; }
@@ -337,10 +337,10 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     })();
 
     function onDeviceReady() {
-        playMusic(MUSIC_URL);
         // phonegap
         document.addEventListener('pause', onPause, false);
         document.addEventListener('result', onResume, false);
+        onVisibilityChange();
 
         refresh();
     }

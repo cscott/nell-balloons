@@ -195,7 +195,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
 
     var BURST_SOUNDS = ['sounds/burst1',
                         'sounds/burst2',
-                        'sounds/burst3'];
+                        'sounds/burst3',
+                        'sounds/burst4',
+                        'sounds/burst5',
+                        'sounds/burst6',
+                        'sounds/burst7'];
     var WHIZ_SOUNDS = ['sounds/deflate1',
                        'sounds/deflate2'];
     var correctAnswer = function() {

@@ -1,8 +1,12 @@
 define(['domReady!', './alea', './buzz', './compat', './hammer'], function(document, Alea, Buzz, Compat, Hammer) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
-    var INITIAL_BALLOON_Y_SPEED = 100; // pixels per second
-    var INITIAL_BALLOON_X_SPEED = 25;
+    var MIN_BALLOON_SPEED_Y = 50;
+    var MAX_BALLOON_SPEED_Y = 1000;
+    var X_SPEED_FRACTION = 0.25; // fraction of y speed
+
+    var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y;
+
     var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = true;
     var random = Alea.Random();
@@ -80,9 +84,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         this.x = Math.floor(random() * this.maxx);
         this.y = balloonsElement.offsetHeight;
         // speeds are in pixels / second.
-        this.speedy = (0.9+0.2*random()) * INITIAL_BALLOON_Y_SPEED;
-        this.speedx = (2*random()-1) * INITIAL_BALLOON_X_SPEED;
+        this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
+        this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
         this.popped = false;
+        // just in case element sizes change
+        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
     };
     Balloon.prototype.refresh = function() {
         // the 'translateZ' is actually very important here: it enables
@@ -106,7 +112,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     };
     Balloon.prototype.isGone = function() {
         // returns true if balloon has floated past top of screen
-        return (this.y < -this.domElement.offsetHeight) || this.popped;
+        return (this.y < -this.domElement.offsetHeight);
     };
     Balloon.prototype.pop = function() {
         // XXX run popping animation & sound effect
@@ -202,16 +208,60 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
                         'sounds/burst7'];
     var WHIZ_SOUNDS = ['sounds/deflate1',
                        'sounds/deflate2'];
+
+    // smoothing factor -- closer to 0 means more weight on present
+    var CORRECT_SMOOTHING = 0.8;
+    // number of correct answers as fraction of total (weighted average)
+    var correctFraction = 0;
+    // milliseconds per correct answer (weighted average)
+    var correctTime = 10000;
+    // time of last correct answer
+    var lastTime = Date.now();
+
+    var adjustSpeeds = function(correctTime, correctFraction) {
+        // try to adjust speed such that:
+        // (a) correctFraction is about 80%
+        // (b) the balloon travels 80% up the screen in 'correctTime' ms.
+        var aspeed = Math.max(correctFraction/0.8, 0.8) * initialBalloonSpeedY;
+        var bspeed = (balloonsElement.offsetHeight * 0.8) /
+            ((correctTime / 1000) * NUM_BALLOONS);
+        var avg = (aspeed + bspeed) / 2;
+        // only allow it to speed up/slow down by factor of 1.2 each time
+        var ADJ_FACTOR = 1.2;
+        var minnew = Math.max(initialBalloonSpeedY / ADJ_FACTOR,
+                              MIN_BALLOON_SPEED_Y);
+        var maxnew = Math.min(initialBalloonSpeedY * ADJ_FACTOR,
+                              MAX_BALLOON_SPEED_Y);
+        initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
+    };
+
     var correctAnswer = function() {
         var isWhiz = (random() < (1/15)); // 1-in-15 chance of a whiz
         // play balloon burst sound
         playSoundClip(random.choice(isWhiz ? WHIZ_SOUNDS : BURST_SOUNDS));
-        // base speed increases as you get more correct
-        INITIAL_BALLOON_Y_SPEED *= 1.05;
-        INITIAL_BALLOON_X_SPEED *= 1.05;
+
+        // maintain weighted averages
+        var now = Date.now();
+        correctTime = CORRECT_SMOOTHING * correctTime +
+            (1-CORRECT_SMOOTHING) * (now - lastTime);
+        lastTime = now;
+        correctFraction = CORRECT_SMOOTHING * correctFraction +
+            (1-CORRECT_SMOOTHING);
+        // adjust speeds based on new fractions
+        adjustSpeeds(correctTime, correctFraction);
     };
-    var incorrectAnswer = function() {
-        balloons.forEach(function(b) { b.speedy *= 2; });
+    var incorrectAnswer = function(how) {
+        // XXX penalty -- lose some rewards?
+
+        // maintain weighted averages
+        var now = Date.now();
+        // correctTime will be at least this low, maybe lower.
+        var correctTimeCopy = CORRECT_SMOOTHING * correctTime +
+            (1 - CORRECT_SMOOTHING) * (lastTime - now);
+        correctFraction = CORRECT_SMOOTHING * correctFraction;
+
+        // adjust speeds based on new fractions
+        adjustSpeeds(Math.min(correctTime, correctTimeCopy), correctFraction);
     };
 
     handleButtonPress = function(color) {
@@ -219,14 +269,14 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
         var i, b, best=null;
         for (i=0; i<balloons.length; i++) {
             b = balloons[i];
-            if (b.color === color && !b.isGone()) {
+            if (b.color === color && !b.isGone() && !b.popped) {
                 if (best===null || b.y < best.y) {
                     best = b;
                 }
             }
         }
         if (best===null) {
-            incorrectAnswer();
+            incorrectAnswer('click');
         } else {
             best.pop();
             correctAnswer(color);
@@ -271,7 +321,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
                 b.update(now-lastFrame);
-                if (b.isGone()) {
+                if (b.isGone() || b.popped) {
+                    if (b.isGone()) { incorrectAnswer('escape'); }
                     isBorn = true;
                     b.reset();
                 }

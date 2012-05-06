@@ -339,7 +339,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer'], function(docum
     function onDeviceReady() {
         // phonegap
         document.addEventListener('pause', onPause, false);
-        document.addEventListener('result', onResume, false);
+        document.addEventListener('resume', onResume, false);
         onVisibilityChange();
 
         refresh();

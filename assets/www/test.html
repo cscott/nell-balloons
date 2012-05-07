@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>CSS Keyframe Animation test</title>
+<link rel="stylesheet" href="style.css" />
+<style type="text/css">
+/* ---------- balloon animation --------------- */
+#b0 { top: 25%; left: 50%; }
+@-webkit-keyframes balloon-squirt {
+   0% {
+    -webkit-transform: translate3d(0,0,0) rotate(0deg);
+   }
+   12.5% {
+    -webkit-transform: translate3d(71px,-71px,0) rotate(40deg);
+   }
+   25% {
+    -webkit-transform: translate3d(190px,-120px,0) rotate(90deg);
+   }
+   37.5% {
+    -webkit-transform: translate3d(350px,10px,0) rotate(160deg);
+   }
+   50% {
+    -webkit-transform: translate3d(370px,250px,0) rotate(180deg);
+   }
+   62.5% {
+    -webkit-transform: translate3d(300px,500px,0) rotate(230deg);
+   }
+   75% {
+    -webkit-transform: translate3d(100px,700px,0) rotate(250deg);
+   }
+   87.5% {
+    -webkit-transform: translate3d(-400px,750px,0) rotate(275deg);
+   }
+   100% {
+    -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
+   }
+}    
+#b0 {
+  -webkit-animation: balloon-squirt 1000ms linear both;
+  -webkit-transform-origin: 74px 83px;
+}
+
+/* ------------ nell breathing animation ---------- */
+.grass #nell { background: none; }
+.grass #nell > div {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  background-repeat: no-repeat;
+}
+.grass #nell .hair { background-image: url('images/nell-hair.png'); }
+.grass #nell .body { background-image: url('images/nell-body.png'); }
+.grass #nell .head { background-image: url('images/nell-head.png'); }
+/* keyframe animation of nell, w/ inspiration from
+   http://samuli.hakoniemi.net/having-fun-with-css-keyframes/ */
+@-webkit-keyframes breathe-head {
+    0% {
+        -webkit-transform: rotate(-0.75deg) translate3d(0px, 0px, 0px);
+    }
+    40% {
+        -webkit-transform: rotate(1.5deg) translate3d(0px, -1px, 0px);
+    }
+    100% {
+        -webkit-transform: rotate(-0.75deg) translate3d(0px, 0px, 0px);
+    }
+}
+@-moz-keyframes breathe-head {  
+    0% {  
+        -moz-transform: rotate(-0.75deg) translate(0px, 0px);  
+    }  
+    40% {  
+        -moz-transform: rotate(1.5deg) translate(0px, -1px);  
+    }  
+  
+    100% {  
+        -moz-transform: rotate(-0.75deg) translate(0px, 0px);  
+    }  
+}
+@-webkit-keyframes breathe-body {  
+    0% {  
+        -webkit-transform: translate3d(0px,0px,0px);  
+    }  
+  
+    40% {  
+        -webkit-transform: translate3d(0px,-3px,0px);  
+    }  
+  
+    100% {  
+        -webkit-transform: translate3d(0px,0px,0px);  
+    }  
+}
+@-moz-keyframes breathe-body {  
+    0% {  
+        -moz-transform: translate(0px,0px);  
+    }  
+  
+    40% {  
+        -moz-transform: translate(0px,-3px);  
+    }  
+  
+    100% {  
+        -moz-transform: translate(0px,0px);  
+    }  
+}
+.grass #nell {  
+    -webkit-animation: breathe-body 3000ms infinite both ease-in-out;  
+    -moz-animation: breathe-body 3000ms infinite both ease-in-out;  
+}  
+.grass #nell .head, .grass #nell .hair {  
+    -webkit-animation: breathe-head 3000ms infinite both ease-in-out;  
+    -moz-animation: breathe-head 3000ms infinite both ease-in-out;  
+    -webkit-transform-origin: 140px 148px;
+    -moz-transform-origin: 140px 148px;
+}  
+
+/* ----------- bug animation ----------- */
+@-webkit-keyframes bug-shake {
+    0% {
+      -webkit-transform: rotate(1deg) translate3d(0,0,0);
+    }
+    50% {
+      -webkit-transform: rotate(-1deg) translate3d(0,0,0);
+    }
+    100% {
+      -webkit-transform: rotate(1deg) translate3d(0,0,0);
+    }
+}
+.grass #hero {
+    -webkit-animation: bug-shake 5000ms infinite both ease-in-out;
+    -webkit-transform-origin: center right;
+}
+</style>
+</head>
+
+<body>
+<div id="game" class="grass">
+ <div id="background"></div>
+ <div id="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div>
+ <div id="balloons"><div id="b0" class="orange"></div></div>
+ <div id="hero"></div>
+ <div id="foreground"></div>
+ <div id="clouds"></div>
+</div>
+<div id="buttons">
+<a class="yellow"></a><a class="lilac"></a><a class="black"></a><a class="orange"></a>
+</div>
+
+</body>
+</html>

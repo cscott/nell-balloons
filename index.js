@@ -14,6 +14,41 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
     var buttons, handleButtonPress;
+    var refresh, refreshID = null;
+
+    var AWARDS = [['a1', 1/2],
+                  ['a2', 1/4],
+                  ['a3', 1/8],
+                  ['a4', 1/16],
+                  ['a5', 1/32],
+                  ['a6', 1/64],
+                  ['a7', 1/128],
+                  ['a8', 1/256]];
+    var pickAward = function() {
+        var i;
+        for (i=0, sum=0; i<AWARDS.length; i++) {
+            sum += AWARDS[i][1];
+        }
+        var v = random() * sum;
+        for (i=0, sum=0; i<AWARDS.length; i++) {
+            sum += AWARDS[i][1];
+            if (v < sum) { return AWARDS[i][0]; }
+        }
+        // should never get here
+        return AWARDS[AWARDS.length-1][0];
+    };
+    var loseAward = function() {
+        var i;
+        for (i=0; i<AWARDS.length; i++) {
+            var elem = document.querySelector('#sprouts .award.'+AWARDS[i][0]);
+            if (elem.classList.contains('show')) {
+                elem.classList.remove('show');
+                elem = document.querySelector('#foreground .award.'+AWARDS[i][0]);
+                elem.classList.remove('show');
+                return;
+            }
+        }
+    };
 
     var funf = function(name, value) {
         // xxx this would break on iOS phonegap
@@ -107,6 +142,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         this.popped = this.popDone = false;
         this.domElement.classList.remove('popped');
         this.domElement.classList.remove('squirt');
+        this.award = null;
         // just in case element sizes change
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
     };
@@ -128,6 +164,19 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 if (this.domElement.classList.contains('squirt')) {
                     playSoundClip(random.choice(BURST_SOUNDS));
                 }
+                if (this.award) {
+                    var elem1 = document.querySelector(
+                        '#foreground .award.'+this.award);
+                    var elem2 = document.querySelector(
+                        '#sprouts .award.'+this.award);
+                    if (elem2.classList.contains('show')) {
+                        // deal w/ race -- maybe we lost this one already!
+                        elem1.classList.add('show');
+                    }
+                    elem1.style.WebkitTransform='';
+                    var flex = document.querySelector('#foreground .award.flex');
+                    flex.style.display = 'none';
+                }
             }
             return;
         }
@@ -147,12 +196,40 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     };
     Balloon.prototype.pop = function() {
         this.popped = true;
+        // chance of award
+        var isAward = (random() < (1/10)); // 1-in-10 chance of an award
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound
-        playSoundClip(random.choice(isSquirt ? SQUIRT_SOUNDS : BURST_SOUNDS));
+        var sounds = isAward ? AWARD_SOUNDS : isSquirt ? SQUIRT_SOUNDS :
+            BURST_SOUNDS;
+        playSoundClip(random.choice(sounds));
 
-        if (isSquirt) {
+        if (isAward) {
+            this.domElement.classList.add('popped');
+            this.popTimeout = 250;
+            // move an award up here.
+            this.award = pickAward();
+            var elem1= document.querySelector('#foreground .award.'+this.award);
+            var elem2= document.querySelector('#sprouts .award.'+this.award);
+            // do we already have this award?
+            if (elem2.classList.contains('show')) {
+                // force the flex badge to fill in.
+                var flex = document.querySelector('#foreground .award.flex');
+                flex.style.top = elem1.offsetTop+'px';
+                flex.style.left = elem1.offsetLeft+'px';
+                flex.style.display = 'block';
+                flex.className = 'award flex '+this.award;
+                elem1 = flex;
+                this.popTimeout = 750;
+            }
+            var offsetY = elem1.offsetTop + elem1.offsetParent.offsetTop;
+            var offsetX = elem1.offsetLeft + elem1.offsetParent.offsetLeft;
+            var x = Math.round(this.x - offsetX + 23 /* center on balloon */);
+            var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
+            elem1.style.WebkitTransform='translate3d('+x+'px,'+y+'px,0)';
+            elem2.classList.add('show');
+        } else if (isSquirt) {
             this.domElement.classList.add('squirt');
             this.popTimeout = 2000; // ms
         } else {
@@ -187,17 +264,25 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     }
 
     // let accelerometer influence drift
-    if (navigator.accelerometer && ENABLE_ACCEL) {
-        var updateAcceleration = function(a) {
-            if (a.y < -4) {
-                balloons.forEach(function(b) { b.speedx -= 50; });
-            } else if (a.y > 4) {
-                balloons.forEach(function(b) { b.speedx += 50; });
-            }
+    var accelID = null;
+    var startAccelerometer = function() { return null; };
+    var stopAccelerometer = function() { };
+    var updateAcceleration = function(a) {
+        if (a.y < -4) {
+            balloons.forEach(function(b) { b.speedx -= 50; });
+        } else if (a.y > 4) {
+            balloons.forEach(function(b) { b.speedx += 50; });
+        }
+    };
+    if (navigator.accelerometer) {
+        startAccelerometer = function() {
+            return navigator.accelerometer.watchAcceleration(updateAcceleration,
+                                                             function() {},
+                                                             { frequency: 80 });
         };
-        navigator.accelerometer.watchAcceleration(updateAcceleration,
-                                                  function() {},
-                                                  { frequency: 80 });
+        stopAccelerometer = function(id) {
+            navigator.accelerometer.clearWatch(id);
+        };
     }
 
     var music;
@@ -252,6 +337,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                          'sounds/deflate2'];
     var WRONG_SOUNDS = ['sounds/wrong1'];
     var ESCAPE_SOUNDS = ['sounds/wrong2'];
+    var AWARD_SOUNDS = ['sounds/award'];
 
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;
@@ -306,7 +392,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         adjustSpeeds(Math.min(correctTime, correctTimeCopy), correctFraction);
     };
 
+    var lockoutID = null;
     handleButtonPress = function(color) {
+        if (lockoutID !== null) { return; }
         // remove the highest balloon of that color
         var i, b, best=null;
         for (i=0; i<balloons.length; i++) {
@@ -320,6 +408,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         if (best===null) {
             playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
+            // lose an award (sigh)
+            loseAward();
+            lockoutID = window.setTimeout(function() {
+                lockoutID = null;
+            }, 1000); // 1s time out after wrong answer
         } else {
             best.pop();
             correctAnswer(color);
@@ -329,10 +422,24 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var onPause = function() {
         funf('status', 'pause');
         stopMusic();
+        if (refreshID !== null) {
+            Compat.cancelAnimationFrame(refreshID);
+            refreshID = null;
+        }
+        if (accelID !== null) {
+            stopAccelerometer();
+            accelID = null;
+        }
     };
     var onResume = function() {
         funf('status', 'resume');
         playMusic(MUSIC_URL);
+        if (refreshID === null) {
+            refreshID = Compat.requestAnimationFrame(refresh);
+        }
+        if (accelID === null && ENABLE_ACCEL) {
+            accelID = startAccelerometer();
+        }
     };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
@@ -361,18 +468,18 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     document.addEventListener(visibilityChange, onVisibilityChange,
                               false);
 
-    var refresh = (function() {
+    refresh = (function() {
         var lastFrame = Date.now();
         return function() {
             var now = Date.now();
-            var isBorn = false;
+            var isBorn = false, isEscape = false;
             var i, b;
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
                     if (!b.popped) {
-                        playSoundClip(random.choice(ESCAPE_SOUNDS));
+                        isEscape = true;
                         incorrectAnswer('escape.'+b.color);
                     }
                     isBorn = true;
@@ -381,11 +488,16 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 }
                 b.refresh();
             }
-            lastFrame = now;
-            Compat.requestAnimationFrame(refresh);
-            if (isBorn) {
-                /* XXX play sound? */
+            // play sounds down here so we only start one per frame.
+            if (isEscape) {
+                playSoundClip(random.choice(ESCAPE_SOUNDS));
             }
+            if (isBorn) {
+                // XXX inflation sound here was very noisy =(
+            }
+            lastFrame = now;
+            // keep playing
+            refreshID = Compat.requestAnimationFrame(refresh);
         };
     })();
 
@@ -394,8 +506,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
-
-        refresh();
     }
     if (window.Cordova && window.device) {
         document.addEventListener("deviceready", onDeviceReady, false);

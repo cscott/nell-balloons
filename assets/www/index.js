@@ -476,7 +476,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             var i, b;
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
-                b.update(now-lastFrame);
+                b.update(Math.min(now-lastFrame, 100));
                 if (b.isGone()) {
                     if (!b.popped) {
                         isEscape = true;

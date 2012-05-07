@@ -31,6 +31,7 @@
 
     <log level="DEBUG"/>
     <preference name="classicRender" value="true" />
+    <preference name="fullscreen" value="true" />
 </cordova>
 
 

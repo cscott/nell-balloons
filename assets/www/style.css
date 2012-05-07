@@ -66,35 +66,55 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   background-image: url('images/award.png'); /* blank fallback image */
   height: 124px;
   margin-top: 116px;
+  -webkit-transform: translate3d(0,138px,0);
 }
-.grass #foreground .award {
+.grass #foreground .award.a1 {
   background-image: url('images/award1.png');
 }
-.grass #foreground .award + .award {
+.grass #foreground .award.a2 {
   background-image: url('images/award2.png');
 }
-.grass #foreground .award + .award + .award {
+.grass #foreground .award.a3 {
   background-image: url('images/award3.png');
 }
-.grass #foreground .award + .award + .award + .award {
+.grass #foreground .award.a4 {
   background-image: url('images/award4.png');
 }
-.grass #foreground .award + .award + .award + .award + .award {
+.grass #foreground .award.a5 {
   background-image: url('images/award5.png');
 }
-.grass #foreground .award + .award + .award + .award + .award + .award {
+.grass #foreground .award.a6 {
   background-image: url('images/award6.png');
 }
-.grass #foreground .award + .award + .award + .award + .award + .award + .award{
+.grass #foreground .award.a7 {
   background-image: url('images/award7.png');
 }
-.grass #foreground .award + .award + .award + .award + .award + .award + .award + .award{
+.grass #foreground .award.a8 {
   background-image: url('images/award8.png');
+}
+.grass #foreground .award.show {
+  -webkit-transform: translate3d(0,0,0) !important;
+  -webkit-transition-property: -webkit-transform;
+  -webkit-transition-duration: 1.5s;
+  -webkit-transition-timing-function: ease-in-out;
+}
+.grass #foreground .award.flex {
+  position: absolute;
+  top: 0; left: 0;
+  display: none;
 }
 .grass #sprouts .award {
   background-image: url('images/sprout1.png');
   background-position: bottom right;
   height: 138px;
+  -webkit-transform: translate3d(0,138px,0);
+  -webkit-transition-property: -webkit-transform;
+  -webkit-transition-duration: 1.5s;
+  -webkit-transition-delay: 1.5s;
+  -webkit-transition-timing-function: ease-in-out;
+}
+.grass #sprouts .award.show {
+  -webkit-transform: translate3d(0,0,0);
 }
 .grass #sprouts {
   height: 138px;

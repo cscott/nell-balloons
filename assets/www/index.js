@@ -125,6 +125,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             this.popTimeout -= dt;
             if (this.popTimeout < 0) {
                 this.popDone = true;
+                if (this.domElement.classList.contains('squirt')) {
+                    playSoundClip(random.choice(BURST_SOUNDS));
+                }
             }
             return;
         }
@@ -151,7 +154,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
 
         if (isSquirt) {
             this.domElement.classList.add('squirt');
-            this.popTimeout = 3000; // ms
+            this.popTimeout = 2000; // ms
         } else {
             this.domElement.classList.add('popped');
             this.popTimeout = 250; // ms
@@ -247,6 +250,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                         'sounds/burst7'];
     var SQUIRT_SOUNDS = ['sounds/deflate1',
                          'sounds/deflate2'];
+    var WRONG_SOUNDS = ['sounds/wrong1'];
+    var ESCAPE_SOUNDS = ['sounds/wrong2'];
 
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;
@@ -313,6 +318,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             }
         }
         if (best===null) {
+            playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
         } else {
             best.pop();
@@ -365,7 +371,10 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
-                    if (!b.popped) { incorrectAnswer('escape.'+b.color); }
+                    if (!b.popped) {
+                        playSoundClip(random.choice(ESCAPE_SOUNDS));
+                        incorrectAnswer('escape.'+b.color);
+                    }
                     isBorn = true;
                     b.reset();
                     funf('born', b.color);

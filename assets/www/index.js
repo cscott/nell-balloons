@@ -16,14 +16,14 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var buttons, handleButtonPress;
     var refresh, refreshID = null;
 
-    var AWARDS = [['a1', 1/2],
-                  ['a2', 1/4],
-                  ['a3', 1/8],
-                  ['a4', 1/16],
-                  ['a5', 1/32],
-                  ['a6', 1/64],
-                  ['a7', 1/128],
-                  ['a8', 1/256]];
+    var AWARDS = [['a1', 1/2+1/2],
+                  ['a2', 1/4+1/3],
+                  ['a3', 1/8+1/4],
+                  ['a4', 1/16+1/5],
+                  ['a5', 1/32+1/6],
+                  ['a6', 1/64+1/7],
+                  ['a7', 1/128+1/8],
+                  ['a8', 1/256+1/9]];
     var pickAward = function() {
         var i;
         for (i=0, sum=0; i<AWARDS.length; i++) {
@@ -197,7 +197,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     Balloon.prototype.pop = function() {
         this.popped = true;
         // chance of award
-        var isAward = (random() < (1/10)); // 1-in-10 chance of an award
+        var isAward = (random() < (1/6)); // 1-in-6 chance of an award
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound

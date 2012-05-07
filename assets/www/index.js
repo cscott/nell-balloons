@@ -315,7 +315,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         adjustSpeeds(Math.min(correctTime, correctTimeCopy), correctFraction);
     };
 
+    var lockoutID = null;
     handleButtonPress = function(color) {
+        if (lockoutID !== null) { return; }
         // remove the highest balloon of that color
         var i, b, best=null;
         for (i=0; i<balloons.length; i++) {
@@ -329,6 +331,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         if (best===null) {
             playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
+            lockoutID = window.setTimeout(function() {
+                lockoutID = null;
+            }, 1000); // 1s time out after wrong answer
         } else {
             best.pop();
             correctAnswer(color);

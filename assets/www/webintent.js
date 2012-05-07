@@ -16,7 +16,7 @@ WebIntent.EXTRA_STREAM = "android.intent.extra.STREAM";
 WebIntent.EXTRA_EMAIL = "android.intent.extra.EMAIL";
 
 WebIntent.prototype.startActivity = function(params, success, fail) {
-	return PhoneGap.exec(function(args) {
+	return Cordova.exec(function(args) {
         success(args);
     }, function(args) {
         fail(args);
@@ -24,7 +24,7 @@ WebIntent.prototype.startActivity = function(params, success, fail) {
 };
 
 WebIntent.prototype.hasExtra = function(params, success, fail) {
-	return PhoneGap.exec(function(args) {
+	return Cordova.exec(function(args) {
         success(args);
     }, function(args) {
         fail(args);
@@ -32,7 +32,7 @@ WebIntent.prototype.hasExtra = function(params, success, fail) {
 };
 
 WebIntent.prototype.getUri = function(success, fail) {
-	return PhoneGap.exec(function(args) {
+	return Cordova.exec(function(args) {
         success(args);
     }, function(args) {
         fail(args);
@@ -40,7 +40,7 @@ WebIntent.prototype.getUri = function(success, fail) {
 };
 
 WebIntent.prototype.getExtra = function(params, success, fail) {
-	return PhoneGap.exec(function(args) {
+	return Cordova.exec(function(args) {
         success(args);
     }, function(args) {
         fail(args);
@@ -49,14 +49,14 @@ WebIntent.prototype.getExtra = function(params, success, fail) {
 
 
 WebIntent.prototype.onNewIntent = function(callback) {
-	return PhoneGap.exec(function(args) {
+	return Cordova.exec(function(args) {
 		callback(args);
     }, function(args) {
     }, 'WebIntent', 'onNewIntent', []);
 };
 
-PhoneGap.addConstructor(function() {
-	PhoneGap.addPlugin('webintent', new WebIntent());
+Cordova.addConstructor(function() {
+	Cordova.addPlugin('webintent', new WebIntent());
 });
 
 return WebIntent;

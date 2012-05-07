@@ -15,6 +15,25 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var balloonsElement = document.getElementById('balloons');
     var buttons, handleButtonPress;
 
+    var funf = function(name, value) {
+        // xxx this would break on iOS phonegap
+        if (!(window.Cordova && window.Cordova.exec)) {
+            return; /* not running on PhoneGap/Android */
+        }
+        var wi = new WebIntent();
+        wi.startActivity({
+            action: 'edu.mit.media.funf.RECORD',
+            extras: {
+                DATABASE_NAME: 'mainPipeline',
+                TIMESTAMP: Date.now(),
+                NAME: 'nell-balloons.'+name,
+                VALUE: value
+            }
+        }, function() {/*success*/}, function(){
+            console.error('Funf logging failed.');
+        });
+    };
+
     var ColoredElement = function(element, color) {
         this.init(element, color);
     };
@@ -250,7 +269,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
     };
 
-    var correctAnswer = function() {
+    var correctAnswer = function(color) {
+        funf('correct', color);
         // maintain weighted averages
         var now = Date.now();
         correctTime = CORRECT_SMOOTHING * correctTime +
@@ -262,6 +282,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         adjustSpeeds(correctTime, correctFraction);
     };
     var incorrectAnswer = function(how) {
+        funf('incorrect', how);
         // XXX penalty -- lose some rewards?
 
         // maintain weighted averages
@@ -287,15 +308,21 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             }
         }
         if (best===null) {
-            incorrectAnswer('click');
+            incorrectAnswer('click.'+color);
         } else {
             best.pop();
             correctAnswer(color);
         }
     };
 
-    var onPause = function() { stopMusic(); };
-    var onResume = function() { playMusic(MUSIC_URL); };
+    var onPause = function() {
+        funf('status', 'pause');
+        stopMusic();
+    };
+    var onResume = function() {
+        funf('status', 'resume');
+        playMusic(MUSIC_URL);
+    };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
     if (typeof document.hidden !== "undefined") {
@@ -333,9 +360,10 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
-                    if (!b.popped) { incorrectAnswer('escape'); }
+                    if (!b.popped) { incorrectAnswer('escape.'+b.color); }
                     isBorn = true;
                     b.reset();
+                    funf('born', b.color);
                 }
                 b.refresh();
             }

@@ -89,8 +89,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         // starting x, y, and speed
         // pick a random x position
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
-        this.domElement.style.top = '0px';
-        this.domElement.style.left = '0px';
         this.reset(this.color); // set random bits.
         this.refresh();
     };
@@ -106,11 +104,15 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
         this.popped = this.popDone = false;
+        this.domElement.style.top = '0px';
+        this.domElement.style.left = '0px';
         this.domElement.classList.remove('popped');
+        this.domElement.classList.remove('squirt');
         // just in case element sizes change
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
     };
     Balloon.prototype.refresh = function() {
+        if (this.popped) { return; }
         // the 'translateZ' is actually very important here: it enables
         // GPU acceleration of this transform.
         var transform = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
@@ -144,13 +146,22 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     Balloon.prototype.pop = function() {
         this.popped = true;
         // run popping animation & sound effect
-        var isWhiz = (random() < (1/15)); // 1-in-15 chance of a whiz
+        var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound
-        playSoundClip(random.choice(isWhiz ? WHIZ_SOUNDS : BURST_SOUNDS));
+        playSoundClip(random.choice(isSquirt ? SQUIRT_SOUNDS : BURST_SOUNDS));
 
-        // XXX special animation for 'whiz'
-        this.domElement.classList.add('popped');
-        this.popTimeout = 250; // ms
+        if (isSquirt) {
+            this.domElement.classList.add('squirt');
+            this.domElement.style.left = Math.round(this.x)+'px';
+            this.domElement.style.top = Math.round(this.y)+'px';
+            this.domElement.style.WebkitTransform =
+                this.domElement.style.MozTransform =
+                this.domElement.style.transform = '';
+            this.popTimeout = 3000; // ms
+        } else {
+            this.domElement.classList.add('popped');
+            this.popTimeout = 250; // ms
+        }
     };
 
     buttons = [];
@@ -240,8 +251,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                         'sounds/burst5',
                         'sounds/burst6',
                         'sounds/burst7'];
-    var WHIZ_SOUNDS = ['sounds/deflate1',
-                       'sounds/deflate2'];
+    var SQUIRT_SOUNDS = ['sounds/deflate1',
+                         'sounds/deflate2'];
 
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;

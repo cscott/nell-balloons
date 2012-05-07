@@ -1,0 +1,36 @@
+"Balloons for Nell" is written primarily by C. Scott Ananian
+for the One Laptop per Child foundation <cscott@laptop.org>.
+
+It uses pieces from the following wonderful people, under the
+terms of the specified licenses:
+
+Music:
+Gavota al Estilo Antiguo by Agustin Barrios;
+recording CC-BY-SA by Chris Ball <cjb@laptop.org>
+
+Sound effects: (freesound.org)
+
+Balloon pack by Gniffelbaf
+http://www.freesound.org/people/Gniffelbaf/packs/5380/
+Creative Commons 0 License
+
+Clip art: (openclipart.org)
+From openclipart.org, licensed under the Creative Commons Public
+Domain Dedication.
+Some particularly noteworthy elements:
+Princess
+http://openclipart.org/detail/124225/princess-by-tzunghaor
+Balloons by AJ Ashton
+http://openclipart.org/detail/105763/balloon-yellow-aj-by-anonymous (& etc)
+
+Java components for Android:
+PhoneGap/Apache Cordova, Apache License version 2.0.
+
+Javascript libraries:
+Web Intent plugin for PhoneGap by Boris Smus; MIT license.
+Hammer.JS by Jorik Tangelder (Eight Media); MIT license.
+RequireJS and domReady plugin by the Dojo Foundation; MIT or New BSD license.
+Buzz, by Jay Salvat; MIT license.
+Alea random number generator by Johannes Baagøe; MIT license.
+
+Thanks to all these people for creating such a fruitful commons!

@@ -81,27 +81,28 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   background-position: -200px 0;
 }
 
-#balloons > div {
+#balloons > div, #balloons > div > div {
   position: absolute;
+  top: 0; left: 0;
   width: 140px; height: 275px;
   background-repeat: no-repeat;
 }
-#balloons > .black {
+#balloons > .black > div {
   background-image: url('images/balloon-black.png');
 }
-#balloons > .lilac {
+#balloons > .lilac > div {
   background-image: url('images/balloon-lilac.png');
 }
-#balloons > .orange {
+#balloons > .orange > div {
   background-image: url('images/balloon-orange.png');
 }
-#balloons > .white {
+#balloons > .white > div {
   background-image: url('images/balloon-white.png');
 }
-#balloons > .yellow {
+#balloons > .yellow > div {
   background-image: url('images/balloon-yellow.png');
 }
-#balloons > .popped {
+#balloons > .popped > div {
   background-image: url('images/bang.png') !important;
 }
 
@@ -164,7 +165,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
     -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
 }
-#balloons > .squirt {
+#balloons > .squirt > div {
   -webkit-animation: balloon-squirt 1250ms linear both;
   -moz-animation: balloon-squirt 1250ms linear both;
   -webkit-transform-origin: 74px 83px;

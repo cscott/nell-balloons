@@ -85,6 +85,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         color = color || random.choice(buttons).color;
         ColoredElement.prototype.init.call(this, document.createElement('div'),
                                            color);
+        this.domElement.appendChild(document.createElement('div'));
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
@@ -104,8 +105,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
         this.popped = this.popDone = false;
-        this.domElement.style.top = '0px';
-        this.domElement.style.left = '0px';
         this.domElement.classList.remove('popped');
         this.domElement.classList.remove('squirt');
         // just in case element sizes change
@@ -152,11 +151,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
 
         if (isSquirt) {
             this.domElement.classList.add('squirt');
-            this.domElement.style.left = Math.round(this.x)+'px';
-            this.domElement.style.top = Math.round(this.y)+'px';
-            this.domElement.style.WebkitTransform =
-                this.domElement.style.MozTransform =
-                this.domElement.style.transform = '';
             this.popTimeout = 3000; // ms
         } else {
             this.domElement.classList.add('popped');

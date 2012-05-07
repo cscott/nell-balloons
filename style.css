@@ -62,8 +62,17 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   position: absolute;
   width: 321px; height: 466px;
   right: -124px; bottom: 15px;
-  background: url('images/nell.png') no-repeat;
 }
+.grass #nell > div {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  background-repeat: no-repeat;
+}
+.grass #nell .hair { background-image: url('images/nell-hair.png'); }
+.grass #nell .body { background-image: url('images/nell-body.png'); }
+.grass #nell .head { background-image: url('images/nell-head.png'); }
+
 .grass #clouds {
   position: absolute;
   left: 0; right: 0;
@@ -72,23 +81,187 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   background-position: -200px 0;
 }
 
-#balloons > div {
+#balloons > div, #balloons > div > div {
   position: absolute;
+  top: 0; left: 0;
   width: 140px; height: 275px;
   background-repeat: no-repeat;
 }
-#balloons > .black {
+#balloons > .black > div {
   background-image: url('images/balloon-black.png');
 }
-#balloons > .lilac {
+#balloons > .lilac > div {
   background-image: url('images/balloon-lilac.png');
 }
-#balloons > .orange {
+#balloons > .orange > div {
   background-image: url('images/balloon-orange.png');
 }
-#balloons > .white {
+#balloons > .white > div {
   background-image: url('images/balloon-white.png');
 }
-#balloons > .yellow {
+#balloons > .yellow > div {
   background-image: url('images/balloon-yellow.png');
+}
+#balloons > .popped > div {
+  background-image: url('images/bang.png') !important;
+}
+
+/* ------------------ animation ------------------- */
+@-webkit-keyframes balloon-squirt {
+   0% {
+    -webkit-transform: translate3d(0,0,0) rotate(0deg);
+   }
+   12.5% {
+    -webkit-transform: translate3d(71px,-71px,0) rotate(40deg);
+   }
+   25% {
+    -webkit-transform: translate3d(190px,-120px,0) rotate(90deg);
+   }
+   37.5% {
+    -webkit-transform: translate3d(350px,10px,0) rotate(160deg);
+   }
+   50% {
+    -webkit-transform: translate3d(370px,250px,0) rotate(180deg);
+   }
+   62.5% {
+    -webkit-transform: translate3d(300px,500px,0) rotate(230deg);
+   }
+   75% {
+    -webkit-transform: translate3d(100px,700px,0) rotate(250deg);
+   }
+   87.5% {
+    -webkit-transform: translate3d(-400px,750px,0) rotate(275deg);
+   }
+   100% {
+    -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
+   }
+}
+@-moz-keyframes balloon-squirt {
+   0% {
+    -moz-transform: translate(0,0) rotate(0deg);
+   }
+   12.5% {
+    -moz-transform: translate(71px,-71px) rotate(40deg);
+   }
+   25% {
+    -moz-transform: translate(190px,-120px) rotate(90deg);
+   }
+   37.5% {
+    -moz-transform: translate(350px,10px) rotate(160deg);
+   }
+   50% {
+    -moz-transform: translate(370px,250px) rotate(180deg);
+   }
+   62.5% {
+    -moz-transform: translate(300px,500px) rotate(230deg);
+   }
+   75% {
+    -moz-transform: translate(100px,700px) rotate(250deg);
+   }
+   87.5% {
+    -moz-transform: translate(-400px,750px) rotate(275deg);
+   }
+   100% {
+    -moz-transform: translate(-1000px,650px) rotate(290deg);
+   }
+}
+#balloons > .squirt > div {
+  -webkit-animation: balloon-squirt 1250ms linear both;
+  -moz-animation: balloon-squirt 1250ms linear both;
+  -webkit-transform-origin: 74px 83px;
+  -moz-transform-origin: 74px 83px;
+}
+
+/* ------------ nell breathing animation ---------- */
+
+/* keyframe animation of nell, w/ inspiration from
+   http://samuli.hakoniemi.net/having-fun-with-css-keyframes/ */
+@-webkit-keyframes nell-breathe-head {
+    0% {
+        -webkit-transform: rotate(-0.75deg) translate3d(0px, 0px, 0px);
+    }
+    40% {
+        -webkit-transform: rotate(1.5deg) translate3d(0px, -1px, 0px);
+    }
+    100% {
+        -webkit-transform: rotate(-0.75deg) translate3d(0px, 0px, 0px);
+    }
+}
+@-moz-keyframes nell-breathe-head {
+    0% {
+        -moz-transform: rotate(-0.75deg) translate(0px, 0px);
+    }
+    40% {
+        -moz-transform: rotate(1.5deg) translate(0px, -1px);
+    }
+
+    100% {
+        -moz-transform: rotate(-0.75deg) translate(0px, 0px);
+    }
+}
+@-webkit-keyframes nell-breathe-body {
+    0% {
+        -webkit-transform: translate3d(0px,0px,0px);
+    }
+
+    40% {
+        -webkit-transform: translate3d(0px,-3px,0px);
+    }
+
+    100% {
+        -webkit-transform: translate3d(0px,0px,0px);
+    }
+}
+@-moz-keyframes nell-breathe-body {
+    0% {
+        -moz-transform: translate(0px,0px);
+    }
+
+    40% {
+        -moz-transform: translate(0px,-3px);
+    }
+
+    100% {
+        -moz-transform: translate(0px,0px);
+    }
+}
+.grass #nell {
+    -webkit-animation: nell-breathe-body 3000ms infinite both ease-in-out;
+    -moz-animation: nell-breathe-body 3000ms infinite both ease-in-out;
+}
+.grass #nell .head, .grass #nell .hair {
+    -webkit-animation: nell-breathe-head 3000ms infinite both ease-in-out;
+    -moz-animation: nell-breathe-head 3000ms infinite both ease-in-out;
+    -webkit-transform-origin: 140px 148px;
+    -moz-transform-origin: 140px 148px;
+}
+
+/* ----------- bug animation ----------- */
+@-webkit-keyframes hero-shake {
+    0% {
+      -webkit-transform: rotate(1deg) translate3d(0,0,0);
+    }
+    50% {
+      -webkit-transform: rotate(-1deg) translate3d(0,0,0);
+    }
+    100% {
+      -webkit-transform: rotate(1deg) translate3d(0,0,0);
+    }
+}
+@-moz-keyframes hero-shake {
+    0% {
+      -moz-transform: rotate(1deg);
+    }
+    50% {
+      -moz-transform: rotate(-1deg);
+    }
+    100% {
+      -moz-transform: rotate(1deg);
+    }
+}
+.grass #hero {
+    -webkit-animation: hero-shake 5000ms infinite both ease-in-out;
+    -moz-animation: hero-shake 5000ms infinite both ease-in-out;
+    -webkit-transform-origin: center right;
+    -moz-transform-origin: center right;
 }

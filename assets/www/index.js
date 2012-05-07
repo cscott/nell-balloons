@@ -14,6 +14,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
     var buttons, handleButtonPress;
+    var refresh, refreshID = null;
 
     var funf = function(name, value) {
         // xxx this would break on iOS phonegap
@@ -187,17 +188,25 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     }
 
     // let accelerometer influence drift
-    if (navigator.accelerometer && ENABLE_ACCEL) {
-        var updateAcceleration = function(a) {
-            if (a.y < -4) {
-                balloons.forEach(function(b) { b.speedx -= 50; });
-            } else if (a.y > 4) {
-                balloons.forEach(function(b) { b.speedx += 50; });
-            }
+    var accelID = null;
+    var startAccelerometer = function() { return null; };
+    var stopAccelerometer = function() { };
+    var updateAcceleration = function(a) {
+        if (a.y < -4) {
+            balloons.forEach(function(b) { b.speedx -= 50; });
+        } else if (a.y > 4) {
+            balloons.forEach(function(b) { b.speedx += 50; });
+        }
+    };
+    if (navigator.accelerometer) {
+        startAccelerometer = function() {
+            return navigator.accelerometer.watchAcceleration(updateAcceleration,
+                                                             function() {},
+                                                             { frequency: 80 });
         };
-        navigator.accelerometer.watchAcceleration(updateAcceleration,
-                                                  function() {},
-                                                  { frequency: 80 });
+        stopAccelerometer = function(id) {
+            navigator.accelerometer.clearWatch(id);
+        };
     }
 
     var music;
@@ -329,10 +338,24 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var onPause = function() {
         funf('status', 'pause');
         stopMusic();
+        if (refreshID !== null) {
+            Compat.cancelAnimationFrame(refreshID);
+            refreshID = null;
+        }
+        if (accelID !== null) {
+            stopAccelerometer();
+            accelID = null;
+        }
     };
     var onResume = function() {
         funf('status', 'resume');
         playMusic(MUSIC_URL);
+        if (refreshID === null) {
+            refreshID = Compat.requestAnimationFrame(refresh);
+        }
+        if (accelID === null && ENABLE_ACCEL) {
+            accelID = startAccelerometer();
+        }
     };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
@@ -361,18 +384,18 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     document.addEventListener(visibilityChange, onVisibilityChange,
                               false);
 
-    var refresh = (function() {
+    refresh = (function() {
         var lastFrame = Date.now();
         return function() {
             var now = Date.now();
-            var isBorn = false;
+            var isBorn = false, isEscape = false;
             var i, b;
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
                 b.update(now-lastFrame);
                 if (b.isGone()) {
                     if (!b.popped) {
-                        playSoundClip(random.choice(ESCAPE_SOUNDS));
+                        isEscape = true;
                         incorrectAnswer('escape.'+b.color);
                     }
                     isBorn = true;
@@ -381,11 +404,16 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 }
                 b.refresh();
             }
-            lastFrame = now;
-            Compat.requestAnimationFrame(refresh);
-            if (isBorn) {
-                /* XXX play sound? */
+            // play sounds down here so we only start one per frame.
+            if (isEscape) {
+                playSoundClip(random.choice(ESCAPE_SOUNDS));
             }
+            if (isBorn) {
+                // XXX inflation sound here was very noisy =(
+            }
+            lastFrame = now;
+            // keep playing
+            refreshID = Compat.requestAnimationFrame(refresh);
         };
     })();
 
@@ -394,8 +422,6 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
-
-        refresh();
     }
     if (window.Cordova && window.device) {
         document.addEventListener("deviceready", onDeviceReady, false);

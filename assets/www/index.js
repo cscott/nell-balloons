@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './buzz', './compat', './hammer'], function(document, Alea, Buzz, Compat, Hammer) {
+define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js'], function(document, Alea, Buzz, Compat, Hammer, WebIntent) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y = 50;

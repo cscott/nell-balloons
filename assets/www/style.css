@@ -46,11 +46,59 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   background-repeat: repeat-x;
   background-position: bottom;
 }
-.grass #foreground {
+.grass #foreground, .grass #sprouts {
   position: absolute;
-  bottom: 0; height:243px;
   left: 0; right: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.grass #foreground {
+  bottom: 0; height:243px;
   background: url('images/grass-front.png') repeat-x;
+}
+.grass #foreground .award, .grass #sprouts .award {
+  display: inline-block;
+  width: 90px;
+  background-repeat: no-repeat;
+  margin-left: 5px; margin-right: 5px;
+}
+.grass #foreground .award {
+  background-image: url('images/award.png'); /* blank fallback image */
+  height: 124px;
+  margin-top: 116px;
+}
+.grass #foreground .award {
+  background-image: url('images/award1.png');
+}
+.grass #foreground .award + .award {
+  background-image: url('images/award2.png');
+}
+.grass #foreground .award + .award + .award {
+  background-image: url('images/award3.png');
+}
+.grass #foreground .award + .award + .award + .award {
+  background-image: url('images/award4.png');
+}
+.grass #foreground .award + .award + .award + .award + .award {
+  background-image: url('images/award5.png');
+}
+.grass #foreground .award + .award + .award + .award + .award + .award {
+  background-image: url('images/award6.png');
+}
+.grass #foreground .award + .award + .award + .award + .award + .award + .award{
+  background-image: url('images/award7.png');
+}
+.grass #foreground .award + .award + .award + .award + .award + .award + .award + .award{
+  background-image: url('images/award8.png');
+}
+.grass #sprouts .award {
+  background-image: url('images/sprout1.png');
+  background-position: bottom right;
+  height: 138px;
+}
+.grass #sprouts {
+  height: 138px;
+  bottom: 122px;
 }
 .grass #hero {
   position: absolute;

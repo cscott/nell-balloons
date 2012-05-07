@@ -37,6 +37,18 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         // should never get here
         return AWARDS[AWARDS.length-1][0];
     };
+    var loseAward = function() {
+        var i;
+        for (i=0; i<AWARDS.length; i++) {
+            var elem = document.querySelector('#sprouts .award.'+AWARDS[i][0]);
+            if (elem.classList.contains('show')) {
+                elem.classList.remove('show');
+                elem = document.querySelector('#foreground .award.'+AWARDS[i][0]);
+                elem.classList.remove('show');
+                return;
+            }
+        }
+    };
 
     var funf = function(name, value) {
         // xxx this would break on iOS phonegap
@@ -155,11 +167,13 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 if (this.award) {
                     var elem1 = document.querySelector(
                         '#foreground .award.'+this.award);
-                    elem1.classList.add('show');
-                    elem1.style.WebkitTransform='';
                     var elem2 = document.querySelector(
                         '#sprouts .award.'+this.award);
-                    elem2.classList.add('show');
+                    if (elem2.classList.contains('show')) {
+                        // deal w/ race -- maybe we lost this one already!
+                        elem1.classList.add('show');
+                    }
+                    elem1.style.WebkitTransform='';
                     var flex = document.querySelector('#foreground .award.flex');
                     flex.style.display = 'none';
                 }
@@ -394,6 +408,8 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         if (best===null) {
             playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
+            // lose an award (sigh)
+            loseAward();
             lockoutID = window.setTimeout(function() {
                 lockoutID = null;
             }, 1000); // 1s time out after wrong answer

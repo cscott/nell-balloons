@@ -97,6 +97,11 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   -webkit-transition-property: -webkit-transform;
   -webkit-transition-duration: 1.5s;
   -webkit-transition-timing-function: ease-in-out;
+
+  -moz-transform: translate(0,0) !important;
+  -moz-transition-property: -moz-transform;
+  -moz-transition-duration: 1.5s;
+  -moz-transition-timing-function: ease-in-out;
 }
 .grass #foreground .award.flex {
   position: absolute;
@@ -112,9 +117,18 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   -webkit-transition-duration: 1.5s;
   -webkit-transition-delay: 1.5s;
   -webkit-transition-timing-function: ease-in-out;
+  -webkit-transform-origin: bottom center;
+
+  -moz-transform: translate(0,138px);
+  -moz-transition-property: -moz-transform;
+  -moz-transition-duration: 1.5s;
+  -moz-transition-delay: 1.5s;
+  -moz-transition-timing-function: ease-in-out;
+  -moz-transform-origin: bottom center;
 }
 .grass #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate(0,0);
 }
 .grass #sprouts {
   height: 138px;

@@ -56,7 +56,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             return; /* not running on PhoneGap/Android */
         }
         var wi = new WebIntent();
-        wi.startActivity({
+        wi.sendBroadcast({
             action: 'edu.mit.media.funf.RECORD',
             extras: {
                 DATABASE_NAME: 'mainPipeline',
@@ -64,7 +64,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                 NAME: 'nell-balloons.'+name,
                 VALUE: value
             }
-        }, function() {/*success*/}, function(){
+        }, function(args) { /* success */ }, function(args) {
             console.error('Funf logging failed.');
         });
     };

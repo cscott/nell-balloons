@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.Html;
 
+import org.apache.cordova.DroidGap;
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
 
@@ -38,7 +39,7 @@ public class WebIntent extends Plugin {
 	 */
 	public PluginResult execute(String action, JSONArray args, String callbackId) {
 		try {
-			if (action.equals("startActivity")) {
+			if (action.equals("startActivity") || action.equals("sendBroadcast")) {
 				if(args.length() != 1) {
 					return new PluginResult(PluginResult.Status.INVALID_ACTION);
 				}
@@ -59,8 +60,12 @@ public class WebIntent extends Plugin {
 						extrasMap.put(key, value);
 					}
 				}
-				
-				startActivity(obj.getString("action"), uri, type, extrasMap);
+				Intent i = makeIntent(obj.getString("action"), uri, type, extrasMap);
+				if (action.equals("startActivity")) {
+				    this.ctx.startActivity(i);
+				} else if (action.equals("sendBroadcast")) {
+				    ((DroidGap)this.ctx).sendBroadcast(i);
+				}
 				return new PluginResult(PluginResult.Status.OK);
 				
 			} else if (action.equals("hasExtra")) {
@@ -115,8 +120,7 @@ public class WebIntent extends Plugin {
 			this.success(result, this.onNewIntentCallback);
 		}
 	}
-	
-	void startActivity(String action, Uri uri, String type, Map<String, String> extras) {
+	private Intent makeIntent(String action, Uri uri, String type, Map<String, String> extras) {
 		Intent i = (uri != null ? new Intent(action, uri) : new Intent(action));
 		if (type != null) {
 			i.setType(type);
@@ -127,7 +131,7 @@ public class WebIntent extends Plugin {
 			if (key.equals(Intent.EXTRA_TEXT) && type.equals("text/html")) {
 				i.putExtra(key, Html.fromHtml(value));
 			} else if(key.equals(Intent.EXTRA_STREAM)) {
-				//allowes sharing of images as attachments.
+				//allows sharing of images as attachments.
 				//value in this case should be a URI of a file
 				i.putExtra(key, Uri.parse(value));
 			} else if(key.equals(Intent.EXTRA_EMAIL)){
@@ -137,6 +141,6 @@ public class WebIntent extends Plugin {
 				i.putExtra(key, value);
 			}	
 		}
-		this.ctx.startActivity(i);
+		return i;
 	}
 }

@@ -193,27 +193,33 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    0% {
     -webkit-transform: translate3d(0,0,0) rotate(0deg);
    }
-   12.5% {
+   5% {
     -webkit-transform: translate3d(71px,-71px,0) rotate(40deg);
    }
-   25% {
+   10% {
     -webkit-transform: translate3d(190px,-120px,0) rotate(90deg);
    }
-   37.5% {
+   15% {
     -webkit-transform: translate3d(350px,10px,0) rotate(160deg);
    }
-   50% {
+   20% {
     -webkit-transform: translate3d(370px,250px,0) rotate(180deg);
    }
-   62.5% {
+   25% {
     -webkit-transform: translate3d(300px,500px,0) rotate(230deg);
    }
-   75% {
+   30% {
     -webkit-transform: translate3d(100px,700px,0) rotate(250deg);
    }
-   87.5% {
+   35% {
     -webkit-transform: translate3d(-400px,750px,0) rotate(275deg);
    }
+   40% {
+    -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
+   }
+   /* work around a Android/Honeycomb bug applying the animation-fill
+    * property by just leaving the animation in the end state for a long
+    * while. */
    100% {
     -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
    }
@@ -222,34 +228,37 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    0% {
     -moz-transform: translate(0,0) rotate(0deg);
    }
-   12.5% {
+   5% {
     -moz-transform: translate(71px,-71px) rotate(40deg);
    }
-   25% {
+   10% {
     -moz-transform: translate(190px,-120px) rotate(90deg);
    }
-   37.5% {
+   15% {
     -moz-transform: translate(350px,10px) rotate(160deg);
    }
-   50% {
+   20% {
     -moz-transform: translate(370px,250px) rotate(180deg);
    }
-   62.5% {
+   25% {
     -moz-transform: translate(300px,500px) rotate(230deg);
    }
-   75% {
+   30% {
     -moz-transform: translate(100px,700px) rotate(250deg);
    }
-   87.5% {
+   35% {
     -moz-transform: translate(-400px,750px) rotate(275deg);
+   }
+   40% {
+    -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
    100% {
     -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
 }
 #balloons > .squirt > div {
-  -webkit-animation: balloon-squirt 1250ms linear both;
-  -moz-animation: balloon-squirt 1250ms linear both;
+  -webkit-animation: balloon-squirt 3125ms linear forwards;
+  -moz-animation: balloon-squirt 3125ms linear forwards;
   -webkit-transform-origin: 74px 83px;
   -moz-transform-origin: 74px 83px;
 }

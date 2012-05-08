@@ -181,6 +181,13 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                     var flex = document.querySelector('#foreground .award.flex');
                     flex.style.display = 'none';
                 }
+            } else if (isHoneycomb && this.popTimeout < 1000 &&
+                       this.domElement.classList.contains('squirt')) {
+                // work around a CSS animation bug in Android/Honeycomb
+                // (animation returns to start state after running)
+                this.domElement.style.WebkitTransform =
+                    'translate3d('+(-this.domElement.offsetWidth)+'px,'+
+                    (-this.domElement.offsetHeight)+'px,0)';
             }
             return;
         }

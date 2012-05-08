@@ -431,7 +431,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             loseAward();
             lockoutID = window.setTimeout(function() {
                 lockoutID = null;
-            }, 1000); // 1s time out after wrong answer
+            }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
             correctAnswer(color);

@@ -348,3 +348,25 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
     -webkit-transform-origin: center right;
     -moz-transform-origin: center right;
 }
+
+/* ----------- cloud animation ----------- */
+@-webkit-keyframes clouds-drift {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 1240px 0px;
+  }
+}
+@-moz-keyframes clouds-drift {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 1240px 0px;
+  }
+}
+.grass #clouds {
+  -webkit-animation: clouds-drift 180s infinite normal none linear;
+  -moz-animation: clouds-drift 180s infinite normal none linear;
+}

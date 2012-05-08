@@ -298,8 +298,12 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
 
     var music;
     var playMusicPhoneGap = function(src) {
+        if (music) {
+            stopMusicPhoneGap();
+            console.warn("Play started before app resumed?");
+        }
         var loop = function() {
-            music.seekTo(0);
+            music.stop();//seekTo(0);
             music.play();
         };
         music = new Media('/android_asset/www/'+src+'.ogg', loop);
@@ -311,6 +315,10 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         music = null;
     };
     var playMusicHTML5 = function(src) {
+        if (music) {
+            stopMusicHTML5();
+            console.warn("Shouldn't happen.");
+        }
         music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
         music.loop().play();
     };

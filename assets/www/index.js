@@ -69,6 +69,10 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         });
     };
 
+    // add top-level "anim" class unless we're on xoom/honeycomb
+    var isHoneycomb = window.device && (device.platform==='Android') && (device.version==='3.2.1') && (device.name==='tervigon');
+    if (!isHoneycomb) { document.body.classList.add('anim'); }
+
     var ColoredElement = function(element, color) {
         this.init(element, color);
     };

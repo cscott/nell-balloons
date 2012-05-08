@@ -307,11 +307,12 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
         -moz-transform: translate(0px,0px);
     }
 }
-.grass #nell {
+.anim .grass #nell {
     -webkit-animation: nell-breathe-body 3000ms infinite both ease-in-out;
     -moz-animation: nell-breathe-body 3000ms infinite both ease-in-out;
 }
-.grass #nell .head, .grass #nell .hair {
+.anim .grass #nell .head,
+.anim .grass #nell .hair {
     -webkit-animation: nell-breathe-head 3000ms infinite both ease-in-out;
     -moz-animation: nell-breathe-head 3000ms infinite both ease-in-out;
     -webkit-transform-origin: 140px 148px;
@@ -341,7 +342,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
       -moz-transform: rotate(1deg);
     }
 }
-.grass #hero {
+.anim .grass #hero {
     -webkit-animation: hero-shake 5000ms infinite both ease-in-out;
     -moz-animation: hero-shake 5000ms infinite both ease-in-out;
     -webkit-transform-origin: center right;

@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './buzz', './compat', './funf', 'score!'], function(document, Alea, Buzz, Compat, Funf, score) {
+define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'], function(document, Alea, Buzz, Compat, Funf, nell, score) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y = 50;
@@ -13,7 +13,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'score!'], functi
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
-    var funf = score.funf = new Funf('NellBalloons');
+    var funf = nell.funf = score.funf = new Funf('NellBalloons');
     var buttons, handleButtonPress;
     var refresh, refreshID = null;
     var SPROUTS;
@@ -606,11 +606,19 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'score!'], functi
         };
     })();
 
+    ['mousedown','touchstart'].forEach(function(evname) {
+        document.getElementById('nell').addEventListener(evname, function(ev) {
+            ev.preventDefault();
+            nell.switchColor();
+        }, false);
+    });
+
     function onDeviceReady() {
         // phonegap
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
+        funf.record('startColor', nell.color);
     }
     if (window.Cordova && window.device) {
         document.addEventListener("deviceready", onDeviceReady, false);

@@ -23,6 +23,14 @@ WebIntent.prototype.startActivity = function(params, success, fail) {
     }, 'WebIntent', 'startActivity', [params]);
 };
 
+WebIntent.prototype.sendBroadcast = function(params, success, fail) {
+    return Cordova.exec(function(args) {
+        success(args);
+    }, function(args) {
+        fail(args);
+    }, 'WebIntent', 'sendBroadcast', [params]);
+};
+
 WebIntent.prototype.hasExtra = function(params, success, fail) {
 	return Cordova.exec(function(args) {
         success(args);

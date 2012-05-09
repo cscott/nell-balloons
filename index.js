@@ -15,15 +15,16 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var balloonsElement = document.getElementById('balloons');
     var buttons, handleButtonPress;
     var refresh, refreshID = null;
+    var SPROUTS;
 
-    var AWARDS = [['a1', 1/2],
-                  ['a2', 1/4],
-                  ['a3', 1/8],
-                  ['a4', 1/16],
-                  ['a5', 1/32],
-                  ['a6', 1/64],
-                  ['a7', 1/128],
-                  ['a8', 1/256]];
+    var AWARDS = [['a1', 1/2+1/3],
+                  ['a2', 1/4+1/6],
+                  ['a3', 1/8+1/9],
+                  ['a4', 1/16+1/12],
+                  ['a5', 1/32+1/15],
+                  ['a6', 1/64+1/18],
+                  ['a7', 1/128+1/21],
+                  ['a8', 1/256+1/24]];
     var pickAward = function() {
         var i;
         for (i=0, sum=0; i<AWARDS.length; i++) {
@@ -40,11 +41,13 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var loseAward = function() {
         var i;
         for (i=0; i<AWARDS.length; i++) {
-            var elem = document.querySelector('#sprouts .award.'+AWARDS[i][0]);
-            if (elem.classList.contains('show')) {
-                elem.classList.remove('show');
-                elem = document.querySelector('#foreground .award.'+AWARDS[i][0]);
-                elem.classList.remove('show');
+            var sprout = SPROUTS[AWARDS[i][0]];
+            if (sprout.size >= 0) {
+                sprout.shrink();
+                if (sprout.size < 0) {
+                    var elem = document.querySelector('#foreground .award.'+AWARDS[i][0]);
+                    elem.classList.remove('show');
+                }
                 return;
             }
         }
@@ -56,18 +59,23 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             return; /* not running on PhoneGap/Android */
         }
         var wi = new WebIntent();
-        wi.startActivity({
+        var o = { name:name, value:value };
+        wi.sendBroadcast({
             action: 'edu.mit.media.funf.RECORD',
             extras: {
                 DATABASE_NAME: 'mainPipeline',
                 TIMESTAMP: Date.now(),
-                NAME: 'nell-balloons.'+name,
-                VALUE: value
+                NAME: 'NellBalloons',
+                VALUE: JSON.stringify(o)
             }
-        }, function() {/*success*/}, function(){
+        }, function(args) { /* success */ }, function(args) {
             console.error('Funf logging failed.');
         });
     };
+
+    // add top-level "anim" class unless we're on xoom/honeycomb
+    var isHoneycomb = window.device && (device.platform==='Android') && (device.version==='3.2.1') && (device.name==='tervigon');
+    if (!isHoneycomb) { document.body.classList.add('anim'); }
 
     var ColoredElement = function(element, color) {
         this.init(element, color);
@@ -165,18 +173,24 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                     playSoundClip(random.choice(BURST_SOUNDS));
                 }
                 if (this.award) {
-                    var elem1 = document.querySelector(
+                    var elem = document.querySelector(
                         '#foreground .award.'+this.award);
-                    var elem2 = document.querySelector(
-                        '#sprouts .award.'+this.award);
-                    if (elem2.classList.contains('show')) {
+                    var sprout = SPROUTS[this.award];
+                    if (sprout.size >= 0) {
                         // deal w/ race -- maybe we lost this one already!
-                        elem1.classList.add('show');
+                        elem.classList.add('show');
                     }
-                    elem1.style.WebkitTransform='';
+                    elem.style.WebkitTransform='';
                     var flex = document.querySelector('#foreground .award.flex');
                     flex.style.display = 'none';
                 }
+            } else if (isHoneycomb && this.popTimeout < 1000 &&
+                       this.domElement.classList.contains('squirt')) {
+                // work around a CSS animation bug in Android/Honeycomb
+                // (animation returns to start state after running)
+                this.domElement.style.WebkitTransform =
+                    'translate3d('+(-this.domElement.offsetWidth)+'px,'+
+                    (-this.domElement.offsetHeight)+'px,0)';
             }
             return;
         }
@@ -197,7 +211,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     Balloon.prototype.pop = function() {
         this.popped = true;
         // chance of award
-        var isAward = (random() < (1/10)); // 1-in-10 chance of an award
+        var isAward = (random() < (1/6)); // 1-in-6 chance of an award
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound
@@ -210,25 +224,25 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             this.popTimeout = 250;
             // move an award up here.
             this.award = pickAward();
-            var elem1= document.querySelector('#foreground .award.'+this.award);
-            var elem2= document.querySelector('#sprouts .award.'+this.award);
+            var elem= document.querySelector('#foreground .award.'+this.award);
+            var sprout = SPROUTS[this.award];
             // do we already have this award?
-            if (elem2.classList.contains('show')) {
+            if (sprout.size >= 0) {
                 // force the flex badge to fill in.
                 var flex = document.querySelector('#foreground .award.flex');
-                flex.style.top = elem1.offsetTop+'px';
-                flex.style.left = elem1.offsetLeft+'px';
+                flex.style.top = elem.offsetTop+'px';
+                flex.style.left = elem.offsetLeft+'px';
                 flex.style.display = 'block';
                 flex.className = 'award flex '+this.award;
-                elem1 = flex;
+                elem = flex;
                 this.popTimeout = 750;
             }
-            var offsetY = elem1.offsetTop + elem1.offsetParent.offsetTop;
-            var offsetX = elem1.offsetLeft + elem1.offsetParent.offsetLeft;
+            var offsetY = elem.offsetTop + elem.offsetParent.offsetTop;
+            var offsetX = elem.offsetLeft + elem.offsetParent.offsetLeft;
             var x = Math.round(this.x - offsetX + 23 /* center on balloon */);
             var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
-            elem1.style.WebkitTransform='translate3d('+x+'px,'+y+'px,0)';
-            elem2.classList.add('show');
+            elem.style.WebkitTransform='translate3d('+x+'px,'+y+'px,0)';
+            sprout.grow();
         } else if (isSquirt) {
             this.domElement.classList.add('squirt');
             this.popTimeout = 2000; // ms
@@ -237,6 +251,60 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             this.popTimeout = 250; // ms
         }
     };
+
+    var SPROUT_SCALES = (function() {
+        var scales = [
+            [0.143, 0.078] // smallest  (34x69)
+        ];
+        var stepsTo = function(n, end) {
+            var i, sx, sy;
+            var start = scales[scales.length-1];
+            for (i=1; i<=n; i++) {
+                sx = (end[0] - start[0]) * i / n;
+                sy = (end[1] - start[1]) * i / n;
+                scales.push([start[0] + sx, start[1] + sy]);
+            }
+        };
+        // fill out table
+        stepsTo(1, [0.215, 0.118]); // small     (51x104)
+        stepsTo(1, [0.287, 0.156]); // orig size (68x138)
+        stepsTo(5, [0.857, 0.469]); // 3x size   (203x415) (~25px per step)
+        stepsTo(16,[1.000, 1.000]); // large               (~25px per step)
+        Object.freeze(scales);
+        return scales;
+    })();
+
+    var Sprout = function(awardClass) {
+        this.awardClass = awardClass;
+        this.domElement = document.querySelector('#sprouts .award.'+awardClass);
+        this.setSize(-1);
+    };
+    Sprout.prototype = {};
+    Sprout.prototype.grow = function() { this.setSize(this.size+1); };
+    Sprout.prototype.shrink = function() { this.setSize(this.size-1); };
+    Sprout.prototype.setSize = function(nsize) {
+        var transform, scale;
+        nsize = Math.max(-1, Math.min(nsize, SPROUT_SCALES.length-1));
+        nsize = Math.round(nsize); // must be an integer
+        if (this.size === nsize) { return; /* no change */ }
+        this.size = nsize;
+        if (nsize < 0) {
+            this.domElement.classList.remove('show');
+            transform = '';
+        } else {
+            this.domElement.classList.add('show');
+            scale = SPROUT_SCALES[nsize];
+            transform = 'translate3d(0,0,0) scale('+scale[0]+','+scale[1]+')';
+        }
+        this.domElement.style.WebkitTransform =
+            this.domElement.style.MozTransform =
+            this.domElement.style.transform = transform;
+    };
+    SPROUTS = {};
+    AWARDS.forEach(function(a) {
+        SPROUTS[a[0]] = new Sprout(a[0]);
+    });
+    Object.freeze(SPROUTS);
 
     buttons = [];
     var createButtons = function() {
@@ -287,8 +355,12 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
 
     var music;
     var playMusicPhoneGap = function(src) {
+        if (music) {
+            stopMusicPhoneGap();
+            console.warn("Play started before app resumed?");
+        }
         var loop = function() {
-            music.seekTo(0);
+            music.stop();//seekTo(0);
             music.play();
         };
         music = new Media('/android_asset/www/'+src+'.ogg', loop);
@@ -300,6 +372,10 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         music = null;
     };
     var playMusicHTML5 = function(src) {
+        if (music) {
+            stopMusicHTML5();
+            console.warn("Shouldn't happen.");
+        }
         music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
         music.loop().play();
     };
@@ -392,9 +468,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         adjustSpeeds(Math.min(correctTime, correctTimeCopy), correctFraction);
     };
 
-    var lockoutID = null;
+    var wrongLockoutID = null;
+    var doubleTapLockoutID = null, doubleTapColor;
     handleButtonPress = function(color) {
-        if (lockoutID !== null) { return; }
         // remove the highest balloon of that color
         var i, b, best=null;
         for (i=0; i<balloons.length; i++) {
@@ -406,16 +482,31 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             }
         }
         if (best===null) {
+            // prevent double taps from being registered as wrong answers
+            if (doubleTapLockoutID !== null && color == doubleTapColor) {
+                return; /* ignore */
+            }
+            // prevent too many wrong answers from being recorded close together
+            if (wrongLockoutID !== null) { return; }
+            // ok, process the wrong answer
             playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
             // lose an award (sigh)
             loseAward();
-            lockoutID = window.setTimeout(function() {
-                lockoutID = null;
-            }, 1000); // 1s time out after wrong answer
+            wrongLockoutID = window.setTimeout(function() {
+                wrongLockoutID = null;
+            }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
             correctAnswer(color);
+            // try to prevent a double tap being registered as a wrong answer.
+            doubleTapColor = color;
+            if (doubleTapLockoutID) {
+                window.clearTimeout(doubleTapLockoutID);
+            }
+            doubleTapLockoutID = window.setTimeout(function() {
+                doubleTapLockoutID = null;
+            }, 500); // 0.5s double-tap lockout
         }
     };
 
@@ -429,6 +520,14 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         if (accelID !== null) {
             stopAccelerometer();
             accelID = null;
+        }
+        if (window.Cordova && window.Cordova.exec) {
+            new WebIntent().sendBroadcast({
+                action: 'edu.mit.media.funf.ARCHIVE',
+                extras: {
+                    DATABASE_NAME: 'mainPipeline'
+                }
+            }, function(){}, function(){});
         }
     };
     var onResume = function() {
@@ -476,7 +575,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             var i, b;
             for (i=0; i<balloons.length; i++) {
                 b = balloons[i];
-                b.update(now-lastFrame);
+                b.update(Math.min(now-lastFrame, 100));
                 if (b.isGone()) {
                     if (!b.popped) {
                         isEscape = true;

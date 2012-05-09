@@ -97,6 +97,11 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   -webkit-transition-property: -webkit-transform;
   -webkit-transition-duration: 1.5s;
   -webkit-transition-timing-function: ease-in-out;
+
+  -moz-transform: translate(0,0) !important;
+  -moz-transition-property: -moz-transform;
+  -moz-transition-duration: 1.5s;
+  -moz-transition-timing-function: ease-in-out;
 }
 .grass #foreground .award.flex {
   position: absolute;
@@ -104,21 +109,30 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   display: none;
 }
 .grass #sprouts .award {
-  background-image: url('images/sprout1.png');
+  background-image: url('images/sprout1-lg.png');
   background-position: bottom right;
-  height: 138px;
-  -webkit-transform: translate3d(0,138px,0);
+  width: 238px; height: 885px;
+  /* adjust to effective width of 100px to match shields */
+  margin-left: -20px; margin-right: -118px;
+  -webkit-transform: translate3d(0,138px,0) scale(.143,.078);
   -webkit-transition-property: -webkit-transform;
   -webkit-transition-duration: 1.5s;
-  -webkit-transition-delay: 1.5s;
   -webkit-transition-timing-function: ease-in-out;
+  -webkit-transform-origin: 70px bottom;
+
+  -moz-transform: translate(0,138px) scale(.143,.078);
+  -moz-transition-property: -moz-transform;
+  -moz-transition-duration: 1.5s;
+  -moz-transition-timing-function: ease-in-out;
+  -moz-transform-origin: 70px bottom;
 }
 .grass #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate(0,0);
 }
 .grass #sprouts {
-  height: 138px;
-  bottom: 122px;
+  height: 885px;
+  bottom: 104px;
 }
 .grass #hero {
   position: absolute;
@@ -179,27 +193,33 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    0% {
     -webkit-transform: translate3d(0,0,0) rotate(0deg);
    }
-   12.5% {
+   5% {
     -webkit-transform: translate3d(71px,-71px,0) rotate(40deg);
    }
-   25% {
+   10% {
     -webkit-transform: translate3d(190px,-120px,0) rotate(90deg);
    }
-   37.5% {
+   15% {
     -webkit-transform: translate3d(350px,10px,0) rotate(160deg);
    }
-   50% {
+   20% {
     -webkit-transform: translate3d(370px,250px,0) rotate(180deg);
    }
-   62.5% {
+   25% {
     -webkit-transform: translate3d(300px,500px,0) rotate(230deg);
    }
-   75% {
+   30% {
     -webkit-transform: translate3d(100px,700px,0) rotate(250deg);
    }
-   87.5% {
+   35% {
     -webkit-transform: translate3d(-400px,750px,0) rotate(275deg);
    }
+   40% {
+    -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
+   }
+   /* work around a Android/Honeycomb bug applying the animation-fill
+    * property by just leaving the animation in the end state for a long
+    * while. */
    100% {
     -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
    }
@@ -208,34 +228,37 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    0% {
     -moz-transform: translate(0,0) rotate(0deg);
    }
-   12.5% {
+   5% {
     -moz-transform: translate(71px,-71px) rotate(40deg);
    }
-   25% {
+   10% {
     -moz-transform: translate(190px,-120px) rotate(90deg);
    }
-   37.5% {
+   15% {
     -moz-transform: translate(350px,10px) rotate(160deg);
    }
-   50% {
+   20% {
     -moz-transform: translate(370px,250px) rotate(180deg);
    }
-   62.5% {
+   25% {
     -moz-transform: translate(300px,500px) rotate(230deg);
    }
-   75% {
+   30% {
     -moz-transform: translate(100px,700px) rotate(250deg);
    }
-   87.5% {
+   35% {
     -moz-transform: translate(-400px,750px) rotate(275deg);
+   }
+   40% {
+    -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
    100% {
     -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
 }
 #balloons > .squirt > div {
-  -webkit-animation: balloon-squirt 1250ms linear both;
-  -moz-animation: balloon-squirt 1250ms linear both;
+  -webkit-animation: balloon-squirt 3125ms linear forwards;
+  -moz-animation: balloon-squirt 3125ms linear forwards;
   -webkit-transform-origin: 74px 83px;
   -moz-transform-origin: 74px 83px;
 }
@@ -293,11 +316,12 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
         -moz-transform: translate(0px,0px);
     }
 }
-.grass #nell {
+.anim .grass #nell {
     -webkit-animation: nell-breathe-body 3000ms infinite both ease-in-out;
     -moz-animation: nell-breathe-body 3000ms infinite both ease-in-out;
 }
-.grass #nell .head, .grass #nell .hair {
+.anim .grass #nell .head,
+.anim .grass #nell .hair {
     -webkit-animation: nell-breathe-head 3000ms infinite both ease-in-out;
     -moz-animation: nell-breathe-head 3000ms infinite both ease-in-out;
     -webkit-transform-origin: 140px 148px;
@@ -327,9 +351,31 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
       -moz-transform: rotate(1deg);
     }
 }
-.grass #hero {
+.anim .grass #hero {
     -webkit-animation: hero-shake 5000ms infinite both ease-in-out;
     -moz-animation: hero-shake 5000ms infinite both ease-in-out;
     -webkit-transform-origin: center right;
     -moz-transform-origin: center right;
+}
+
+/* ----------- cloud animation ----------- */
+@-webkit-keyframes clouds-drift {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 1240px 0px;
+  }
+}
+@-moz-keyframes clouds-drift {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 1240px 0px;
+  }
+}
+.grass #clouds {
+  -webkit-animation: clouds-drift 180s infinite normal none linear;
+  -moz-animation: clouds-drift 180s infinite normal none linear;
 }

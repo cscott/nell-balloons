@@ -411,9 +411,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         adjustSpeeds(Math.min(correctTime, correctTimeCopy), correctFraction);
     };
 
-    var lockoutID = null;
+    var wrongLockoutID = null;
+    var doubleTapLockoutID = null, doubleTapColor;
     handleButtonPress = function(color) {
-        if (lockoutID !== null) { return; }
         // remove the highest balloon of that color
         var i, b, best=null;
         for (i=0; i<balloons.length; i++) {
@@ -425,16 +425,31 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             }
         }
         if (best===null) {
+            // prevent double taps from being registered as wrong answers
+            if (doubleTapLockoutID !== null && color == doubleTapColor) {
+                return; /* ignore */
+            }
+            // prevent too many wrong answers from being recorded close together
+            if (wrongLockoutID !== null) { return; }
+            // ok, process the wrong answer
             playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
             // lose an award (sigh)
             loseAward();
-            lockoutID = window.setTimeout(function() {
-                lockoutID = null;
+            wrongLockoutID = window.setTimeout(function() {
+                wrongLockoutID = null;
             }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
             correctAnswer(color);
+            // try to prevent a double tap being registered as a wrong answer.
+            doubleTapColor = color;
+            if (doubleTapLockoutID) {
+                window.clearTimeout(doubleTapLockoutID);
+            }
+            doubleTapLockoutID = window.setTimeout(function() {
+                doubleTapLockoutID = null;
+            }, 500); // 0.5s double-tap lockout
         }
     };
 

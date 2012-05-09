@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js'], function(document, Alea, Buzz, Compat, Hammer, WebIntent) {
+define(['domReady!', './alea', './buzz', './compat', './funf', 'score!'], function(document, Alea, Buzz, Compat, Funf, score) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y = 50;
@@ -13,6 +13,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
+    var funf = score.funf = new Funf('NellBalloons');
     var buttons, handleButtonPress;
     var refresh, refreshID = null;
     var SPROUTS;
@@ -25,6 +26,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                   ['a6', 1/64+1/18],
                   ['a7', 1/128+1/21],
                   ['a8', 1/256+1/24]];
+
     var pickAward = function() {
         var i;
         for (i=0, sum=0; i<AWARDS.length; i++) {
@@ -53,28 +55,9 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         }
     };
 
-    var funf = function(name, value) {
-        // xxx this would break on iOS phonegap
-        if (!(window.Cordova && window.Cordova.exec)) {
-            return; /* not running on PhoneGap/Android */
-        }
-        var wi = new WebIntent();
-        var o = { name:name, value:value };
-        wi.sendBroadcast({
-            action: 'edu.mit.media.funf.RECORD',
-            extras: {
-                DATABASE_NAME: 'mainPipeline',
-                TIMESTAMP: Date.now(),
-                NAME: 'NellBalloons',
-                VALUE: JSON.stringify(o)
-            }
-        }, function(args) { /* success */ }, function(args) {
-            console.error('Funf logging failed.');
-        });
-    };
-
     // add top-level "anim" class unless we're on xoom/honeycomb
-    var isHoneycomb = window.device && (device.platform==='Android') && (device.version==='3.2.1') && (device.name==='tervigon');
+    var isHoneycomb = window.device && (window.device.platform==='Android') &&
+        (window.device.version==='3.2.1') && (window.device.name==='tervigon');
     if (!isHoneycomb) { document.body.classList.add('anim'); }
 
     var ColoredElement = function(element, color) {
@@ -243,6 +226,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
             elem.style.WebkitTransform='translate3d('+x+'px,'+y+'px,0)';
             sprout.grow();
+            saveScore();
         } else if (isSquirt) {
             this.domElement.classList.add('squirt');
             this.popTimeout = 2000; // ms
@@ -305,6 +289,28 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         SPROUTS[a[0]] = new Sprout(a[0]);
     });
     Object.freeze(SPROUTS);
+
+    // load recent score
+    var loadScore = function() {
+        if (!(score.recent && score.recent.length === AWARDS.length)) {
+            return;
+        }
+        AWARDS.forEach(function(a, i) {
+            var sprout = SPROUTS[a[0]];
+            sprout.setSize(score.recent[i]);
+            if (sprout.size >= 0) {
+                var elem = document.querySelector('#foreground .award.'+a[0]);
+                elem.classList.add('show');
+            }
+        });
+    };
+    var saveScore = function() {
+        var nscore = AWARDS.map(function(a) {
+            return SPROUTS[a[0]].size;
+        });
+        score.save(nscore);
+    };
+    loadScore();
 
     buttons = [];
     var createButtons = function() {
@@ -442,7 +448,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     };
 
     var correctAnswer = function(color) {
-        funf('correct', color);
+        funf.record('correct', color);
         // maintain weighted averages
         var now = Date.now();
         correctTime = CORRECT_SMOOTHING * correctTime +
@@ -454,7 +460,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         adjustSpeeds(correctTime, correctFraction);
     };
     var incorrectAnswer = function(how) {
-        funf('incorrect', how);
+        funf.record('incorrect', how);
         // XXX penalty -- lose some rewards?
 
         // maintain weighted averages
@@ -492,7 +498,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             playSoundClip(random.choice(WRONG_SOUNDS));
             incorrectAnswer('click.'+color);
             // lose an award (sigh)
-            loseAward();
+            loseAward(); saveScore();
             wrongLockoutID = window.setTimeout(function() {
                 wrongLockoutID = null;
             }, 500); // 0.5s time out after wrong answer
@@ -511,7 +517,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
     };
 
     var onPause = function() {
-        funf('status', 'pause');
+        funf.record('status', 'pause');
         stopMusic();
         if (refreshID !== null) {
             Compat.cancelAnimationFrame(refreshID);
@@ -521,17 +527,11 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             stopAccelerometer();
             accelID = null;
         }
-        if (window.Cordova && window.Cordova.exec) {
-            new WebIntent().sendBroadcast({
-                action: 'edu.mit.media.funf.ARCHIVE',
-                extras: {
-                    DATABASE_NAME: 'mainPipeline'
-                }
-            }, function(){}, function(){});
-        }
+        saveScore();
+        funf.archive();
     };
     var onResume = function() {
-        funf('status', 'resume');
+        funf.record('status', 'resume');
         playMusic(MUSIC_URL);
         if (refreshID === null) {
             refreshID = Compat.requestAnimationFrame(refresh);
@@ -583,7 +583,7 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
                     }
                     isBorn = true;
                     b.reset();
-                    funf('born', b.color);
+                    funf.record('born', b.color);
                 }
                 b.refresh();
             }

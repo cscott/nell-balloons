@@ -109,30 +109,30 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   display: none;
 }
 .grass #sprouts .award {
-  background-image: url('images/sprout1.png');
+  background-image: url('images/sprout1-lg.png');
   background-position: bottom right;
-  height: 138px;
-  -webkit-transform: translate3d(0,138px,0);
+  width: 238px; height: 885px;
+  /* adjust to effective width of 100px to match shields */
+  margin-left: -20px; margin-right: -118px;
+  -webkit-transform: translate3d(0,138px,0) scale(.143,.078);
   -webkit-transition-property: -webkit-transform;
   -webkit-transition-duration: 1.5s;
-  -webkit-transition-delay: 1.5s;
   -webkit-transition-timing-function: ease-in-out;
-  -webkit-transform-origin: bottom center;
+  -webkit-transform-origin: 70px bottom;
 
-  -moz-transform: translate(0,138px);
+  -moz-transform: translate(0,138px) scale(.143,.078);
   -moz-transition-property: -moz-transform;
   -moz-transition-duration: 1.5s;
-  -moz-transition-delay: 1.5s;
   -moz-transition-timing-function: ease-in-out;
-  -moz-transform-origin: bottom center;
+  -moz-transform-origin: 70px bottom;
 }
 .grass #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
   -moz-transform: translate(0,0);
 }
 .grass #sprouts {
-  height: 138px;
-  bottom: 122px;
+  height: 885px;
+  bottom: 104px;
 }
 .grass #hero {
   position: absolute;

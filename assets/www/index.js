@@ -56,13 +56,14 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
             return; /* not running on PhoneGap/Android */
         }
         var wi = new WebIntent();
+        var o = { name:name, value:value };
         wi.sendBroadcast({
             action: 'edu.mit.media.funf.RECORD',
             extras: {
                 DATABASE_NAME: 'mainPipeline',
                 TIMESTAMP: Date.now(),
-                NAME: 'nell-balloons.'+name,
-                VALUE: value
+                NAME: 'NellBalloons',
+                VALUE: JSON.stringify(o)
             }
         }, function(args) { /* success */ }, function(args) {
             console.error('Funf logging failed.');
@@ -463,6 +464,14 @@ define(['domReady!', './alea', './buzz', './compat', './hammer', './webintent.js
         if (accelID !== null) {
             stopAccelerometer();
             accelID = null;
+        }
+        if (window.Cordova && window.Cordova.exec) {
+            new WebIntent().sendBroadcast({
+                action: 'edu.mit.media.funf.ARCHIVE',
+                extras: {
+                    DATABASE_NAME: 'mainPipeline'
+                }
+            }, function(){}, function(){});
         }
     };
     var onResume = function() {

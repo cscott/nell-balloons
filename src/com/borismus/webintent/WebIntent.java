@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.Html;
 
-import org.apache.cordova.DroidGap;
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
 
@@ -64,7 +63,7 @@ public class WebIntent extends Plugin {
 				if (action.equals("startActivity")) {
 				    this.ctx.startActivity(i);
 				} else if (action.equals("sendBroadcast")) {
-				    ((DroidGap)this.ctx).sendBroadcast(i);
+				    ((Activity) this.ctx).sendBroadcast(i);
 				}
 				return new PluginResult(PluginResult.Status.OK);
 				
@@ -137,6 +136,8 @@ public class WebIntent extends Plugin {
 			} else if(key.equals(Intent.EXTRA_EMAIL)){
 				//allows to add the email address of the receiver
 				i.putExtra(Intent.EXTRA_EMAIL, new String[]{value});
+                        } else if (key.equals("TIMESTAMP")) {
+                                i.putExtra(key, (long) new Long(value));
 			} else {
 				i.putExtra(key, value);
 			}	

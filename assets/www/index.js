@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'], function(document, Alea, Buzz, Compat, Funf, nell, score) {
+define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound'], function(document, Alea, Compat, Funf, nell, score, Sound) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
@@ -159,7 +159,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             if (this.popTimeout < 0) {
                 this.popDone = true;
                 if (this.domElement.classList.contains('squirt')) {
-                    playSoundClip(random.choice(BURST_SOUNDS));
+                    random.choice(BURST_SOUNDS).play();
                 }
                 if (this.award) {
                     var elem = document.querySelector(
@@ -199,7 +199,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         // play balloon burst sound
         var sounds = isAward ? AWARD_SOUNDS : isSquirt ? SQUIRT_SOUNDS :
             BURST_SOUNDS;
-        playSoundClip(random.choice(sounds));
+        random.choice(sounds).play();
 
         if (isAward) {
             this.domElement.classList.add('popped');
@@ -359,72 +359,37 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
     }
 
     var music;
-    var playMusicPhoneGap = function(src) {
-        var nmusic; // local scoped var, for loop() definition.
-        if (music) {
-            stopMusicPhoneGap();
-            console.warn("Play started before app resumed?");
+    var playMusic = function(src) {
+        if (!music) {
+            music = new Sound.Track({ url: src, formats: ['ogg','mp3'] });
         }
-        var loop = function() {
-            if (music===null || music.id!==nmusic.id) { return; /* stopping */ }
-            nmusic.seekTo(0);
-            nmusic.play();
-        };
-        music = nmusic = new Media('/android_asset/www/'+src+'.ogg', loop,
-            function(errorCode) {
-                console.error("MUSIC ERROR: "+errorCode+" ["+nmusic.id+"]");
-            });
-        music.play();
+        music.loop();
     };
-    var stopMusicPhoneGap = function() {
-        var omusic = music;
-        music = null; // set music to null, before loop() has a chance to run.
-        omusic.stop();
-        omusic.release();
-    };
-    var playMusicHTML5 = function(src) {
+    var stopMusic = function() {
         if (music) {
-            stopMusicHTML5();
-            console.warn("Shouldn't happen.");
+            music.unloop();
         }
-        music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
-        music.loop().play();
     };
-    var stopMusicHTML5 = function() {
-        music.unloop(); // helps on firefox
-        music.stop();
-        music = null;
-    };
-    var playMusic = (typeof Media !== 'undefined') ? playMusicPhoneGap :
-        Buzz.isSupported() ? playMusicHTML5 : function() { /* ignore */ };
-    var stopMusic = (typeof Media !== 'undefined') ? stopMusicPhoneGap :
-        Buzz.isSupported() ? stopMusicHTML5 : function() { /* ignore */ };
 
-    var playSoundClipPhoneGap = function(url) {
-        var media = new Media('/android_asset/www/'+url+'.ogg',
-                              function() { media.release(); },
-                              function(error) { console.error(error.code+": "+error.message); });
-        media.play();
+    var loadSounds = function(sounds) {
+        return sounds.map(function(url) {
+            return new Sound.Effect({url: url, instances: 2,
+                                     formats: ['ogg','mp3'] });
+        });
     };
-    var playSoundClipHTML5 = function(url) {
-        var sound = new Buzz.sound(url, { formats: ['ogg','mp3'] });
-        sound.play();
-    };
-    var playSoundClip = (typeof Media !== 'undefined') ? playSoundClipPhoneGap :
-        Buzz.isSupported() ? playSoundClipHTML5 : function() { /* ignore */ };
 
-    var BURST_SOUNDS = ['sounds/burst1',
-                        'sounds/burst2',
-                        'sounds/burst3',
-                        'sounds/burst4',
-                        'sounds/burst5',
-                        'sounds/burst6',
-                        'sounds/burst7'];
-    var SQUIRT_SOUNDS = ['sounds/deflate1',
-                         'sounds/deflate2'];
-    var WRONG_SOUNDS = ['sounds/wrong1'];
-    var ESCAPE_SOUNDS = ['sounds/wrong2'];
-    var AWARD_SOUNDS = ['sounds/award'];
+    var BURST_SOUNDS = loadSounds(['sounds/burst1',
+                                   'sounds/burst2',
+                                   'sounds/burst3',
+                                   'sounds/burst4',
+                                   'sounds/burst5',
+                                   'sounds/burst6',
+                                   'sounds/burst7']);
+    var SQUIRT_SOUNDS = loadSounds(['sounds/deflate1',
+                                    'sounds/deflate2']);
+    var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
+    var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
+    var AWARD_SOUNDS = loadSounds(['sounds/award']);
 
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;
@@ -497,7 +462,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             // prevent too many wrong answers from being recorded close together
             if (wrongLockoutID !== null) { return; }
             // ok, process the wrong answer
-            playSoundClip(random.choice(WRONG_SOUNDS));
+            random.choice(WRONG_SOUNDS).play();
             incorrectAnswer('click.'+color, /* XXX use the escape time */
                             balloonsElement.offsetHeight/initialBalloonSpeedY);
             // lose an award (sigh)
@@ -592,7 +557,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             }
             // play sounds down here so we only start one per frame.
             if (isEscape) {
-                playSoundClip(random.choice(ESCAPE_SOUNDS));
+                random.choice(ESCAPE_SOUNDS).play();
             }
             if (isBorn) {
                 // XXX inflation sound here was very noisy =(

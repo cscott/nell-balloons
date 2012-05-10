@@ -55,11 +55,6 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         }
     };
 
-    // add top-level "anim" class unless we're on xoom/honeycomb
-    var isHoneycomb = window.device && (window.device.platform==='Android') &&
-        (window.device.version==='3.2.1') && (window.device.name==='tervigon');
-    if (!isHoneycomb) { document.body.classList.add('anim'); }
-
     var ColoredElement = function(element, color) {
         this.init(element, color);
     };
@@ -621,8 +616,14 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
         funf.record('startColor', nell.color);
+        // add top-level "anim" class unless we're on xoom/honeycomb
+        var isHoneycomb = window.device &&
+            (window.device.platform==='Android') &&
+            (window.device.version==='3.2.1') &&
+            (window.device.name==='tervigon');
+        if (!isHoneycomb) { document.body.classList.add('anim'); }
     }
-    if (window.Cordova && window.device) {
+    if (window.cordovaDetect) {
         document.addEventListener("deviceready", onDeviceReady, false);
     } else {
         console.log('not on phonegap');

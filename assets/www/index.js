@@ -110,7 +110,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
-        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
         this.reset(this.color); // set random bits.
         this.refresh();
     };
@@ -120,8 +119,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         if (color !== this.color) {
             ColoredElement.prototype.reset.call(this, color);
         }
+        // just in case element sizes change
+        this.height = balloonsElement.offsetHeight;
+        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
+        // now reset properties
         this.x = Math.floor(random() * this.maxx);
-        this.y = balloonsElement.offsetHeight;
+        this.y = this.height;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
@@ -131,8 +134,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         this.domElement.classList.remove('popped');
         this.domElement.classList.remove('squirt');
         this.award = null;
-        // just in case element sizes change
-        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
     };
     Balloon.prototype.refresh = function() {
         if (this.popped) { return; }
@@ -188,7 +189,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     };
     Balloon.prototype.isGone = function() {
         // returns true if balloon has floated past top of screen
-        return (this.y < -this.domElement.offsetHeight) || this.popDone;
+        return (this.y < -this.height) || this.popDone;
     };
     Balloon.prototype.pop = function() {
         this.popped = true;

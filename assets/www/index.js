@@ -415,7 +415,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     };
 
     var correctAnswer = function(color, balloonTime) {
-        funf.record('correct', color);
+        funf.record('correct', color+':'+balloonTime);
         // maintain weighted averages
         correctTime = CORRECT_SMOOTHING * correctTime +
             (1-CORRECT_SMOOTHING) * balloonTime;
@@ -425,7 +425,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         adjustSpeeds(correctTime, correctFraction);
     };
     var incorrectAnswer = function(how, balloonTime) {
-        funf.record('incorrect', how);
+        funf.record('incorrect', how+':'+balloonTime);
 
         // maintain weighted averages
         // since this answer is incorrect, use the time only if it
@@ -464,7 +464,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             // ok, process the wrong answer
             random.choice(WRONG_SOUNDS).play();
             incorrectAnswer('click.'+color, /* XXX use the escape time */
-                            balloonsElement.offsetHeight/initialBalloonSpeedY);
+                            Math.round(balloonsElement.offsetHeight /
+                                       initialBalloonSpeedY));
             // lose an award (sigh)
             loseAward(); saveScore();
             wrongLockoutID = window.setTimeout(function() {

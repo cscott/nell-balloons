@@ -401,9 +401,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     var adjustSpeeds = function(correctTime, correctFraction) {
         // try to adjust speed such that:
         // (a) correctFraction is about 80%
-        // (b) the balloon travels 80% up the screen in 'correctTime' ms.
+        // (b) the balloon travels 90% up the screen in 'correctTime' ms.
         var aspeed = Math.max(correctFraction/0.8, 0.8) * initialBalloonSpeedY;
-        var bspeed = (balloonsElement.offsetHeight * 0.8) / correctTime;
+        var bspeed = (balloonsElement.offsetHeight * 0.9) / correctTime;
         var avg = (aspeed + bspeed) / 2;
         // only allow it to speed up/slow down by factor of 1.2 each time
         var ADJ_FACTOR = 1.2;

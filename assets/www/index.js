@@ -577,7 +577,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
 
     refresh = (function() {
         var lastFrame = Date.now();
-        return function() {
+        return function innerRefresh() {
             var now = Date.now();
             var isBorn = false, isEscape = false;
             var i, b;

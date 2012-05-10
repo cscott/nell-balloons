@@ -38,13 +38,13 @@ define(['./lawnchair/lawnchair'], function(Lawnchair) {
         this.recent = nscore;
         this.recentTime = Date.now();
         this.lawnchair.save({key: 'recent', value: this.recent,
-                        timestamp: this.recentTime}, function(){});
+                        timestamp: this.recentTime});
         // is this a new high score?
         if ((!this.best) || compare(nscore, this.best) > 0) {
             this.best = this.recent;
             this.bestTime = this.recentTime;
             this.lawnchair.save({key: 'best', value: this.best,
-                            timestamp: this.bestTime}, function(){});
+                            timestamp: this.bestTime});
             if (this.funf) {
                 // XXX work around bug in db2csv script which flattens
                 // the array into 10 separate 'highscore' entries if

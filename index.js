@@ -1,11 +1,11 @@
-define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'], function(document, Alea, Buzz, Compat, Funf, nell, score) {
+define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound'], function(document, Alea, Compat, Funf, nell, score, Sound) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
-    var MIN_BALLOON_SPEED_Y = 50;
-    var MAX_BALLOON_SPEED_Y = 1000;
+    var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
+    var MAX_BALLOON_SPEED_Y = 1000 / 1000; /* pixels per ms */
     var X_SPEED_FRACTION = 0.25; // fraction of y speed
 
-    var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y;
+    var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y; /* pixels per ms */
 
     var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = true;
@@ -54,11 +54,6 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             }
         }
     };
-
-    // add top-level "anim" class unless we're on xoom/honeycomb
-    var isHoneycomb = window.device && (window.device.platform==='Android') &&
-        (window.device.version==='3.2.1') && (window.device.name==='tervigon');
-    if (!isHoneycomb) { document.body.classList.add('anim'); }
 
     var ColoredElement = function(element, color) {
         this.init(element, color);
@@ -115,7 +110,6 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
-        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
         this.reset(this.color); // set random bits.
         this.refresh();
     };
@@ -125,17 +119,21 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         if (color !== this.color) {
             ColoredElement.prototype.reset.call(this, color);
         }
+        // just in case element sizes change
+        this.height = balloonsElement.offsetHeight;
+        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
+        // now reset properties
         this.x = Math.floor(random() * this.maxx);
-        this.y = balloonsElement.offsetHeight;
+        this.y = this.height;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
+        this.born = false; this.bornTime = 0;
+        this.bornTimeout = 0; // born immediately by default
         this.popped = this.popDone = false;
         this.domElement.classList.remove('popped');
         this.domElement.classList.remove('squirt');
         this.award = null;
-        // just in case element sizes change
-        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
     };
     Balloon.prototype.refresh = function() {
         if (this.popped) { return; }
@@ -147,13 +145,22 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             this.domElement.style.transform = transform;
     };
     Balloon.prototype.update = function(dt /* milliseconds */) {
+        if (!this.born) {
+            // don't move until it's born
+            this.bornTimeout -= dt;
+            if (this.bornTimeout < 0) {
+                this.born = true;
+                this.bornTime = Date.now();
+            }
+            return;
+        }
         if (this.popped) {
             // don't move after it's popped.
             this.popTimeout -= dt;
             if (this.popTimeout < 0) {
                 this.popDone = true;
                 if (this.domElement.classList.contains('squirt')) {
-                    playSoundClip(random.choice(BURST_SOUNDS));
+                    random.choice(BURST_SOUNDS).play();
                 }
                 if (this.award) {
                     var elem = document.querySelector(
@@ -167,18 +174,11 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
                     var flex = document.querySelector('#foreground .award.flex');
                     flex.style.display = 'none';
                 }
-            } else if (isHoneycomb && this.popTimeout < 1000 &&
-                       this.domElement.classList.contains('squirt')) {
-                // work around a CSS animation bug in Android/Honeycomb
-                // (animation returns to start state after running)
-                this.domElement.style.WebkitTransform =
-                    'translate3d('+(-this.domElement.offsetWidth)+'px,'+
-                    (-this.domElement.offsetHeight)+'px,0)';
             }
             return;
         }
-        this.y -= dt * this.speedy / 1000;
-        this.x += dt * this.speedx / 1000;
+        this.y -= dt * this.speedy;
+        this.x += dt * this.speedx;
         if (this.x < 0) {
             this.x = 0; this.speedx = 0;
         }
@@ -189,7 +189,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
     };
     Balloon.prototype.isGone = function() {
         // returns true if balloon has floated past top of screen
-        return (this.y < -this.domElement.offsetHeight) || this.popDone;
+        return (this.y < -this.height) || this.popDone;
     };
     Balloon.prototype.pop = function() {
         this.popped = true;
@@ -200,7 +200,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         // play balloon burst sound
         var sounds = isAward ? AWARD_SOUNDS : isSquirt ? SQUIRT_SOUNDS :
             BURST_SOUNDS;
-        playSoundClip(random.choice(sounds));
+        random.choice(sounds).play();
 
         if (isAward) {
             this.domElement.classList.add('popped');
@@ -360,72 +360,37 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
     }
 
     var music;
-    var playMusicPhoneGap = function(src) {
-        var nmusic; // local scoped var, for loop() definition.
-        if (music) {
-            stopMusicPhoneGap();
-            console.warn("Play started before app resumed?");
+    var playMusic = function(src) {
+        if (!music) {
+            music = new Sound.Track({ url: src, formats: ['ogg','mp3'] });
         }
-        var loop = function() {
-            if (music===null || music.id!==nmusic.id) { return; /* stopping */ }
-            nmusic.seekTo(0);
-            nmusic.play();
-        };
-        music = nmusic = new Media('/android_asset/www/'+src+'.ogg', loop,
-            function(errorCode) {
-                console.error("MUSIC ERROR: "+errorCode+" ["+nmusic.id+"]");
-            });
-        music.play();
+        music.loop();
     };
-    var stopMusicPhoneGap = function() {
-        var omusic = music;
-        music = null; // set music to null, before loop() has a chance to run.
-        omusic.stop();
-        omusic.release();
-    };
-    var playMusicHTML5 = function(src) {
+    var stopMusic = function() {
         if (music) {
-            stopMusicHTML5();
-            console.warn("Shouldn't happen.");
+            music.unloop();
         }
-        music = new Buzz.sound(src, { formats: ['ogg','mp3'] });
-        music.loop().play();
     };
-    var stopMusicHTML5 = function() {
-        music.unloop(); // helps on firefox
-        music.stop();
-        music = null;
-    };
-    var playMusic = (typeof Media !== 'undefined') ? playMusicPhoneGap :
-        Buzz.isSupported() ? playMusicHTML5 : function() { /* ignore */ };
-    var stopMusic = (typeof Media !== 'undefined') ? stopMusicPhoneGap :
-        Buzz.isSupported() ? stopMusicHTML5 : function() { /* ignore */ };
 
-    var playSoundClipPhoneGap = function(url) {
-        var media = new Media('/android_asset/www/'+url+'.ogg',
-                              function() { media.release(); },
-                              function(error) { console.error(error.code+": "+error.message); });
-        media.play();
+    var loadSounds = function(sounds) {
+        return sounds.map(function(url) {
+            return new Sound.Effect({url: url, instances: 2,
+                                     formats: ['ogg','mp3'] });
+        });
     };
-    var playSoundClipHTML5 = function(url) {
-        var sound = new Buzz.sound(url, { formats: ['ogg','mp3'] });
-        sound.play();
-    };
-    var playSoundClip = (typeof Media !== 'undefined') ? playSoundClipPhoneGap :
-        Buzz.isSupported() ? playSoundClipHTML5 : function() { /* ignore */ };
 
-    var BURST_SOUNDS = ['sounds/burst1',
-                        'sounds/burst2',
-                        'sounds/burst3',
-                        'sounds/burst4',
-                        'sounds/burst5',
-                        'sounds/burst6',
-                        'sounds/burst7'];
-    var SQUIRT_SOUNDS = ['sounds/deflate1',
-                         'sounds/deflate2'];
-    var WRONG_SOUNDS = ['sounds/wrong1'];
-    var ESCAPE_SOUNDS = ['sounds/wrong2'];
-    var AWARD_SOUNDS = ['sounds/award'];
+    var BURST_SOUNDS = loadSounds(['sounds/burst1',
+                                   'sounds/burst2',
+                                   'sounds/burst3',
+                                   'sounds/burst4',
+                                   'sounds/burst5',
+                                   'sounds/burst6',
+                                   'sounds/burst7']);
+    var SQUIRT_SOUNDS = loadSounds(['sounds/deflate1',
+                                    'sounds/deflate2']);
+    var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
+    var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
+    var AWARD_SOUNDS = loadSounds(['sounds/award']);
 
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;
@@ -433,16 +398,13 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
     var correctFraction = 0;
     // milliseconds per correct answer (weighted average)
     var correctTime = 10000;
-    // time of last correct answer
-    var lastTime = Date.now();
 
     var adjustSpeeds = function(correctTime, correctFraction) {
         // try to adjust speed such that:
         // (a) correctFraction is about 80%
-        // (b) the balloon travels 80% up the screen in 'correctTime' ms.
+        // (b) the balloon travels 90% up the screen in 'correctTime' ms.
         var aspeed = Math.max(correctFraction/0.8, 0.8) * initialBalloonSpeedY;
-        var bspeed = (balloonsElement.offsetHeight * 0.8) /
-            ((correctTime / 1000) * NUM_BALLOONS);
+        var bspeed = (balloonsElement.offsetHeight * 0.9) / correctTime;
         var avg = (aspeed + bspeed) / 2;
         // only allow it to speed up/slow down by factor of 1.2 each time
         var ADJ_FACTOR = 1.2;
@@ -453,31 +415,31 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
     };
 
-    var correctAnswer = function(color) {
-        funf.record('correct', color);
+    var correctAnswer = function(color, balloonTime) {
+        funf.record('correct', color+':'+balloonTime);
         // maintain weighted averages
-        var now = Date.now();
         correctTime = CORRECT_SMOOTHING * correctTime +
-            (1-CORRECT_SMOOTHING) * (now - lastTime);
-        lastTime = now;
+            (1-CORRECT_SMOOTHING) * balloonTime;
         correctFraction = CORRECT_SMOOTHING * correctFraction +
             (1-CORRECT_SMOOTHING);
         // adjust speeds based on new fractions
         adjustSpeeds(correctTime, correctFraction);
     };
-    var incorrectAnswer = function(how) {
-        funf.record('incorrect', how);
-        // XXX penalty -- lose some rewards?
+    var incorrectAnswer = function(how, balloonTime) {
+        funf.record('incorrect', how+':'+balloonTime);
 
         // maintain weighted averages
-        var now = Date.now();
-        // correctTime will be at least this low, maybe lower.
-        var correctTimeCopy = CORRECT_SMOOTHING * correctTime +
-            (1 - CORRECT_SMOOTHING) * (lastTime - now);
+        // since this answer is incorrect, use the time only if it
+        // is greater than the current correctTime estimate.
+        var correctTimeCopy = correctTime;
+        if (balloonTime > correctTime) {
+            correctTimeCopy = CORRECT_SMOOTHING * correctTime +
+                (1 - CORRECT_SMOOTHING) * balloonTime;
+        }
         correctFraction = CORRECT_SMOOTHING * correctFraction;
 
         // adjust speeds based on new fractions
-        adjustSpeeds(Math.min(correctTime, correctTimeCopy), correctFraction);
+        adjustSpeeds(correctTimeCopy, correctFraction);
     };
 
     var wrongLockoutID = null;
@@ -487,7 +449,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         var i, b, best=null;
         for (i=0; i<balloons.length; i++) {
             b = balloons[i];
-            if (b.color === color && !b.isGone() && !b.popped) {
+            if (b.color === color && b.born && !(b.isGone() || b.popped)) {
                 if (best===null || b.y < best.y) {
                     best = b;
                 }
@@ -501,8 +463,10 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             // prevent too many wrong answers from being recorded close together
             if (wrongLockoutID !== null) { return; }
             // ok, process the wrong answer
-            playSoundClip(random.choice(WRONG_SOUNDS));
-            incorrectAnswer('click.'+color);
+            random.choice(WRONG_SOUNDS).play();
+            incorrectAnswer('click.'+color, /* XXX use the escape time */
+                            Math.round(balloonsElement.offsetHeight /
+                                       initialBalloonSpeedY));
             // lose an award (sigh)
             loseAward(); saveScore();
             wrongLockoutID = window.setTimeout(function() {
@@ -510,7 +474,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
-            correctAnswer(color);
+            correctAnswer(color, Date.now() - best.bornTime);
             // try to prevent a double tap being registered as a wrong answer.
             doubleTapColor = color;
             if (doubleTapLockoutID) {
@@ -575,7 +539,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
 
     refresh = (function() {
         var lastFrame = Date.now();
-        return function() {
+        return function innerRefresh() {
             var now = Date.now();
             var isBorn = false, isEscape = false;
             var i, b;
@@ -585,7 +549,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
                 if (b.isGone()) {
                     if (!b.popped) {
                         isEscape = true;
-                        incorrectAnswer('escape.'+b.color);
+                        incorrectAnswer('escape.'+b.color, now - b.bornTime);
                     }
                     isBorn = true;
                     b.reset();
@@ -595,7 +559,7 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
             }
             // play sounds down here so we only start one per frame.
             if (isEscape) {
-                playSoundClip(random.choice(ESCAPE_SOUNDS));
+                random.choice(ESCAPE_SOUNDS).play();
             }
             if (isBorn) {
                 // XXX inflation sound here was very noisy =(
@@ -619,8 +583,14 @@ define(['domReady!', './alea', './buzz', './compat', './funf', 'nell!', 'score!'
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
         funf.record('startColor', nell.color);
+        // add top-level "anim" class unless we're on xoom/honeycomb
+        var isHoneycomb = window.device &&
+            (window.device.platform==='Android') &&
+            (window.device.version==='3.2.1') &&
+            (window.device.name==='tervigon');
+        if (!isHoneycomb) { document.body.classList.add('anim'); }
     }
-    if (window.Cordova && window.device) {
+    if (window.cordovaDetect) {
         document.addEventListener("deviceready", onDeviceReady, false);
     } else {
         console.log('not on phonegap');

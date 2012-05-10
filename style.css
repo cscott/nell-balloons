@@ -144,6 +144,11 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
 #clouds, #foreground, #sprouts, #hero, #balloons {
   pointer-events: none;
 }
+/* don't highlight nell when she is tapped */
+#nell {
+ -webkit-tap-highlight-color: rgba(0,0,0,0);
+ tap-highlight-color: rgba(0,0,0,0);
+}
 .grass #nell {
   position: absolute;
   width: 321px; height: 466px;
@@ -156,43 +161,31 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   background-repeat: no-repeat;
 }
 .grass #nell .hair { background-image: url('images/nell-hair.png'); }
-/*
-.grass #nell .body { background-image: url('images/nell-body0.png'); }
-.grass #nell .head { background-image: url('images/nell-head0.png'); }
-*/
+.grass #nell .body { background-image: url('images/nell-body.png'); }
+.grass #nell .head { background-image: url('images/nell-head.png'); }
 
-.grass #nell.n0 .body { background-image: url('images/nell-body0.png'); }
-.grass #nell.n0 .head { background-image: url('images/nell-head0.png'); }
-
-.grass #nell.n1 .body { background-image: url('images/nell-body1.png'); }
-.grass #nell.n1 .head { background-image: url('images/nell-head1.png'); }
-
-.grass #nell.n2 .body { background-image: url('images/nell-body2.png'); }
-.grass #nell.n2 .head { background-image: url('images/nell-head2.png'); }
-
-.grass #nell.n3 .body { background-image: url('images/nell-body3.png'); }
-.grass #nell.n3 .head { background-image: url('images/nell-head3.png'); }
-
-.grass #nell.n4 .body { background-image: url('images/nell-body4.png'); }
-.grass #nell.n4 .head { background-image: url('images/nell-head4.png'); }
-
-.grass #nell.n5 .body { background-image: url('images/nell-body5.png'); }
-.grass #nell.n5 .head { background-image: url('images/nell-head5.png'); }
-
-.grass #nell.n6 .body { background-image: url('images/nell-body6.png'); }
-.grass #nell.n6 .head { background-image: url('images/nell-head6.png'); }
-
-.grass #nell.n7 .body { background-image: url('images/nell-body7.png'); }
-.grass #nell.n7 .head { background-image: url('images/nell-head7.png'); }
-
-.grass #nell.n8 .body { background-image: url('images/nell-body8.png'); }
-.grass #nell.n8 .head { background-image: url('images/nell-head8.png'); }
-
-.grass #nell.n9 .body { background-image: url('images/nell-body9.png'); }
-.grass #nell.n9 .head { background-image: url('images/nell-head9.png'); }
-
-.grass #nell.n10 .body { background-image: url('images/nell-body10.png'); }
-.grass #nell.n10 .head { background-image: url('images/nell-head10.png'); }
+.grass #nell.n0 .body,
+.grass #nell.n0 .head { background-position: 0px 0px; }
+.grass #nell.n1 .body,
+.grass #nell.n1 .head { background-position: -321px 0px; }
+.grass #nell.n2 .body,
+.grass #nell.n2 .head { background-position: -642px 0px; }
+.grass #nell.n3 .body,
+.grass #nell.n3 .head { background-position: -963px 0px; }
+.grass #nell.n4 .body,
+.grass #nell.n4 .head { background-position: -1284px 0px; }
+.grass #nell.n5 .body,
+.grass #nell.n5 .head { background-position: -1605px 0px; }
+.grass #nell.n6 .body,
+.grass #nell.n6 .head { background-position: -1926px 0px; }
+.grass #nell.n7 .body,
+.grass #nell.n7 .head { background-position: -2247px 0px; }
+.grass #nell.n8 .body,
+.grass #nell.n8 .head { background-position: -2568px 0px; }
+.grass #nell.n9 .body,
+.grass #nell.n9 .head { background-position: -2889px 0px; }
+.grass #nell.n10 .body,
+.grass #nell.n10 .head { background-position: -3210px 0px; }
 
 .grass #clouds {
   position: absolute;
@@ -232,28 +225,28 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    0% {
     -webkit-transform: translate3d(0,0,0) rotate(0deg);
    }
-   5% {
+   1% {
     -webkit-transform: translate3d(71px,-71px,0) rotate(40deg);
    }
-   10% {
+   2% {
     -webkit-transform: translate3d(190px,-120px,0) rotate(90deg);
    }
-   15% {
+   3% {
     -webkit-transform: translate3d(350px,10px,0) rotate(160deg);
    }
-   20% {
+   4% {
     -webkit-transform: translate3d(370px,250px,0) rotate(180deg);
    }
-   25% {
+   5% {
     -webkit-transform: translate3d(300px,500px,0) rotate(230deg);
    }
-   30% {
+   6% {
     -webkit-transform: translate3d(100px,700px,0) rotate(250deg);
    }
-   35% {
+   7% {
     -webkit-transform: translate3d(-400px,750px,0) rotate(275deg);
    }
-   40% {
+   8% {
     -webkit-transform: translate3d(-1000px,650px,0) rotate(290deg);
    }
    /* work around a Android/Honeycomb bug applying the animation-fill
@@ -267,28 +260,28 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    0% {
     -moz-transform: translate(0,0) rotate(0deg);
    }
-   5% {
+   1% {
     -moz-transform: translate(71px,-71px) rotate(40deg);
    }
-   10% {
+   2% {
     -moz-transform: translate(190px,-120px) rotate(90deg);
    }
-   15% {
+   3% {
     -moz-transform: translate(350px,10px) rotate(160deg);
    }
-   20% {
+   4% {
     -moz-transform: translate(370px,250px) rotate(180deg);
    }
-   25% {
+   5% {
     -moz-transform: translate(300px,500px) rotate(230deg);
    }
-   30% {
+   6% {
     -moz-transform: translate(100px,700px) rotate(250deg);
    }
-   35% {
+   7% {
     -moz-transform: translate(-400px,750px) rotate(275deg);
    }
-   40% {
+   8% {
     -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
    100% {
@@ -296,8 +289,8 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
    }
 }
 #balloons > .squirt > div {
-  -webkit-animation: balloon-squirt 3125ms linear forwards;
-  -moz-animation: balloon-squirt 3125ms linear forwards;
+  -webkit-animation: balloon-squirt 15625ms linear forwards;
+  -moz-animation: balloon-squirt 15625ms linear forwards;
   -webkit-transform-origin: 74px 83px;
   -moz-transform-origin: 74px 83px;
 }

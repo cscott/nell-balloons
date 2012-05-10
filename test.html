@@ -4,6 +4,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>CSS Keyframe Animation test</title>
 <link rel="stylesheet" href="style.css" />
+<script type="text/javascript" src="require.js"></script>
+<script type="text/javascript">
+require(['./lawnchair/lawnchair'], function(Lawnchair) {
+Lawnchair({name:'test4'}, function() {
+  var lawnchair = this;
+console.log('hmm');
+  lawnchair.save({key:'foo', value:'bar'}, function() {
+    console.log('whoo');
+  });
+});
+});
+</script>
 <style type="text/css">
 .grass #sprouts .award {
   /* was: 90px, w/ 5px left/right margins */

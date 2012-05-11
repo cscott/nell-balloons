@@ -26,6 +26,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
                   ['a6', 1/64+1/18],
                   ['a7', 1/128+1/21],
                   ['a8', 1/256+1/24]];
+    // XXX remove all but first two rewards for first week deployment
+    AWARDS.forEach(function(a) { a[1] = 0; });
+    AWARDS[0][1] = 0.9;
+    AWARDS[0][2] = 0.1;
+    // XXX end award hack
 
     var pickAward = function() {
         var i;
@@ -120,11 +125,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             ColoredElement.prototype.reset.call(this, color);
         }
         // just in case element sizes change
-        this.height = balloonsElement.offsetHeight;
+        this.height = this.domElement.offsetHeight;
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
         // now reset properties
         this.x = Math.floor(random() * this.maxx);
-        this.y = this.height;
+        this.y = balloonsElement.offsetHeight;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;

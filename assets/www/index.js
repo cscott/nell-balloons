@@ -120,11 +120,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             ColoredElement.prototype.reset.call(this, color);
         }
         // just in case element sizes change
-        this.height = balloonsElement.offsetHeight;
+        this.height = this.domElement.offsetHeight;
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
         // now reset properties
         this.x = Math.floor(random() * this.maxx);
-        this.y = this.height;
+        this.y = balloonsElement.offsetHeight;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;

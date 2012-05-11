@@ -26,6 +26,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
                   ['a6', 1/64+1/18],
                   ['a7', 1/128+1/21],
                   ['a8', 1/256+1/24]];
+    // XXX remove all but first two rewards for first week deployment
+    AWARDS.forEach(function(a) { a[1] = 0; });
+    AWARDS[0][1] = 0.9;
+    AWARDS[0][2] = 0.1;
+    // XXX end award hack
 
     var pickAward = function() {
         var i;

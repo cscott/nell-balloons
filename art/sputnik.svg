@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="602.05652"
+   height="441.63834"
+   id="svg3614"
+   version="1.1"
+   inkscape:version="0.47 "
+   sodipodi:docname="sputnik.svg">
+  <title
+     id="title2828">Sputnik</title>
+  <defs
+     id="defs3616">
+    <linearGradient
+       id="linearGradient4212">
+      <stop
+         style="stop-color:#a40000;stop-opacity:1;"
+         offset="0"
+         id="stop4214" />
+      <stop
+         style="stop-color:#ec0000;stop-opacity:1;"
+         offset="1"
+         id="stop4216" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect4168"
+       is_visible="true"
+       pattern="M 0,5 10,10 10,0 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect4162"
+       is_visible="true"
+       pattern="M 0,5 10,10 10,0 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect4158"
+       is_visible="true"
+       pattern="M 0,5 10,10 10,0 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect4154"
+       is_visible="true"
+       pattern="m 251.42857,112.14286 10,5 0,-10 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective3622" />
+    <inkscape:perspective
+       id="perspective3632"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4188"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4212"
+       id="linearGradient4218"
+       x1="342.85715"
+       y1="549.50507"
+       x2="554.28571"
+       y2="549.50507"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.7480366"
+     inkscape:cx="170.31018"
+     inkscape:cy="220.81916"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="975"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1"
+     showborder="false" />
+  <metadata
+     id="metadata3619">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Sputnik</dc:title>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="sattelite body"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline"
+     transform="translate(-64.99428,-287.33099)">
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:url(#linearGradient4218);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3638"
+       sodipodi:cx="448.57144"
+       sodipodi:cy="549.50507"
+       sodipodi:rx="105.71429"
+       sodipodi:ry="105.71429"
+       d="m 554.28573,549.50507 c 0,58.38438 -47.3299,105.71428 -105.71429,105.71428 -58.38439,0 -105.71429,-47.3299 -105.71429,-105.71428 0,-58.38439 47.3299,-105.71429 105.71429,-105.71429 58.38439,0 105.71429,47.3299 105.71429,105.71429 z"
+       transform="matrix(0.66477657,0,0,0.66477657,87.508596,-7.6907191)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="sattelite arms"
+     transform="translate(-64.99428,-287.33099)">
+    <path
+       style="fill:#a40000;stroke:#a40000;stroke-width:0.56544214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 360.11468,294.00301 c 0,-0.50486 -1.91847,-3.2311 -1.91847,-3.2311 l -14.56443,1.25349 c -9.95439,9.64718 -19.90877,20.40441 -29.86316,30.95652 l -0.5885,3.90832 C 229.29195,426.40114 176.87184,482.15703 65.277001,628.52262 l 1.817489,1.21163 c 78.68043,-105.52603 253.24876,-301.06339 253.24876,-301.06339 0.24953,0.33729 1.23221,0.72236 1.8823,0.16552 0,0 25.84601,-26.98505 25.84601,-26.98505 l 12.04312,-7.84832 z"
+       id="path4150"
+       sodipodi:nodetypes="ccccccccccc" />
+    <path
+       style="fill:#a40000;stroke:#a40000;stroke-width:0.56544214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 322.4522,386.99804 c 0,0 -80.9794,244.2508 -104.40485,324.62439 l 2.82721,0.80773 C 230.56785,670.82979 323.8658,403.9613 323.8658,403.9613 l 1.51458,0.40389 3.83693,-12.72244 c -1.68082,-1.1226 -3.54205,-3.90157 -3.63499,-5.45248 l -3.13012,0.80777 z"
+       id="path4174"
+       sodipodi:nodetypes="cccccccc" />
+    <path
+       style="fill:#a40000;stroke:#a40000;stroke-width:0.56544214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 428.37068,306.6611 3.42709,10.28129 1.71355,0.57118 3.4271,10.85248 -1.71355,0 3.42709,16.5643 c 0,0 183.47711,297.17611 225.90283,378.123 l 2.21331,-1.42797 C 643.92079,676.93035 444.93497,344.35916 444.93497,344.35916 l 0.2856,-5.71182 -8.28215,-26.56 -8.56774,-5.42624 z"
+       id="path4176"
+       sodipodi:nodetypes="cccccccccccc" />
+    <path
+       style="fill:#a40000;stroke:#a40000;stroke-width:0.56544214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 431.40078,403.15353 c 0,0 85.22021,216.28164 116.52147,313.01262 l 5.45247,12.52047 2.22138,0 -0.60583,-2.01942 C 550.9514,716.06516 438.4688,395.47967 438.4688,395.47967 c -0.89625,2.14089 -2.44044,4.46689 -7.06802,7.67386 z"
+       id="path4178"
+       sodipodi:nodetypes="ccccccc" />
+  </g>
+</svg>

@@ -575,11 +575,16 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         };
     })();
 
+    var handleNellTouch = function(ev) {
+        console.log('nell touched!');
+        ev.preventDefault();
+        nell.switchColor();
+    };
     ['mousedown','touchstart'].forEach(function(evname) {
-        document.getElementById('nell').addEventListener(evname, function(ev) {
-            ev.preventDefault();
-            nell.switchColor();
-        }, false);
+        var nellElems = document.querySelectorAll('#nell > div'), i;
+        for (i=0; i<nellElems.length; i++) {
+            nellElems[i].addEventListener(evname, handleNellTouch, false);
+        }
     });
 
     function onDeviceReady() {

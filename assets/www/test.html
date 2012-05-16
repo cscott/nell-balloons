@@ -6,62 +6,73 @@
 <link rel="stylesheet" href="style.css" />
 <script type="text/javascript" src="require.js"></script>
 <script type="text/javascript">
-require(['./lawnchair/lawnchair'], function(Lawnchair) {
-Lawnchair({name:'test4'}, function() {
-  var lawnchair = this;
-console.log('hmm');
-  lawnchair.save({key:'foo', value:'bar'}, function() {
-    console.log('whoo');
-  });
-});
+require([], function() {
 });
 </script>
 <style type="text/css">
-.grass #sprouts .award {
-  /* was: 90px, w/ 5px left/right margins */
-  /* width: 238px; margin-left:-20px; margin-right:-118px; */
+#level {
+  -webkit-transform: translate3d(0,0%,0);/* xxx for testing */
 }
-@-webkit-keyframes clouds-drift {
-  0% {
-    background-position: 0px 0px;
-  }
-  100% {
-    background-position: 1240px 0px;
-  }
+.test #level {
+  height: 4520px;
+  -webkit-transform-origin: bottom left;
+  -webkit-transform: scale3d(0.13,0.13,1);
 }
-.grass #clouds {
-  -webkit-animation: clouds-drift 180s infinite normal none linear;
+.trop #level {
+  -webkit-transform: translate3d(0,25%,0);/* xxx for testing */
 }
-/*
-// smallest: 34x 69 (.143,.078)
-// small:    51x104 (.215,.118)
-// original: 68x138 (.287,.156) \ 5 steps ~= 25px
-// 3x:      203x415 (.857,.469) \ 16 steps ~= 25px each
-// large:   237x885 (1.00,1.00)
-*/
+.strat #level {
+  -webkit-transform: translate3d(0,50%,0);/* xxx for testing */
+}
+.meso #level {
+  -webkit-transform: translate3d(0,75%,0);/* xxx for testing */
+}
 </style>
 </head>
 
-<body>
-<div id="game" class="grass">
- <div id="background"></div>
- <div id="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div>
+<body class="anim">
+<div id="game"><div id="level" class="grass">
+ <div id="background"><div class="stars"></div></div>
+ <div id="nell" class="n9">
+  <div class="ground">
+   <div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div>
+  </div>
+  <div class="troposphere">
+   <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div></div>
+   <div class="hotair"></div>
+  </div>
+  <div class="stratosphere">
+   <div class="jet1"></div>
+   <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="head"></div></div></div>
+   <div class="jet2"></div>
+  </div>
+  <div class="mesosphere">
+   <div class="astronaut1"></div>
+   <div class="nellscaler"><div class="nell"><div class="head"></div></div></div>
+   <div class="astronaut2"></div>
+  </div>
+ </div>
  <div id="balloons"><div id="b0" class="orange"></div></div>
- <div id="hero"></div>
  <div id="sprouts">
     <div class="award a1 show"></div><div class="award a2"></div><div
          class="award a3"></div><div class="award a4"></div><div
          class="award a5"></div><div class="award a6"></div><div
          class="award a7"></div><div class="award a8"></div>
  </div>
+ <div id="hero"></div>
  <div id="foreground">
     <div class="award a1 show"></div><div class="award a2 show"></div><div
          class="award a3"></div><div class="award a4"></div><div
          class="award a5"></div><div class="award a6"></div><div
          class="award a7"></div><div class="award a8"></div>
  </div>
- <div id="clouds"></div>
-</div>
+ <div id="clouds">
+  <div class="troposphere"></div>
+  <div class="stratosphere"></div>
+  <div class="mesosphere"></div>
+  <div class="stars"></div>
+ </div>
+</div></div>
 <div id="buttons">
 <a class="yellow"></a><a class="lilac"></a><a class="black"></a><a class="orange"></a>
 </div>

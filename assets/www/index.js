@@ -52,7 +52,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             if (sprout.size >= 0) {
                 sprout.shrink();
                 if (sprout.size < 0) {
-                    var elem = document.querySelector('#foreground .award.'+AWARDS[i][0]);
+                    var elem = document.querySelector('#awards .award.'+AWARDS[i][0]);
                     elem.classList.remove('show');
                 }
                 return;
@@ -169,14 +169,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
                 }
                 if (this.award) {
                     var elem = document.querySelector(
-                        '#foreground .award.'+this.award);
+                        '#awards .award.'+this.award);
                     var sprout = SPROUTS[this.award];
                     if (sprout.size >= 0) {
                         // deal w/ race -- maybe we lost this one already!
                         elem.classList.add('show');
                     }
                     elem.style.WebkitTransform='';
-                    var flex = document.querySelector('#foreground .award.flex');
+                    var flex = document.querySelector('#awards .award.flex');
                     flex.style.display = 'none';
                 }
             }
@@ -212,12 +212,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             this.popTimeout = 250;
             // move an award up here.
             this.award = pickAward();
-            var elem= document.querySelector('#foreground .award.'+this.award);
+            var elem= document.querySelector('#awards .award.'+this.award);
             var sprout = SPROUTS[this.award];
             // do we already have this award?
             if (sprout.size >= 0) {
                 // force the flex badge to fill in.
-                var flex = document.querySelector('#foreground .award.flex');
+                var flex = document.querySelector('#awards .award.flex');
                 flex.style.top = elem.offsetTop+'px';
                 flex.style.left = elem.offsetLeft+'px';
                 flex.style.display = 'block';
@@ -304,7 +304,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             var sprout = SPROUTS[a[0]];
             sprout.setSize(score.recent[i]);
             if (sprout.size >= 0) {
-                var elem = document.querySelector('#foreground .award.'+a[0]);
+                var elem = document.querySelector('#awards .award.'+a[0]);
                 elem.classList.add('show');
             }
         });

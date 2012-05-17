@@ -14,7 +14,7 @@ require([], function() {
   -webkit-transform: translate3d(0,0%,0);/* xxx for testing */
 }
 .test #level {
-  height: 4520px;
+  height: 4520px; width: 800px;
   -webkit-transform-origin: bottom left;
   -webkit-transform: scale3d(0.13,0.13,1);
 }
@@ -32,7 +32,21 @@ require([], function() {
 
 <body class="anim">
 <div id="game"><div id="level" class="grass">
- <div id="background"><div class="stars"></div></div>
+ <div id="background">
+  <div class="troposphere">
+   <div class="cloud c2"></div>
+  </div>
+  <div class="stratosphere">
+   <div class="cloud c1"></div>
+   <div class="cloud c2"></div>
+   <div class="cloud c3"></div>
+  </div>
+  <div class="mesosphere">
+   <div class="stars"></div>
+   <div class="satellite1"></div>
+   <div class="satellite2"></div>
+  </div>
+ </div>
  <div id="nell" class="n9">
   <div class="ground">
    <div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div>

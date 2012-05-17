@@ -38,20 +38,58 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
 
 
 /* Graphics */
-.grass #background,
-.grass #background > .stars {
+#background,
+#background > div {
   position: absolute;
   left: 0; right: 0;
 }
-.grass #background {
+#background {
   top: 0; bottom: 0;
+}
+#background > div {
+  height: 25%;
+}
+#background > .ground       { bottom: 0; }
+#background > .troposphere  { bottom: 25%; }
+#background > .stratosphere { bottom: 50%; }
+#background > .mesosphere   { bottom: 75%; }
+.grass #background {
   background-color: #000;
   background-image: url('images/grass-back.png');
   background-repeat: repeat-x;
   background-position: bottom;
 }
-.grass #background > .stars {
-  top: 0; height: 25%;
+.grass #background .satellite1,
+.grass #background .satellite2,
+.grass #background .cloud {
+  position: absolute;
+  width: 200%; min-width: 1600px;
+  left: 0;
+  background-repeat: repeat-x;
+}
+
+.grass #background .satellite1 {
+  height: 362px;
+  background-image: url('images/satellite1.png');
+  bottom: 25%;
+}
+.grass #background .satellite2 {
+  height: 117px;
+  background-image: url('images/satellite2.png');
+  top: 25%;
+}
+
+.grass #background .cloud {
+  height: 162px;
+  background-image: url('images/cloud-small.png');
+}
+.grass #background .c1 { background-position: 166px 0; bottom: 75%; }
+.grass #background .c2 { background-position: -100px 0; bottom: 50%; }
+.grass #background .c3 { background-position: 433px 0; bottom: 25%; }
+
+.grass #background .stars {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
   background: url('images/star-tile.png') repeat;
 }
 .grass #foreground, .grass #sprouts {
@@ -157,29 +195,29 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
  -webkit-tap-highlight-color: rgba(0,0,0,0);
  tap-highlight-color: rgba(0,0,0,0);
 }
-.grass #nell {
+#nell {
   position: absolute;
   left: 0; right: 0;
   bottom: 0; height: 25%;
 }
-.grass #nell > div {
+#nell > div {
   position: absolute; right: 0;
 }
-.grass #nell > .ground { bottom: 0; }
-.grass #nell > .troposphere { bottom: 100%; }
-.grass #nell > .stratosphere { bottom: 200%; }
-.grass #nell > .mesosphere { bottom: 300%; }
+#nell > .ground { bottom: 0; }
+#nell > .troposphere { bottom: 100%; }
+#nell > .stratosphere { bottom: 200%; }
+#nell > .mesosphere { bottom: 300%; }
 
-.grass #nell > .ground {
+#nell > .ground {
   width: 197px; height: 466px;
 }
-.grass #nell > .ground > .nell {
+#nell > .ground > .nell {
   position: absolute; right: -124px; bottom: 15px;
 }
-.grass #nell > .troposphere {
+#nell > .troposphere {
   width: 260px; height: 865px;
 }
-.grass #nell > .troposphere > .nellscaler {
+#nell > .troposphere > .nellscaler {
   position: absolute; right: -67px; bottom: 55px;
   clip: rect(auto,auto,220px,auto);
   -webkit-transform-origin: bottom right;
@@ -187,21 +225,21 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   -moz-transform-origin: bottom right;
   -moz-transform: scale3d(0.62,0.62,1);
 }
-.grass #nell > .troposphere .nell {
+#nell > .troposphere .nell {
   position: absolute; right: 0; bottom: 0;
 }
-.grass #nell > .troposphere > .hotair {
+#nell > .troposphere > .hotair {
   position: absolute;
   width: 510px; height: 825px;
   bottom: 39px; right: -250px;
   background: url('images/hotair.png') no-repeat;
 }
-.grass #nell > .stratosphere {
+#nell > .stratosphere {
   width: 561px; height: 305px;
   -webkit-transform: rotate(8deg) translate3d(-10px,0,0);
   -moz-transform: rotate(8deg) translate(-10px,0);
 }
-.grass #nell > .stratosphere > .nellscaler {
+#nell > .stratosphere > .nellscaler {
   position: absolute; bottom: 117px; right: 138px;
   clip: rect(52px,auto,220px,auto);
   -webkit-transform-origin: bottom left;
@@ -209,80 +247,80 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   -moz-transform-origin: bottom left;
   -moz-transform: scale3d(0.3,0.3,1);
 }
-.grass #nell > .stratosphere .jet1,
-.grass #nell > .stratosphere .jet2 {
+#nell > .stratosphere .jet1,
+#nell > .stratosphere .jet2 {
   position: absolute; bottom: 0; right: 0;
   width: 561px; height: 305px;
   background-repeat: no-repeat;
 }
-.grass #nell .jet1 {
+#nell .jet1 {
   background-image: url('images/jet1.png');
 }
-.grass #nell .jet2 {
+#nell .jet2 {
   background-image: url('images/jet2.png');
 }
-.grass #nell > .mesosphere {
+#nell > .mesosphere {
   width: 255px; height: 473px;
   -webkit-transform: translate3d(0,-153px,0);
   -moz-transform: translate(0,-153px);
 
 }
-.grass #nell > .mesosphere > .nellscaler {
+#nell > .mesosphere > .nellscaler {
   position: absolute; top: 36px; left: -99px;
   -webkit-transform-origin: top center;
   -webkit-transform: rotate(-39.5deg);
   -moz-transform-origin: top center;
   -moz-transform: rotate(-39.5deg);
 }
-.grass #nell > .mesosphere .astronaut1,
-.grass #nell > .mesosphere .astronaut2 {
+#nell > .mesosphere .astronaut1,
+#nell > .mesosphere .astronaut2 {
   position: absolute; bottom: 0; left: 0;
   width: 393px; height: 473px;
   background-repeat: no-repeat;
 }
-.grass #nell .astronaut1 {
+#nell .astronaut1 {
   background-image: url('images/astronaut1.png');
 }
-.grass #nell .astronaut2 {
+#nell .astronaut2 {
   background-image: url('images/astronaut2.png');
 }
 /* layout for nell parts */
-.grass #nell .nell,
-.grass #nell .nellscaler {
+#nell .nell,
+#nell .nellscaler {
   width: 321px; height: 466px;
 }
-.grass #nell .nell > div {
+#nell .nell > div {
   position: absolute;
   left: 0; right: 0;
   top: 0; bottom: 0;
   background-repeat: no-repeat;
 }
-.grass #nell .hair { background-image: url('images/nell-hair.png'); }
-.grass #nell .body { background-image: url('images/nell-body.png'); }
-.grass #nell .head { background-image: url('images/nell-head.png'); }
+#nell .hair { background-image: url('images/nell-hair.png'); }
+#nell .body { background-image: url('images/nell-body.png'); }
+#nell .head { background-image: url('images/nell-head.png'); }
 
-.grass #nell.n0 .body,
-.grass #nell.n0 .head { background-position: 0px 0px; }
-.grass #nell.n1 .body,
-.grass #nell.n1 .head { background-position: -321px 0px; }
-.grass #nell.n2 .body,
-.grass #nell.n2 .head { background-position: -642px 0px; }
-.grass #nell.n3 .body,
-.grass #nell.n3 .head { background-position: -963px 0px; }
-.grass #nell.n4 .body,
-.grass #nell.n4 .head { background-position: -1284px 0px; }
-.grass #nell.n5 .body,
-.grass #nell.n5 .head { background-position: -1605px 0px; }
-.grass #nell.n6 .body,
-.grass #nell.n6 .head { background-position: -1926px 0px; }
-.grass #nell.n7 .body,
-.grass #nell.n7 .head { background-position: -2247px 0px; }
-.grass #nell.n8 .body,
-.grass #nell.n8 .head { background-position: -2568px 0px; }
-.grass #nell.n9 .body,
-.grass #nell.n9 .head { background-position: -2889px 0px; }
-.grass #nell.n10 .body,
-.grass #nell.n10 .head { background-position: -3210px 0px; }
+#nell.n0 .body,
+#nell.n0 .head { background-position: 0px 0px; }
+#nell.n1 .body,
+#nell.n1 .head { background-position: -321px 0px; }
+#nell.n2 .body,
+#nell.n2 .head { background-position: -642px 0px; }
+#nell.n3 .body,
+#nell.n3 .head { background-position: -963px 0px; }
+#nell.n4 .body,
+#nell.n4 .head { background-position: -1284px 0px; }
+#nell.n5 .body,
+#nell.n5 .head { background-position: -1605px 0px; }
+#nell.n6 .body,
+#nell.n6 .head { background-position: -1926px 0px; }
+#nell.n7 .body,
+#nell.n7 .head { background-position: -2247px 0px; }
+#nell.n8 .body,
+#nell.n8 .head { background-position: -2568px 0px; }
+#nell.n9 .body,
+#nell.n9 .head { background-position: -2889px 0px; }
+#nell.n10 .body,
+#nell.n10 .head { background-position: -3210px 0px; }
 
 .grass #clouds {
   position: absolute;
@@ -464,15 +502,15 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
         -moz-transform: translate(0px,0px);
     }
 }
-.anim .grass #nell .ground .nell,
-.anim .grass #nell .troposphere .nell {
+.anim #nell .ground .nell,
+.anim #nell .troposphere .nell {
     -webkit-animation: nell-breathe-body 3000ms infinite both ease-in-out;
     -moz-animation: nell-breathe-body 3000ms infinite both ease-in-out;
 }
-.anim .grass #nell .ground .head,
-.anim .grass #nell .ground .hair,
-.anim .grass #nell .troposphere .head,
-.anim .grass #nell .troposphere .hair {
+.anim #nell .ground .head,
+.anim #nell .ground .hair,
+.anim #nell .troposphere .head,
+.anim #nell .troposphere .hair {
     -webkit-animation: nell-breathe-head 3000ms infinite both ease-in-out;
     -moz-animation: nell-breathe-head 3000ms infinite both ease-in-out;
     -webkit-transform-origin: 140px 148px;
@@ -502,7 +540,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
       -moz-transform: rotate(-1deg);
     }
 }
-.anim .grass #nell .troposphere {
+.anim #nell .troposphere {
     -webkit-animation: hotair-bob 15s infinite both ease-in-out;
     -moz-animation: hotair-bob 15s infinite both ease-in-out;
 }
@@ -529,7 +567,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
       -moz-transform: rotate(8deg) translate(-10px,0);
     }
 }
-.anim .grass #nell .stratosphere {
+.anim #nell .stratosphere {
     -webkit-animation: jet-bob 20s infinite both ease-in-out;
     -moz-animation: jet-bob 20s infinite both ease-in-out;
 }
@@ -556,7 +594,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
       -moz-transform: translate(0,-153px);
     }
 }
-.anim .grass #nell .mesosphere {
+.anim #nell .mesosphere {
     -webkit-animation: astronaut-bob 20s infinite both ease-in-out;
     -moz-animation: astronaut-bob 20s infinite both ease-in-out;
 }
@@ -590,7 +628,7 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
     -moz-transform-origin: center right;
 }
 
-/* ----------- cloud animation ----------- */
+/* ----------- cloud divider animation ----------- */
 @-webkit-keyframes clouds-drift {
   0% {
     background-position: 0px 0px;
@@ -626,4 +664,28 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
 .grass #clouds > .stars {
   -webkit-animation: none;
   -moz-animation: none;
+}
+
+/* ----------- cloud and satellite background animation ----------- */
+@-webkit-keyframes background-drift {
+  0% {
+    -webkit-transform: translate3d(-800px,0,0);
+  }
+  100% {
+    -webkit-transform: translate3d(0px,0,0);
+  }
+}
+@-moz-keyframes background-drift {
+  0% {
+    -moz-transform: translate(-800px,0);
+  }
+  100% {
+    -moz-transform: translate(0px,0);
+  }
+}
+.grass #background .cloud,
+.grass #background .satellite1,
+.grass #background .satellite2 {
+  -webkit-animation: background-drift 200s infinite normal none linear;
+  -moz-animation: background-drift 200s infinite normal none linear;
 }

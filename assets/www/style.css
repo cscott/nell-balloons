@@ -57,6 +57,10 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
 }
 .video #mask { opacity: 0.8; }
 .video #video { opacity: 1; }
+.video #game * {
+ -webkit-animation-play-state: paused;
+ -moz-animation-play-state: paused;
+}
 
 #level, #balloons, #awards {
  -webkit-transition: -webkit-transform 1s ease-in-out;
@@ -389,32 +393,95 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
   background-position: bottom left;
 }
 
-#balloons > div, #balloons > div > div {
+#balloons > div, #balloons .balloon, #balloons .payload {
   position: absolute;
-  top: 0; left: 0;
-  width: 140px; height: 275px;
   background-repeat: no-repeat;
 }
-#balloons > .black > div {
-  background-image: url('images/balloon-black.png');
+#balloons > div {
+  top: 0; left: 0;
+  /* width & height control relation between balloon & payload */
+  width: 174px; height: 386px;
 }
-#balloons > .lilac > div {
-  background-image: url('images/balloon-lilac.png');
+#balloons .balloon {
+  width: 140px; height: 275px;
+  top: 0; left: 0;
 }
-#balloons > .orange > div {
-  background-image: url('images/balloon-orange.png');
+#balloons .payload {
+  bottom: 0; right: 0;
+  width: 150px; height: 120px;
 }
-#balloons > .white > div {
+#balloons .payload /* default */ {
+  background-image: url('images/tag-white-empty.png');
+}
+#balloons .balloon, /* default */
+#balloons > .white > .balloon {
   background-image: url('images/balloon-white.png');
 }
-#balloons > .yellow > div {
+#balloons > .black > .balloon {
+  background-image: url('images/balloon-black.png');
+}
+#balloons > .lilac > .balloon {
+  background-image: url('images/balloon-lilac.png');
+}
+#balloons > .orange > .balloon {
+  background-image: url('images/balloon-orange.png');
+}
+#balloons > .yellow > .balloon {
   background-image: url('images/balloon-yellow.png');
 }
-#balloons > .popped > div {
+#balloons > .popped > .balloon {
   background-image: url('images/bang.png') !important;
 }
 
-/* ------------------ animation ------------------- */
+/* payloads for "grass" level */
+.grass.ground #balloons .payload { display: none; }
+.grass.troposphere #balloons .black .payload {
+  background-image: url('images/tag-black-bat.png');
+}
+.grass.troposphere #balloons .lilac .payload {
+  background-image: url('images/tag-lilac-mat.png');
+}
+.grass.troposphere #balloons .orange .payload {
+  background-image: url('images/tag-orange-orange.png');
+}
+.grass.troposphere #balloons .yellow .payload {
+  background-image: url('images/tag-yellow-banana.png');
+}
+
+.grass.stratosphere #balloons .balloon {
+  background-image: url('images/balloon-white.png') !important;
+}
+.grass.stratosphere #balloons .black .payload {
+  background-image: url('images/tag-white-bat.png');
+}
+.grass.stratosphere #balloons .lilac .payload {
+  background-image: url('images/tag-white-mat.png');
+}
+.grass.stratosphere #balloons .orange .payload {
+  background-image: url('images/tag-white-orange.png');
+}
+.grass.stratosphere #balloons .yellow .payload {
+  background-image: url('images/tag-white-banana.png');
+}
+
+.grass.mesosphere #balloons .balloon {
+  background-image: url('images/balloon-white.png') !important;
+}
+.grass.mesosphere #balloons .black .payload {
+  background-image: url('images/tag-white-bat-bw.png');
+}
+.grass.mesosphere #balloons .lilac .payload {
+  background-image: url('images/tag-white-mat-bw.png');
+}
+.grass.mesosphere #balloons .orange .payload {
+  background-image: url('images/tag-white-orange-bw.png');
+}
+.grass.mesosphere #balloons .yellow .payload {
+  background-image: url('images/tag-white-banana-bw.png');
+}
+
+
+/* ------------------ balloon animations ------------------- */
 @-webkit-keyframes balloon-squirt {
    0% {
     -webkit-transform: translate3d(0,0,0) rotate(0deg);
@@ -482,11 +549,47 @@ html,body { width:100%; height:100%; margin:0; padding: 0; border:none; }
     -moz-transform: translate(-1000px,650px) rotate(290deg);
    }
 }
-#balloons > .squirt > div {
+#balloons > .squirt > .balloon {
   -webkit-animation: balloon-squirt 15625ms linear forwards;
   -moz-animation: balloon-squirt 15625ms linear forwards;
   -webkit-transform-origin: 74px 83px;
   -moz-transform-origin: 74px 83px;
+}
+
+@-webkit-keyframes payload-drop {
+   0% {
+     -webkit-transform: translate3d(0,0,0);
+     opacity: 1;
+   }
+   1% {
+     -webkit-transform: translate3d(0,200px,0);
+     opacity: 0;
+   }
+   /* work around a Android/Honeycomb bug applying the animation-fill
+    * property by just leaving the animation in the end state for a long
+    * while. */
+   100% {
+     -webkit-transform: translate3d(0,200px,0);
+     opacity: 0;
+   }
+}
+@-moz-keyframes payload-drop {
+   0% {
+     -moz-transform: translate(0,0);
+     opacity: 1;
+   }
+   1% {
+     -moz-transform: translate(0,200px);
+     opacity: 0;
+   }
+   100% {
+     -moz-transform: translate(0,200px);
+     opacity: 0;
+   }
+}
+#balloons .payload-dropped .payload {
+  -webkit-animation: payload-drop 25000ms ease-in forwards;
+  -moz-animation: payload-drop 25000ms ease-in forwards;
 }
 
 /* ------------ nell breathing animation ---------- */

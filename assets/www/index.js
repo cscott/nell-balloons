@@ -111,7 +111,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         color = color || random.choice(buttons).color;
         ColoredElement.prototype.init.call(this, document.createElement('div'),
                                            color);
-        this.domElement.appendChild(document.createElement('div'));
+        this.balloon = document.createElement('div');
+        this.balloon.classList.add('balloon');
+        this.payload = document.createElement('div');
+        this.payload.classList.add('payload');
+        this.domElement.appendChild(this.payload); /* payload in back */
+        this.domElement.appendChild(this.balloon); /* balloon in front */
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
@@ -138,6 +143,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         this.popped = this.popDone = false;
         this.domElement.classList.remove('popped');
         this.domElement.classList.remove('squirt');
+        this.domElement.classList.remove('payload-dropped');
         this.award = null;
     };
     Balloon.prototype.refresh = function() {
@@ -206,6 +212,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         var sounds = isAward ? AWARD_SOUNDS : isSquirt ? SQUIRT_SOUNDS :
             BURST_SOUNDS;
         random.choice(sounds).play();
+        this.domElement.classList.add('payload-dropped');
 
         if (isAward) {
             this.domElement.classList.add('popped');

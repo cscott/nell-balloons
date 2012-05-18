@@ -13,14 +13,20 @@ require([], function() {
 .test #level {
   height: 4520px; width: 800px;
   -webkit-transform-origin: bottom left;
-  -webkit-transform: scale3d(0.13,0.13,1);
+  -webkit-transform: scale(0.13);
 }
+.test #menu {
+  height: 1280px; width: 800px;
+  -webkit-transform-origin: top left;
+  -webkit-transform: scale(0.6);
+}
+
 #b0 { -webkit-transform: translate3d(100px,-100px,0); }
 </style>
 </head>
 
-<body class="anim">
-<div id="game"><div id="level" class="grass">
+<body class="anim n9 menu">
+<div id="game"><div id="level" class="grass mesosphere">
  <div id="background">
   <div class="troposphere">
    <div class="cloud c2"></div>
@@ -36,23 +42,29 @@ require([], function() {
    <div class="satellite2"></div>
   </div>
  </div>
- <div id="nell" class="n9">
+ <div id="nell" class="nells">
   <div class="ground">
    <div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div>
   </div>
   <div class="troposphere">
-   <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div></div>
-   <div class="hotair"></div>
+   <div class="hotair">
+    <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div></div>
+    <div class="foreground"></div>
+   </div>
   </div>
   <div class="stratosphere">
-   <div class="jet1"></div>
-   <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="head"></div></div></div>
-   <div class="jet2"></div>
+    <div class="jet">
+     <div class="background"></div>
+     <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="head"></div></div></div>
+     <div class="foreground"></div>
+    </div>
   </div>
   <div class="mesosphere">
-   <div class="astronaut1"></div>
-   <div class="nellscaler"><div class="nell"><div class="head"></div></div></div>
-   <div class="astronaut2"></div>
+   <div class="astronaut">
+    <div class="background"></div>
+    <div class="nellscaler"><div class="nell"><div class="head"></div></div></div>
+    <div class="foreground"></div>
+   </div>
   </div>
  </div>
  <div id="balloons"><div id="b0" class="orange"><div class="payload"></div><div class="balloon"></div></div></div>
@@ -82,6 +94,52 @@ require([], function() {
 <div id="buttons">
 <a class="yellow"></a><a class="lilac"></a><a class="black"></a><a class="orange"></a>
 </div>
+
+<div id="menu">
+ <div class="level grass">
+  <div class="background">
+    <div class="mesosphere">
+      <div class="stars"></div>
+    </div>
+  </div>
+ </div>
+ <div class="nells">
+  <div class="ground">
+   <div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div>
+  </div>
+  <div class="troposphere">
+   <div class="hotair">
+    <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="body"></div><div class="head"></div></div></div>
+    <div class="foreground"></div>
+   </div>
+  </div>
+  <div class="stratosphere">
+   <div class="jet">
+    <div class="background"></div>
+    <div class="nellscaler"><div class="nell"><div class="hair"></div><div class="head"></div></div></div>
+    <div class="foreground"></div>
+   </div>
+  </div>
+  <div class="mesosphere">
+   <div class="astronaut">
+    <div class="background"></div>
+    <div class="nellscaler"><div class="nell"><div class="head"></div></div></div>
+    <div class="foreground"></div>
+   </div>
+  </div>
+ </div><!-- end of nells -->
+ <div class="sprout"></div>
+ <div class="stars">
+  <div class="ground"><div class="star"></div></div>
+  <div class="troposphere"><div class="star"></div></div>
+  <div class="stratosphere"><div class="star"></div></div>
+  <div class="mesosphere"><div class="star"></div></div>
+ </div>
+ <div class="clouds">
+  <div class="grass"></div>
+ </div>
+</div>
+
 <div id="mask"></div>
 <div id="video"></div>
 

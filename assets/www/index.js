@@ -81,11 +81,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         this.domElement.parentElement.removeChild(this.domElement);
     };
 
-    var Button = function(color) {
+    var ClickableElement = function(color) {
+        this.init(color);
+    };
+    ClickableElement.prototype = Object.create(ColoredElement.prototype);
+    ClickableElement.prototype.init = function(color) {
         ColoredElement.prototype.init.call(this, document.createElement('a'),
                                            color);
         this.domElement.href='#';
-        this.attach(buttonsElement);
         ['mousedown', 'touchstart'].forEach(function(evname) {
             this.domElement.addEventListener(evname,this.highlight.bind(this));
         }.bind(this));
@@ -93,18 +96,41 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             this.domElement.addEventListener(evname, this.unhighlight.bind(this));
         }.bind(this));
     };
-    Button.prototype = Object.create(ColoredElement.prototype);
-    Button.prototype.highlight = function(event) {
+    ClickableElement.prototype.highlight = function(event) {
         this.domElement.classList.add('hover');
         event.preventDefault();
     };
-    Button.prototype.unhighlight = function(event) {
+    ClickableElement.prototype.unhighlight = function(event) {
         this.domElement.classList.remove('hover');
         event.preventDefault();
         if (event.type !== 'touchcancel' &&
             event.type !== 'mouseout') {
-            handleButtonPress(this.color);
+            this.handleClick();
         }
+    };
+
+    var Button = function(color) {
+        this.init(color);
+    };
+    Button.prototype = Object.create(ClickableElement.prototype);
+    Button.prototype.init = function(color) {
+        ClickableElement.prototype.init.call(this, color);
+        this.attach(buttonsElement);
+    };
+    Button.prototype.handleClick = function() {
+        handleButtonPress(this.color);
+    };
+
+    var MenuStar = function(altitude) {
+        this.init(altitude);
+    };
+    MenuStar.prototype = Object.create(ClickableElement.prototype);
+    MenuStar.prototype.init = function(altitude) {
+        ClickableElement.prototype.init.call(this, 'star');
+        this.altitude = altitude;
+    };
+    MenuStar.prototype.handleClick = function() {
+        console.log('Menu Star for '+this.altitude+' clicked'); // XXX
     };
 
     var Balloon = function(color) {
@@ -343,6 +369,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     };
     createButtons();
 
+    altitudeStars = [];
+    var createStars = function() {
+        ['ground', 'troposphere', 'stratosphere', 'mesosphere'].forEach(function(altitude) {
+            var s = new MenuStar(altitude);
+            s.attach(document.querySelector('#menu > .stars > .'+altitude));
+            altitudeStars.push(s);
+        });
+    };
+    createStars();
+
+
     var balloons = [];
     while (balloons.length < NUM_BALLOONS) {
         balloons.push(new Balloon());
@@ -511,6 +548,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         }
         saveScore();
         funf.archive();
+        document.body.classList.add('paused');
     };
     var onResume = function() {
         funf.record('status', 'resume');
@@ -521,6 +559,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         if (accelID === null && ENABLE_ACCEL) {
             accelID = startAccelerometer();
         }
+        document.body.classList.remove('paused');
     };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
@@ -583,12 +622,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     })();
 
     var handleNellTouch = function(ev) {
-        console.log('nell touched!');
         ev.preventDefault();
         nell.switchColor();
     };
     ['mousedown','touchstart'].forEach(function(evname) {
-        var nellElems = document.querySelectorAll('#nell > div'), i;
+        var nellElems = document.querySelectorAll('.nells > div > div'), i;
         for (i=0; i<nellElems.length; i++) {
             nellElems[i].addEventListener(evname, handleNellTouch, false);
         }

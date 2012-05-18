@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound'], function(document, Alea, Compat, Funf, nell, score, Sound) {
+define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound', './version'], function(document, Alea, Compat, Funf, nell, score, Sound, version) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
@@ -13,7 +13,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
-    var funf = nell.funf = score.funf = new Funf('NellBalloons');
+    var funf = nell.funf = score.funf = new Funf('NellBalloons'+version);
     var buttons, handleButtonPress;
     var refresh, refreshID = null;
     var SPROUTS;
@@ -164,7 +164,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
-        this.born = false; this.bornTime = 0;
+        this.born = false; this.bornTime = this.pauseTime = 0;
         this.bornTimeout = 0; // born immediately by default
         this.popped = this.popDone = false;
         this.domElement.classList.remove('popped');
@@ -188,6 +188,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             if (this.bornTimeout < 0) {
                 this.born = true;
                 this.bornTime = Date.now();
+                this.pauseTime = 0;
             }
             return;
         }
@@ -523,7 +524,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
-            correctAnswer(color, Date.now() - best.bornTime);
+            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime);
             // try to prevent a double tap being registered as a wrong answer.
             doubleTapColor = color;
             if (doubleTapLockoutID) {
@@ -535,7 +536,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         }
     };
 
+    var pauseTime = Date.now();
     var onPause = function() {
+        pauseTime = Date.now();
         funf.record('status', 'pause');
         stopMusic();
         if (refreshID !== null) {
@@ -551,6 +554,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         document.body.classList.add('paused');
     };
     var onResume = function() {
+        var timePaused = pauseTime - Date.now();
         funf.record('status', 'resume');
         playMusic(MUSIC_URL);
         if (refreshID === null) {
@@ -560,6 +564,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             accelID = startAccelerometer();
         }
         document.body.classList.remove('paused');
+        balloons.forEach(function(b) {
+            b.pauseTime += timePaused;
+        });
     };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
@@ -600,7 +607,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
                 if (b.isGone()) {
                     if (!b.popped) {
                         isEscape = true;
-                        incorrectAnswer('escape.'+b.color, now - b.bornTime);
+                        incorrectAnswer('escape.'+b.color,
+                                        (now - b.bornTime) - b.pauseTime);
                     }
                     isBorn = true;
                     b.reset();

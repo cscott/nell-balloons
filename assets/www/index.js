@@ -117,7 +117,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
     MenuStar.prototype = Object.create(ClickableElement.prototype);
     MenuStar.prototype.handleClick = function() {
-        console.log('Menu Star for '+this.altitude+' clicked'); // XXX
+        this.altitudeClicked(this.altitude);
     };
 
     var Balloon = function(color) {
@@ -428,6 +428,127 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
     var AWARD_SOUNDS = loadSounds(['sounds/award']);
 
+    // utility method
+    var _switchClass = function(elem, from, to, optProp) {
+        var f = optProp ? (from && from[optProp]) : from;
+        var t = optProp ? to[optProp] : to;
+        if (f) { elem.classList.remove(f); }
+        elem.classList.add(t);
+        return to;
+    };
+
+    // ------------ game modes ---------------
+    var GameMode = function(bodyClass) {
+        this.bodyClass = bodyClass;
+    };
+    GameMode.prototype = {};
+    GameMode.prototype.enter = function() {
+        this.resume();
+        document.body.classList.add(this.bodyClass);
+    };
+    GameMode.prototype.leave = function() {
+        this.pause();
+        document.body.classList.remove(this.bodyClass);
+    };
+    GameMode.prototype.pause = function() {
+        document.body.classList.add('paused');
+    };
+    GameMode.prototype.resume = function() {
+        document.body.classList.remove('paused');
+    };
+    // static properties
+    GameMode.currentMode = null;
+    GameMode.switchTo = function(mode) {
+        if (GameMode.currentMode) {
+            GameMode.currentMode.leave();
+        }
+        GameMode.currentMode = mode;
+        GameMode.currentMode.enter();
+    };
+
+    GameMode.Menu = new GameMode('menu');
+    GameMode.Menu.enter = (function() {
+        var superEnter = GameMode.Menu.enter;
+        return function() {
+            superEnter.call(this);
+            // do child class things
+        };
+    })();
+    GameMode.Menu.start = function(altitude) {
+        GameMode.Playing.switchLevel(this.currentLevel);
+        GameMode.Playing.switchAltitude(altitude);
+        GameMode.switchTo(GameMode.Playing);
+    };
+    GameMode.Menu.switchLevel = function(level) {
+        var levelElem = document.querySelector('#menu .level');
+        this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
+                                         'levelClass');
+    };
+    MenuStar.prototype.altitudeClicked =
+        GameMode.Menu.start.bind(GameMode.Menu);
+
+    GameMode.Video = new GameMode('video');
+
+    GameMode.Playing = new GameMode('game');
+    GameMode.Playing.switchLevel = function(level) {
+        var levelElem = document.querySelector('#game #level');
+        this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
+                                         'levelClass');
+    };
+    GameMode.Playing.switchAltitude = function(altitude) {
+        var levelElem = document.querySelector('#game #level');
+        this.currentAltitude = _switchClass(levelElem,
+                                            this.currentAltitude, altitude);
+    };
+    GameMode.Playing.pause = (function(superPause) {
+        return function() {
+            superPause.call(this);
+            this.pauseTime = Date.now();
+            funf.record('status', 'pause');
+            stopMusic();
+            if (refreshID !== null) {
+                Compat.cancelAnimationFrame(refreshID);
+                refreshID = null;
+            }
+            if (accelID !== null) {
+                stopAccelerometer();
+                accelID = null;
+            }
+            saveScore();
+            funf.archive();
+        };
+    })(GameMode.Playing.pause);
+    GameMode.Playing.resume = (function(superResume) {
+        return function() {
+            superResume.call(this);
+            var timePaused = this.pauseTime - Date.now();
+            funf.record('status', 'resume');
+            playMusic(MUSIC_URL);
+            if (refreshID === null) {
+                refreshID = Compat.requestAnimationFrame(refresh);
+            }
+            if (accelID === null && ENABLE_ACCEL) {
+                accelID = startAccelerometer();
+            }
+            balloons.forEach(function(b) {
+                b.pauseTime += timePaused;
+            });
+        };
+    })(GameMode.Playing.resume);
+
+
+    // ------------ game levels --------------
+    var GameLevel = function(levelClass) {
+        this.levelClass = levelClass;
+    };
+    GameLevel.prototype = {};
+    GameLevel.prototype.soundFor = function(altitude, color) {
+    };
+
+    var LEVELS = [ new GameLevel('grass') ]; // XXX
+
+
+
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;
     // number of correct answers as fraction of total (weighted average)
@@ -522,38 +643,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
-    var pauseTime = Date.now();
-    var onPause = function() {
-        pauseTime = Date.now();
-        funf.record('status', 'pause');
-        stopMusic();
-        if (refreshID !== null) {
-            Compat.cancelAnimationFrame(refreshID);
-            refreshID = null;
-        }
-        if (accelID !== null) {
-            stopAccelerometer();
-            accelID = null;
-        }
-        saveScore();
-        funf.archive();
-        document.body.classList.add('paused');
-    };
-    var onResume = function() {
-        var timePaused = pauseTime - Date.now();
-        funf.record('status', 'resume');
-        playMusic(MUSIC_URL);
-        if (refreshID === null) {
-            refreshID = Compat.requestAnimationFrame(refresh);
-        }
-        if (accelID === null && ENABLE_ACCEL) {
-            accelID = startAccelerometer();
-        }
-        document.body.classList.remove('paused');
-        balloons.forEach(function(b) {
-            b.pauseTime += timePaused;
-        });
-    };
+    var onPause = function() { GameMode.currentMode.pause(); };
+    var onResume = function() { GameMode.currentMode.resume(); };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
     if (typeof document.hidden !== "undefined") {
@@ -627,6 +718,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     });
 
     function onDeviceReady() {
+        // start in menu screen
+        window.GameMode = GameMode;
+        GameMode.Menu.switchLevel(LEVELS[0]);
+        GameMode.switchTo(GameMode.Menu);
         // phonegap
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);

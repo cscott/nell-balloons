@@ -61,14 +61,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var ColoredElement = function(element, color) {
-        this.init(element, color);
-    };
-    ColoredElement.prototype = {};
-    ColoredElement.prototype.init = function(element, color) {
         this.domElement = element;
         this.domElement.classList.add(color);
         this.color = color;
     };
+    ColoredElement.prototype = {};
     ColoredElement.prototype.reset = function(color) {
         this.domElement.classList.remove(this.color);
         this.domElement.classList.add(color);
@@ -82,12 +79,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var ClickableElement = function(color) {
-        this.init(color);
-    };
-    ClickableElement.prototype = Object.create(ColoredElement.prototype);
-    ClickableElement.prototype.init = function(color) {
-        ColoredElement.prototype.init.call(this, document.createElement('a'),
-                                           color);
+        ColoredElement.call(this, document.createElement('a'), color);
         this.domElement.href='#';
         ['mousedown', 'touchstart'].forEach(function(evname) {
             this.domElement.addEventListener(evname,this.highlight.bind(this));
@@ -96,6 +88,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             this.domElement.addEventListener(evname, this.unhighlight.bind(this));
         }.bind(this));
     };
+    ClickableElement.prototype = Object.create(ColoredElement.prototype);
     ClickableElement.prototype.highlight = function(event) {
         this.domElement.classList.add('hover');
         event.preventDefault();
@@ -110,33 +103,26 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var Button = function(color) {
-        this.init(color);
-    };
-    Button.prototype = Object.create(ClickableElement.prototype);
-    Button.prototype.init = function(color) {
-        ClickableElement.prototype.init.call(this, color);
+        ClickableElement.call(this, color);
         this.attach(buttonsElement);
     };
+    Button.prototype = Object.create(ClickableElement.prototype);
     Button.prototype.handleClick = function() {
         handleButtonPress(this.color);
     };
 
     var MenuStar = function(altitude) {
-        this.init(altitude);
-    };
-    MenuStar.prototype = Object.create(ClickableElement.prototype);
-    MenuStar.prototype.init = function(altitude) {
-        ClickableElement.prototype.init.call(this, 'star');
+        ClickableElement.call(this, 'star');
         this.altitude = altitude;
     };
+    MenuStar.prototype = Object.create(ClickableElement.prototype);
     MenuStar.prototype.handleClick = function() {
         console.log('Menu Star for '+this.altitude+' clicked'); // XXX
     };
 
     var Balloon = function(color) {
         color = color || random.choice(buttons).color;
-        ColoredElement.prototype.init.call(this, document.createElement('div'),
-                                           color);
+        ColoredElement.call(this, document.createElement('div'), color);
         this.balloon = document.createElement('div');
         this.balloon.classList.add('balloon');
         this.payload = document.createElement('div');

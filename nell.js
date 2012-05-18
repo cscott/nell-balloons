@@ -26,8 +26,9 @@ define(['./alea', './lawnchair/lawnchair'], function(Alea, Lawnchair) {
     };
     Nell.prototype = {};
     Nell.prototype.setColor = function(color) {
+        document.body.classList.remove(this.color||'n0');
         this.color = color;
-        document.getElementById('nell').className = this.color;
+        document.body.classList.add(this.color);
     };
     Nell.prototype.saveColor = function() {
         this.lawnchair.save({ key:'color', value: this.color,

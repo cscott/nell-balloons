@@ -1,4 +1,4 @@
-define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound'], function(document, Alea, Compat, Funf, nell, score, Sound) {
+define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound', './version'], function(document, Alea, Compat, Funf, nell, score, Sound, version) {
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
@@ -13,7 +13,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
     var balloonsElement = document.getElementById('balloons');
-    var funf = nell.funf = score.funf = new Funf('NellBalloons');
+    var funf = nell.funf = score.funf = new Funf('NellBalloons'+version);
     var buttons, handleButtonPress;
     var refresh, refreshID = null;
     var SPROUTS;
@@ -52,7 +52,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             if (sprout.size >= 0) {
                 sprout.shrink();
                 if (sprout.size < 0) {
-                    var elem = document.querySelector('#foreground .award.'+AWARDS[i][0]);
+                    var elem = document.querySelector('#awards .award.'+AWARDS[i][0]);
                     elem.classList.remove('show');
                 }
                 return;
@@ -61,14 +61,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     };
 
     var ColoredElement = function(element, color) {
-        this.init(element, color);
-    };
-    ColoredElement.prototype = {};
-    ColoredElement.prototype.init = function(element, color) {
         this.domElement = element;
         this.domElement.classList.add(color);
         this.color = color;
     };
+    ColoredElement.prototype = {};
     ColoredElement.prototype.reset = function(color) {
         this.domElement.classList.remove(this.color);
         this.domElement.classList.add(color);
@@ -81,11 +78,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         this.domElement.parentElement.removeChild(this.domElement);
     };
 
-    var Button = function(color) {
-        ColoredElement.prototype.init.call(this, document.createElement('a'),
-                                           color);
+    var ClickableElement = function(color) {
+        ColoredElement.call(this, document.createElement('a'), color);
         this.domElement.href='#';
-        this.attach(buttonsElement);
         ['mousedown', 'touchstart'].forEach(function(evname) {
             this.domElement.addEventListener(evname,this.highlight.bind(this));
         }.bind(this));
@@ -93,25 +88,47 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             this.domElement.addEventListener(evname, this.unhighlight.bind(this));
         }.bind(this));
     };
-    Button.prototype = Object.create(ColoredElement.prototype);
-    Button.prototype.highlight = function(event) {
+    ClickableElement.prototype = Object.create(ColoredElement.prototype);
+    ClickableElement.prototype.highlight = function(event) {
         this.domElement.classList.add('hover');
         event.preventDefault();
     };
-    Button.prototype.unhighlight = function(event) {
+    ClickableElement.prototype.unhighlight = function(event) {
         this.domElement.classList.remove('hover');
         event.preventDefault();
         if (event.type !== 'touchcancel' &&
             event.type !== 'mouseout') {
-            handleButtonPress(this.color);
+            this.handleClick();
         }
+    };
+
+    var Button = function(color) {
+        ClickableElement.call(this, color);
+        this.attach(buttonsElement);
+    };
+    Button.prototype = Object.create(ClickableElement.prototype);
+    Button.prototype.handleClick = function() {
+        handleButtonPress(this.color);
+    };
+
+    var MenuStar = function(altitude) {
+        ClickableElement.call(this, 'star');
+        this.altitude = altitude;
+    };
+    MenuStar.prototype = Object.create(ClickableElement.prototype);
+    MenuStar.prototype.handleClick = function() {
+        this.altitudeClicked(this.altitude);
     };
 
     var Balloon = function(color) {
         color = color || random.choice(buttons).color;
-        ColoredElement.prototype.init.call(this, document.createElement('div'),
-                                           color);
-        this.domElement.appendChild(document.createElement('div'));
+        ColoredElement.call(this, document.createElement('div'), color);
+        this.balloon = document.createElement('div');
+        this.balloon.classList.add('balloon');
+        this.payload = document.createElement('div');
+        this.payload.classList.add('payload');
+        this.domElement.appendChild(this.payload); /* payload in back */
+        this.domElement.appendChild(this.balloon); /* balloon in front */
         this.attach(balloonsElement);
         // starting x, y, and speed
         // pick a random x position
@@ -133,11 +150,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
-        this.born = false; this.bornTime = 0;
+        this.born = false; this.bornTime = this.pauseTime = 0;
         this.bornTimeout = 0; // born immediately by default
         this.popped = this.popDone = false;
         this.domElement.classList.remove('popped');
         this.domElement.classList.remove('squirt');
+        this.domElement.classList.remove('payload-dropped');
         this.award = null;
     };
     Balloon.prototype.refresh = function() {
@@ -156,6 +174,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             if (this.bornTimeout < 0) {
                 this.born = true;
                 this.bornTime = Date.now();
+                this.pauseTime = 0;
             }
             return;
         }
@@ -169,14 +188,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
                 }
                 if (this.award) {
                     var elem = document.querySelector(
-                        '#foreground .award.'+this.award);
+                        '#awards .award.'+this.award);
                     var sprout = SPROUTS[this.award];
                     if (sprout.size >= 0) {
                         // deal w/ race -- maybe we lost this one already!
                         elem.classList.add('show');
                     }
                     elem.style.WebkitTransform='';
-                    var flex = document.querySelector('#foreground .award.flex');
+                    var flex = document.querySelector('#awards .award.flex');
                     flex.style.display = 'none';
                 }
             }
@@ -206,18 +225,19 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         var sounds = isAward ? AWARD_SOUNDS : isSquirt ? SQUIRT_SOUNDS :
             BURST_SOUNDS;
         random.choice(sounds).play();
+        this.domElement.classList.add('payload-dropped');
 
         if (isAward) {
             this.domElement.classList.add('popped');
             this.popTimeout = 250;
             // move an award up here.
             this.award = pickAward();
-            var elem= document.querySelector('#foreground .award.'+this.award);
+            var elem= document.querySelector('#awards .award.'+this.award);
             var sprout = SPROUTS[this.award];
             // do we already have this award?
             if (sprout.size >= 0) {
                 // force the flex badge to fill in.
-                var flex = document.querySelector('#foreground .award.flex');
+                var flex = document.querySelector('#awards .award.flex');
                 flex.style.top = elem.offsetTop+'px';
                 flex.style.left = elem.offsetLeft+'px';
                 flex.style.display = 'block';
@@ -304,7 +324,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             var sprout = SPROUTS[a[0]];
             sprout.setSize(score.recent[i]);
             if (sprout.size >= 0) {
-                var elem = document.querySelector('#foreground .award.'+a[0]);
+                var elem = document.querySelector('#awards .award.'+a[0]);
                 elem.classList.add('show');
             }
         });
@@ -335,6 +355,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         });
     };
     createButtons();
+
+    altitudeStars = [];
+    var createStars = function() {
+        ['ground', 'troposphere', 'stratosphere', 'mesosphere'].forEach(function(altitude) {
+            var s = new MenuStar(altitude);
+            s.attach(document.querySelector('#menu > .stars > .'+altitude));
+            altitudeStars.push(s);
+        });
+    };
+    createStars();
+
 
     var balloons = [];
     while (balloons.length < NUM_BALLOONS) {
@@ -396,6 +427,127 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
     var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
     var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
     var AWARD_SOUNDS = loadSounds(['sounds/award']);
+
+    // utility method
+    var _switchClass = function(elem, from, to, optProp) {
+        var f = optProp ? (from && from[optProp]) : from;
+        var t = optProp ? to[optProp] : to;
+        if (f) { elem.classList.remove(f); }
+        elem.classList.add(t);
+        return to;
+    };
+
+    // ------------ game modes ---------------
+    var GameMode = function(bodyClass) {
+        this.bodyClass = bodyClass;
+    };
+    GameMode.prototype = {};
+    GameMode.prototype.enter = function() {
+        this.resume();
+        document.body.classList.add(this.bodyClass);
+    };
+    GameMode.prototype.leave = function() {
+        this.pause();
+        document.body.classList.remove(this.bodyClass);
+    };
+    GameMode.prototype.pause = function() {
+        document.body.classList.add('paused');
+    };
+    GameMode.prototype.resume = function() {
+        document.body.classList.remove('paused');
+    };
+    // static properties
+    GameMode.currentMode = null;
+    GameMode.switchTo = function(mode) {
+        if (GameMode.currentMode) {
+            GameMode.currentMode.leave();
+        }
+        GameMode.currentMode = mode;
+        GameMode.currentMode.enter();
+    };
+
+    GameMode.Menu = new GameMode('menu');
+    GameMode.Menu.enter = (function() {
+        var superEnter = GameMode.Menu.enter;
+        return function() {
+            superEnter.call(this);
+            // do child class things
+        };
+    })();
+    GameMode.Menu.start = function(altitude) {
+        GameMode.Playing.switchLevel(this.currentLevel);
+        GameMode.Playing.switchAltitude(altitude);
+        GameMode.switchTo(GameMode.Playing);
+    };
+    GameMode.Menu.switchLevel = function(level) {
+        var levelElem = document.querySelector('#menu .level');
+        this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
+                                         'levelClass');
+    };
+    MenuStar.prototype.altitudeClicked =
+        GameMode.Menu.start.bind(GameMode.Menu);
+
+    GameMode.Video = new GameMode('video');
+
+    GameMode.Playing = new GameMode('game');
+    GameMode.Playing.switchLevel = function(level) {
+        var levelElem = document.querySelector('#game #level');
+        this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
+                                         'levelClass');
+    };
+    GameMode.Playing.switchAltitude = function(altitude) {
+        var levelElem = document.querySelector('#game #level');
+        this.currentAltitude = _switchClass(levelElem,
+                                            this.currentAltitude, altitude);
+    };
+    GameMode.Playing.pause = (function(superPause) {
+        return function() {
+            superPause.call(this);
+            this.pauseTime = Date.now();
+            funf.record('status', 'pause');
+            stopMusic();
+            if (refreshID !== null) {
+                Compat.cancelAnimationFrame(refreshID);
+                refreshID = null;
+            }
+            if (accelID !== null) {
+                stopAccelerometer();
+                accelID = null;
+            }
+            saveScore();
+            funf.archive();
+        };
+    })(GameMode.Playing.pause);
+    GameMode.Playing.resume = (function(superResume) {
+        return function() {
+            superResume.call(this);
+            var timePaused = this.pauseTime - Date.now();
+            funf.record('status', 'resume');
+            playMusic(MUSIC_URL);
+            if (refreshID === null) {
+                refreshID = Compat.requestAnimationFrame(refresh);
+            }
+            if (accelID === null && ENABLE_ACCEL) {
+                accelID = startAccelerometer();
+            }
+            balloons.forEach(function(b) {
+                b.pauseTime += timePaused;
+            });
+        };
+    })(GameMode.Playing.resume);
+
+
+    // ------------ game levels --------------
+    var GameLevel = function(levelClass) {
+        this.levelClass = levelClass;
+    };
+    GameLevel.prototype = {};
+    GameLevel.prototype.soundFor = function(altitude, color) {
+    };
+
+    var LEVELS = [ new GameLevel('grass') ]; // XXX
+
+
 
     // smoothing factor -- closer to 0 means more weight on present
     var CORRECT_SMOOTHING = 0.8;
@@ -479,7 +631,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
             }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
-            correctAnswer(color, Date.now() - best.bornTime);
+            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime);
             // try to prevent a double tap being registered as a wrong answer.
             doubleTapColor = color;
             if (doubleTapLockoutID) {
@@ -491,30 +643,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         }
     };
 
-    var onPause = function() {
-        funf.record('status', 'pause');
-        stopMusic();
-        if (refreshID !== null) {
-            Compat.cancelAnimationFrame(refreshID);
-            refreshID = null;
-        }
-        if (accelID !== null) {
-            stopAccelerometer();
-            accelID = null;
-        }
-        saveScore();
-        funf.archive();
-    };
-    var onResume = function() {
-        funf.record('status', 'resume');
-        playMusic(MUSIC_URL);
-        if (refreshID === null) {
-            refreshID = Compat.requestAnimationFrame(refresh);
-        }
-        if (accelID === null && ENABLE_ACCEL) {
-            accelID = startAccelerometer();
-        }
-    };
+    var onPause = function() { GameMode.currentMode.pause(); };
+    var onResume = function() { GameMode.currentMode.resume(); };
     // Set the name of the hidden property and the change event for visibility
     var hidden="hidden", visibilityChange="visibilitychange";
     if (typeof document.hidden !== "undefined") {
@@ -554,7 +684,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
                 if (b.isGone()) {
                     if (!b.popped) {
                         isEscape = true;
-                        incorrectAnswer('escape.'+b.color, now - b.bornTime);
+                        incorrectAnswer('escape.'+b.color,
+                                        (now - b.bornTime) - b.pauseTime);
                     }
                     isBorn = true;
                     b.reset();
@@ -575,14 +706,22 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound']
         };
     })();
 
+    var handleNellTouch = function(ev) {
+        ev.preventDefault();
+        nell.switchColor();
+    };
     ['mousedown','touchstart'].forEach(function(evname) {
-        document.getElementById('nell').addEventListener(evname, function(ev) {
-            ev.preventDefault();
-            nell.switchColor();
-        }, false);
+        var nellElems = document.querySelectorAll('.nells > div > div'), i;
+        for (i=0; i<nellElems.length; i++) {
+            nellElems[i].addEventListener(evname, handleNellTouch, false);
+        }
     });
 
     function onDeviceReady() {
+        // start in menu screen
+        window.GameMode = GameMode;
+        GameMode.Menu.switchLevel(LEVELS[0]);
+        GameMode.switchTo(GameMode.Menu);
         // phonegap
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);

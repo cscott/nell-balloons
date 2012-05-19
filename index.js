@@ -1,4 +1,5 @@
 define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound', './version'], function(document, Alea, Compat, Funf, nell, score, Sound, version) {
+    var DOCUMENT_TITLE = document.title = "Balloons for Nell";
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
@@ -9,6 +10,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = true;
+    var HTML5_HISTORY = history.pushState && history.replaceState;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
@@ -82,24 +84,39 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         ColoredElement.call(this, document.createElement('a'), color);
         this.domElement.href='#';
         ['mousedown', 'touchstart'].forEach(function(evname) {
-            this.domElement.addEventListener(evname,this.highlight.bind(this));
+            this.domElement.addEventListener(evname,this.highlight.bind(this), false);
         }.bind(this));
         ['mouseup','mouseout','touchcancel','touchend'].forEach(function(evname){
-            this.domElement.addEventListener(evname, this.unhighlight.bind(this));
+            this.domElement.addEventListener(evname, this.unhighlight.bind(this), false);
         }.bind(this));
+        this.domElement.addEventListener('click', function(event) {
+            // suppress 'click' event, which would change the history.
+            event.preventDefault();
+        }, false);
+        this.ignoreMouse = false;
     };
     ClickableElement.prototype = Object.create(ColoredElement.prototype);
     ClickableElement.prototype.highlight = function(event) {
+        switch (event.type) {
+        case 'touchstart': this.ignoreMouse = true; break;
+        case 'mousedown': if (this.ignoreMouse) { return; } break;
+        }
         this.domElement.classList.add('hover');
         event.preventDefault();
     };
     ClickableElement.prototype.unhighlight = function(event) {
+        switch (event.type) {
+        case 'mouseup':
+        case 'mouseout':
+            if (this.ignoreMouse) { return; } break;
+        }
         this.domElement.classList.remove('hover');
         event.preventDefault();
         if (event.type !== 'touchcancel' &&
             event.type !== 'mouseout') {
             this.handleClick();
         }
+        this.ignoreMouse = false;
     };
 
     var Button = function(color) {
@@ -136,11 +153,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.refresh();
     };
     Balloon.prototype = Object.create(ColoredElement.prototype);
-    Balloon.prototype.reset = function(color) {
-        color = color || random.choice(buttons).color;
-        if (color !== this.color) {
-            ColoredElement.prototype.reset.call(this, color);
-        }
+    Balloon.prototype.doBirth = function() {
+        this.born = true;
+        this.bornTime = Date.now();
+        this.pauseTime = 0;
+
         // just in case element sizes change
         this.height = this.domElement.offsetHeight;
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
@@ -150,6 +167,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
+    };
+    Balloon.prototype.reset = function(color) {
+        color = color || random.choice(buttons).color;
+        if (color !== this.color) {
+            ColoredElement.prototype.reset.call(this, color);
+        }
         this.born = false; this.bornTime = this.pauseTime = 0;
         this.bornTimeout = 0; // born immediately by default
         this.popped = this.popDone = false;
@@ -157,12 +180,16 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.domElement.classList.remove('squirt');
         this.domElement.classList.remove('payload-dropped');
         this.award = null;
+        // ensure that unborn balloon is invisible
+        this.y = balloonsElement.offsetHeight;
     };
     Balloon.prototype.refresh = function() {
         if (this.popped) { return; }
-        // the 'translateZ' is actually very important here: it enables
+        // the '3d' is actually very important here: it enables
         // GPU acceleration of this transform.
-        var transform = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
+        var transform = 'translate3d('+
+            Math.round(this.x)+'px,'+
+            Math.round(this.y)+'px,0)';
         this.domElement.style.WebkitTransform =
             this.domElement.style.MozTransform =
             this.domElement.style.transform = transform;
@@ -172,9 +199,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             // don't move until it's born
             this.bornTimeout -= dt;
             if (this.bornTimeout < 0) {
-                this.born = true;
-                this.bornTime = Date.now();
-                this.pauseTime = 0;
+                this.doBirth();
             }
             return;
         }
@@ -440,21 +465,27 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     // ------------ game modes ---------------
     var GameMode = function(bodyClass) {
         this.bodyClass = bodyClass;
+        this.active = false;
     };
     GameMode.prototype = {};
     GameMode.prototype.enter = function() {
         this.resume();
         document.body.classList.add(this.bodyClass);
+        this.active = true;
     };
     GameMode.prototype.leave = function() {
         this.pause();
         document.body.classList.remove(this.bodyClass);
+        this.active = false;
     };
     GameMode.prototype.pause = function() {
         document.body.classList.add('paused');
     };
     GameMode.prototype.resume = function() {
         document.body.classList.remove('paused');
+    };
+    GameMode.prototype.toJSON = function() {
+        return { mode: this.bodyClass };
     };
     // static properties
     GameMode.currentMode = null;
@@ -467,17 +498,18 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     GameMode.Menu = new GameMode('menu');
-    GameMode.Menu.enter = (function() {
-        var superEnter = GameMode.Menu.enter;
-        return function() {
-            superEnter.call(this);
-            // do child class things
-        };
-    })();
+    GameMode.Menu.toJSON = function() {
+        return { mode: 'Menu', level: this.currentLevel.num };
+    };
     GameMode.Menu.start = function(altitude) {
         GameMode.Playing.switchLevel(this.currentLevel);
         GameMode.Playing.switchAltitude(altitude);
         GameMode.switchTo(GameMode.Playing);
+        if (HTML5_HISTORY) { // Android/Honeycomb doesn't support this
+            history.pushState(GameMode.currentMode.toJSON(),
+                              DOCUMENT_TITLE + ' | Play!',
+                              '#play');
+        }
     };
     GameMode.Menu.switchLevel = function(level) {
         var levelElem = document.querySelector('#menu .level');
@@ -487,9 +519,42 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     MenuStar.prototype.altitudeClicked =
         GameMode.Menu.start.bind(GameMode.Menu);
 
-    GameMode.Video = new GameMode('video');
+    GameMode.OverlayMode = function(bodyClass) {
+        GameMode.call(this, bodyClass);
+        this.underMode = null;
+    };
+    GameMode.OverlayMode.prototype = Object.create(GameMode.prototype);
+    GameMode.OverlayMode.prototype.setUnderMode = function(underMode) {
+        this.underMode = this.active ?
+            _switchClass(document.body, this.underMode, underMode, 'bodyClass'):
+            underMode;
+    };
+    GameMode.OverlayMode.prototype.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            if (this.underMode)
+                document.body.classList.add(this.underMode.bodyClass);
+        };
+    })(GameMode.OverlayMode.prototype.enter);
+    GameMode.OverlayMode.prototype.leave = (function(superLeave) {
+        return function() {
+            superLeave.call(this);
+            if (this.underMode)
+                document.body.classList.remove(this.underMode.bodyClass);
+        };
+    })(GameMode.OverlayMode.prototype.leave);
+
+    GameMode.Video = new GameMode.OverlayMode('video');
+    GameMode.Rotate = new GameMode.OverlayMode('rotate');
 
     GameMode.Playing = new GameMode('game');
+    GameMode.Playing.toJSON = function() {
+        return {
+            mode: 'Playing',
+            level: this.currentLevel.num,
+            altitude: this.currentAltitude
+        };
+    };
     GameMode.Playing.switchLevel = function(level) {
         var levelElem = document.querySelector('#game #level');
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
@@ -546,7 +611,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var LEVELS = [ new GameLevel('grass') ]; // XXX
-
+    LEVELS.forEach(function(l, i) { l.num = i; });
+    // default level (handy in case we
+    GameMode.Playing.switchLevel(LEVELS[0]);
+    GameMode.Playing.switchAltitude('ground');
 
 
     // smoothing factor -- closer to 0 means more weight on present
@@ -707,6 +775,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     })();
 
     var handleNellTouch = function(ev) {
+        if (ev.type === 'touchstart') {
+            // prevent duplicate events
+            ev.target.removeEventListener('mousedown', handleNellTouch, false);
+        }
         ev.preventDefault();
         nell.switchColor();
     };
@@ -717,12 +789,63 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     });
 
+    var onPopState = function() {
+        var State = event.state;
+        switch (State.mode) {
+        case 'Playing':
+            GameMode.Playing.switchLevel(LEVELS[State.level]);
+            GameMode.Playing.switchAltitude(LEVELS[State.altitude]);
+            GameMode.switchTo(GameMode.Playing);
+            break;
+        case 'Menu':
+            GameMode.Menu.switchLevel(LEVELS[State.level]);
+            GameMode.switchTo(GameMode.Menu);
+            break;
+        }
+    };
+
+    var onOrientationChange = function() {
+        // XXX this is xoom specific, we should really look at width/height
+        var isXoom = (window.device &&
+                      window.device.platform==='Android' &&
+                      window.device.name==='tervigon');
+        if (!isXoom) { return; }
+
+        if (window.orientation === 0 || window.orientation === 180) {
+            if (GameMode.currentMode !== GameMode.Rotate) {
+                GameMode.Rotate.setUnderMode(GameMode.currentMode);
+                GameMode.switchTo(GameMode.Rotate);
+            }
+        } else if (window.orientation === 90 || window.orientation === -90) {
+            if (GameMode.currentMode === GameMode.Rotate) {
+                GameMode.switchTo(GameMode.currentMode.underMode);
+            }
+        }
+    };
+
     function onDeviceReady() {
         // start in menu screen
         window.GameMode = GameMode;
         GameMode.Menu.switchLevel(LEVELS[0]);
         GameMode.switchTo(GameMode.Menu);
+        if (HTML5_HISTORY) {
+            history.replaceState(GameMode.currentMode.toJSON(),
+                                 DOCUMENT_TITLE+' | Menu', '#menu');
+            window.addEventListener('popstate', onPopState, false);
+        }
+        window.addEventListener('orientationchange',onOrientationChange,false);
+        if ('orientation' in window) { onOrientationChange(); }
+
         // phonegap
+        document.addEventListener("backbutton", function() {
+            if (HTML5_HISTORY) {
+                history.back();
+            } else { // hack!
+                if (GameMode.currentMode === GameMode.Playing) {
+                    GameMode.switchTo(GameMode.Menu);
+                }
+            }
+        }, false);
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();

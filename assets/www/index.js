@@ -153,11 +153,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.refresh();
     };
     Balloon.prototype = Object.create(ColoredElement.prototype);
-    Balloon.prototype.reset = function(color) {
-        color = color || random.choice(buttons).color;
-        if (color !== this.color) {
-            ColoredElement.prototype.reset.call(this, color);
-        }
+    Balloon.prototype.doBirth = function() {
+        this.born = true;
+        this.bornTime = Date.now();
+        this.pauseTime = 0;
+
         // just in case element sizes change
         this.height = this.domElement.offsetHeight;
         this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
@@ -167,6 +167,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
+    };
+    Balloon.prototype.reset = function(color) {
+        color = color || random.choice(buttons).color;
+        if (color !== this.color) {
+            ColoredElement.prototype.reset.call(this, color);
+        }
         this.born = false; this.bornTime = this.pauseTime = 0;
         this.bornTimeout = 0; // born immediately by default
         this.popped = this.popDone = false;
@@ -174,12 +180,16 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.domElement.classList.remove('squirt');
         this.domElement.classList.remove('payload-dropped');
         this.award = null;
+        // ensure that unborn balloon is invisible
+        this.y = balloonsElement.offsetHeight;
     };
     Balloon.prototype.refresh = function() {
         if (this.popped) { return; }
-        // the 'translateZ' is actually very important here: it enables
+        // the '3d' is actually very important here: it enables
         // GPU acceleration of this transform.
-        var transform = 'translateX('+Math.round(this.x)+'px) translateY('+Math.round(this.y)+'px) translateZ(0)';
+        var transform = 'translate3d('+
+            Math.round(this.x)+'px,'+
+            Math.round(this.y)+'px,0)';
         this.domElement.style.WebkitTransform =
             this.domElement.style.MozTransform =
             this.domElement.style.transform = transform;
@@ -189,9 +199,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             // don't move until it's born
             this.bornTimeout -= dt;
             if (this.bornTimeout < 0) {
-                this.born = true;
-                this.bornTime = Date.now();
-                this.pauseTime = 0;
+                this.doBirth();
             }
             return;
         }

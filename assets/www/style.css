@@ -6,7 +6,7 @@ body { background: #008; }
 
 /* Positioning */
 #game, #buttons, #balloons, #level, #mask, #awards, #sprouts, #clouds, #nell,
-#menu {
+#menu, #rotate {
  position: absolute;
  left: 0; right: 0;
  overflow: hidden;
@@ -54,7 +54,7 @@ body { background: #008; }
  background: #fff;
  border: 5px solid black;
 }
-#mask, #video, #menu {
+#mask, #video, #menu, #rotate {
  /* transition effect knowledge gleaned from:
   *   http://www.greywyvern.com/?post=337
   * thanks! */
@@ -64,11 +64,15 @@ body { background: #008; }
  opacity: 0;
  visibility: hidden;
 }
-.video #mask { opacity: 0.8; }
+.video #mask,
+.rotate #mask { opacity: 0.8; }
 .video #video,
-.menu #menu { opacity: 1; }
+.menu #menu,
+.rotate #rotate { opacity: 1; }
 .video #mask,
 .video #video,
+.rotate #mask,
+.rotate #rotate,
 .menu #menu {
   visibility: visible;
   /* change the visibility property immediately */
@@ -1030,3 +1034,40 @@ body { background: #008; }
 }
 #menu > .stars > div > * { pointer-events: all; }
 .nells > div > div { pointer-events: all; }
+
+/* ------- "please rotate" animation -------- */
+#rotate,
+#rotate .background,
+#rotate .foreground {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+#rotate .background {
+  background-image: url('images/xoom-rotate-bg.png');
+}
+#rotate .foreground {
+  background-image: url('images/xoom-rotate-fg.png');
+}
+@-webkit-keyframes rotate-throb {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@-moz-keyframes menu-star-throb {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.rotate #rotate .background {
+  -webkit-animation: rotate-throb 1s infinite alternate ease;
+  -moz-animation: rotate-throb 1s infinite alternate ease;
+}

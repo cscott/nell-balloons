@@ -545,6 +545,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     })(GameMode.OverlayMode.prototype.leave);
 
     GameMode.Video = new GameMode.OverlayMode('video');
+    GameMode.Rotate = new GameMode.OverlayMode('rotate');
 
     GameMode.Playing = new GameMode('game');
     GameMode.Playing.toJSON = function() {
@@ -811,12 +812,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         if (!isXoom) { return; }
 
         if (window.orientation === 0 || window.orientation === 180) {
-            if (GameMode.currentMode !== GameMode.Video) {
-                GameMode.Video.setUnderMode(GameMode.currentMode);
-                GameMode.switchTo(GameMode.Video);
+            if (GameMode.currentMode !== GameMode.Rotate) {
+                GameMode.Rotate.setUnderMode(GameMode.currentMode);
+                GameMode.switchTo(GameMode.Rotate);
             }
         } else if (window.orientation === 90 || window.orientation === -90) {
-            if (GameMode.currentMode === GameMode.Video) {
+            if (GameMode.currentMode === GameMode.Rotate) {
                 GameMode.switchTo(GameMode.currentMode.underMode);
             }
         }

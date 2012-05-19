@@ -994,6 +994,31 @@ body { background: #008; }
 #menu > .stars .star.hover {
   background-image: url('images/star-bright.png');
 }
+/* rotate & pulse the stars to make it clear they are touchable */
+@-webkit-keyframes menu-star-throb {
+  0% {
+    -webkit-transform: scale(1) translate3d(0,0,0);
+  }
+  100% {
+    -webkit-transform: scale(0.8) translate3d(0,0,0);
+  }
+}
+@-moz-keyframes menu-star-throb {
+  0% {
+    -moz-transform: scale(1);
+  }
+  100% {
+    -moz-transform: scale(0.8);
+  }
+}
+.menu #menu > .stars .star {
+  -webkit-animation: menu-star-throb 1s infinite alternate ease-in;
+  -moz-animation: menu-star-throb 1s infinite alternate ease-in;
+}
+#menu > .stars .star.hover {
+  -webkit-animation-play-state: paused;
+  -moz-animation-play-state: paused;
+}
 #menu > .clouds,
 #menu > .sprout,
 #menu > .stars,

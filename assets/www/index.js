@@ -93,19 +93,30 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             // suppress 'click' event, which would change the history.
             event.preventDefault();
         }, false);
+        this.ignoreMouse = false;
     };
     ClickableElement.prototype = Object.create(ColoredElement.prototype);
     ClickableElement.prototype.highlight = function(event) {
+        switch (event.type) {
+        case 'touchstart': this.ignoreMouse = true; break;
+        case 'mousedown': if (this.ignoreMouse) { return; } break;
+        }
         this.domElement.classList.add('hover');
         event.preventDefault();
     };
     ClickableElement.prototype.unhighlight = function(event) {
+        switch (event.type) {
+        case 'mouseup':
+        case 'mouseout':
+            if (this.ignoreMouse) { return; } break;
+        }
         this.domElement.classList.remove('hover');
         event.preventDefault();
         if (event.type !== 'touchcancel' &&
             event.type !== 'mouseout') {
             this.handleClick();
         }
+        this.ignoreMouse = false;
     };
 
     var Button = function(color) {
@@ -734,6 +745,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     })();
 
     var handleNellTouch = function(ev) {
+        if (ev.type === 'touchstart') {
+            // prevent duplicate events
+            ev.target.removeEventListener('mousedown', handleNellTouch, false);
+        }
         ev.preventDefault();
         nell.switchColor();
     };

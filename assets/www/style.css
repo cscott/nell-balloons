@@ -487,7 +487,7 @@ html,body {
 }
 
 .grass.stratosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png') !important;
+  background-image: url('images/balloon-white.png');
 }
 .grass.stratosphere #balloons .black .payload {
   background-image: url('images/tag-white-bat.png');
@@ -503,7 +503,7 @@ html,body {
 }
 
 .grass.mesosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png') !important;
+  background-image: url('images/balloon-white.png');
 }
 .grass.mesosphere #balloons .black .payload {
   background-image: url('images/tag-white-bat-bw.png');

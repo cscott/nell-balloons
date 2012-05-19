@@ -1,4 +1,5 @@
 define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound', './version'], function(document, Alea, Compat, Funf, nell, score, Sound, version) {
+    var DOCUMENT_TITLE = document.title = "Balloons for Nell";
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
@@ -82,11 +83,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         ColoredElement.call(this, document.createElement('a'), color);
         this.domElement.href='#';
         ['mousedown', 'touchstart'].forEach(function(evname) {
-            this.domElement.addEventListener(evname,this.highlight.bind(this));
+            this.domElement.addEventListener(evname,this.highlight.bind(this), false);
         }.bind(this));
         ['mouseup','mouseout','touchcancel','touchend'].forEach(function(evname){
-            this.domElement.addEventListener(evname, this.unhighlight.bind(this));
+            this.domElement.addEventListener(evname, this.unhighlight.bind(this), false);
         }.bind(this));
+        this.domElement.addEventListener('click', function(event) {
+            // suppress 'click' event, which would change the history.
+            event.preventDefault();
+        }, false);
     };
     ClickableElement.prototype = Object.create(ColoredElement.prototype);
     ClickableElement.prototype.highlight = function(event) {
@@ -456,6 +461,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.prototype.resume = function() {
         document.body.classList.remove('paused');
     };
+    GameMode.prototype.toJSON = function() {
+        return { mode: this.bodyClass };
+    };
     // static properties
     GameMode.currentMode = null;
     GameMode.switchTo = function(mode) {
@@ -467,6 +475,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     GameMode.Menu = new GameMode('menu');
+    GameMode.Menu.toJSON = function() {
+        return { mode: 'Menu', level: this.currentLevel.num };
+    };
     GameMode.Menu.enter = (function() {
         var superEnter = GameMode.Menu.enter;
         return function() {
@@ -490,6 +501,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Video = new GameMode('video');
 
     GameMode.Playing = new GameMode('game');
+    GameMode.Playing.toJSON = function() {
+        return {
+            mode: 'Playing',
+            level: this.currentLevel.num,
+            altitude: this.currentAltitude
+        };
+    };
     GameMode.Playing.switchLevel = function(level) {
         var levelElem = document.querySelector('#game #level');
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
@@ -546,7 +564,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var LEVELS = [ new GameLevel('grass') ]; // XXX
-
+    LEVELS.forEach(function(l, i) { l.num = i; });
+    // default level (handy in case we
+    GameMode.Playing.switchLevel(LEVELS[0]);
+    GameMode.Playing.switchAltitude('ground');
 
 
     // smoothing factor -- closer to 0 means more weight on present

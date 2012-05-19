@@ -10,6 +10,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = true;
+    var HTML5_HISTORY = history.pushState && history.replaceState;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');
     var buttonsElement = document.getElementById('buttons');
@@ -489,6 +490,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         GameMode.Playing.switchLevel(this.currentLevel);
         GameMode.Playing.switchAltitude(altitude);
         GameMode.switchTo(GameMode.Playing);
+        if (HTML5_HISTORY) { // Android/Honeycomb doesn't support this
+            history.pushState(GameMode.currentMode.toJSON(),
+                              DOCUMENT_TITLE + ' | Play!',
+                              '#play');
+        }
     };
     GameMode.Menu.switchLevel = function(level) {
         var levelElem = document.querySelector('#menu .level');
@@ -738,12 +744,42 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     });
 
+    var onPopState = function() {
+        var State = event.state;
+        switch (State.mode) {
+        case 'Playing':
+            GameMode.Playing.switchLevel(LEVELS[State.level]);
+            GameMode.Playing.switchAltitude(LEVELS[State.altitude]);
+            GameMode.switchTo(GameMode.Playing);
+            break;
+        case 'Menu':
+            GameMode.Menu.switchLevel(LEVELS[State.level]);
+            GameMode.switchTo(GameMode.Menu);
+            break;
+        }
+    };
+
     function onDeviceReady() {
         // start in menu screen
         window.GameMode = GameMode;
         GameMode.Menu.switchLevel(LEVELS[0]);
         GameMode.switchTo(GameMode.Menu);
+        if (HTML5_HISTORY) {
+            history.replaceState(GameMode.currentMode.toJSON(),
+                                 DOCUMENT_TITLE+' | Menu', '#menu');
+            window.addEventListener('popstate', onPopState, false);
+        }
+
         // phonegap
+        document.addEventListener("backbutton", function() {
+            if (HTML5_HISTORY) {
+                history.back();
+            } else { // hack!
+                if (GameMode.currentMode === GameMode.Playing) {
+                    GameMode.switchTo(GameMode.Menu);
+                }
+            }
+        }, false);
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();

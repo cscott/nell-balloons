@@ -842,6 +842,10 @@ html,body {
       -moz-transform: rotate(1deg);
     }
 }
+.grass #clouds > .bug {
+    -webkit-animation: none;
+    -moz-animation: none;
+}
 .anim .grass #clouds > .bug {
     -webkit-animation: bug-shake 5000ms infinite both ease-in-out;
     -moz-animation: bug-shake 5000ms infinite both ease-in-out;

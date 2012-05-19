@@ -465,15 +465,18 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     // ------------ game modes ---------------
     var GameMode = function(bodyClass) {
         this.bodyClass = bodyClass;
+        this.active = false;
     };
     GameMode.prototype = {};
     GameMode.prototype.enter = function() {
         this.resume();
         document.body.classList.add(this.bodyClass);
+        this.active = true;
     };
     GameMode.prototype.leave = function() {
         this.pause();
         document.body.classList.remove(this.bodyClass);
+        this.active = false;
     };
     GameMode.prototype.pause = function() {
         document.body.classList.add('paused');
@@ -498,13 +501,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Menu.toJSON = function() {
         return { mode: 'Menu', level: this.currentLevel.num };
     };
-    GameMode.Menu.enter = (function() {
-        var superEnter = GameMode.Menu.enter;
-        return function() {
-            superEnter.call(this);
-            // do child class things
-        };
-    })();
     GameMode.Menu.start = function(altitude) {
         GameMode.Playing.switchLevel(this.currentLevel);
         GameMode.Playing.switchAltitude(altitude);
@@ -523,7 +519,32 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     MenuStar.prototype.altitudeClicked =
         GameMode.Menu.start.bind(GameMode.Menu);
 
-    GameMode.Video = new GameMode('video');
+    GameMode.OverlayMode = function(bodyClass) {
+        GameMode.call(this, bodyClass);
+        this.underMode = null;
+    };
+    GameMode.OverlayMode.prototype = Object.create(GameMode.prototype);
+    GameMode.OverlayMode.prototype.setUnderMode = function(underMode) {
+        this.underMode = this.active ?
+            _switchClass(document.body, this.underMode, underMode, 'bodyClass'):
+            underMode;
+    };
+    GameMode.OverlayMode.prototype.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            if (this.underMode)
+                document.body.classList.add(this.underMode.bodyClass);
+        };
+    })(GameMode.OverlayMode.prototype.enter);
+    GameMode.OverlayMode.prototype.leave = (function(superLeave) {
+        return function() {
+            superLeave.call(this);
+            if (this.underMode)
+                document.body.classList.remove(this.underMode.bodyClass);
+        };
+    })(GameMode.OverlayMode.prototype.leave);
+
+    GameMode.Video = new GameMode.OverlayMode('video');
 
     GameMode.Playing = new GameMode('game');
     GameMode.Playing.toJSON = function() {
@@ -782,6 +803,25 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
+    var onOrientationChange = function() {
+        // XXX this is xoom specific, we should really look at width/height
+        var isXoom = (window.device &&
+                      window.device.platform==='Android' &&
+                      window.device.name==='tervigon');
+        if (!isXoom) { return; }
+
+        if (window.orientation === 0 || window.orientation === 180) {
+            if (GameMode.currentMode !== GameMode.Video) {
+                GameMode.Video.setUnderMode(GameMode.currentMode);
+                GameMode.switchTo(GameMode.Video);
+            }
+        } else if (window.orientation === 90 || window.orientation === -90) {
+            if (GameMode.currentMode === GameMode.Video) {
+                GameMode.switchTo(GameMode.currentMode.underMode);
+            }
+        }
+    };
+
     function onDeviceReady() {
         // start in menu screen
         window.GameMode = GameMode;
@@ -792,6 +832,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                                  DOCUMENT_TITLE+' | Menu', '#menu');
             window.addEventListener('popstate', onPopState, false);
         }
+        window.addEventListener('orientationchange',onOrientationChange,false);
+        if ('orientation' in window) { onOrientationChange(); }
 
         // phonegap
         document.addEventListener("backbutton", function() {

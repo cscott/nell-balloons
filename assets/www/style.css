@@ -5,8 +5,8 @@ html,body {
 body { background: #008; }
 
 /* Positioning */
-#game, #buttons, #balloons, #level, #mask, #awards, #sprouts, #clouds, #nell,
-#menu, #rotate {
+#game, #buttons, #balloons, #level, #mask, #awards, #sprouts, #ruler,
+#clouds, #nell, #menu, #rotate {
  position: absolute;
  left: 0; right: 0;
  overflow: hidden;
@@ -252,8 +252,57 @@ body { background: #008; }
   height: 885px;
   bottom: 104px;
 }
+
+#ruler {
+  top: 0; bottom: 0;
+}
+#ruler > div {
+  position: absolute;
+  left: 0; width: 100%;
+  height: 25%;
+}
+#ruler > .background,
+#ruler .foreground {
+  position: absolute;
+  bottom: 0; left: 0; width: 38px; height: 100%;
+  background: url('images/ruler-tile-dk.png') repeat-y bottom left;
+}
+#ruler .foreground {
+  height: 100%; /* override on element */
+  background-image: url('images/ruler-tile.png');
+  -webkit-transition: height 1s ease;
+  -moz-transition: height 1s ease;
+  transition: height 1s ease;
+}
+#ruler > .ground       { bottom: 0; }
+#ruler > .troposphere  { bottom: 25%; }
+#ruler > .stratosphere { bottom: 50%; }
+#ruler > .mesosphere   { bottom: 75%; }
+#ruler .stars {
+  position: absolute;
+  left: 35px;
+  background: url('images/star-small-outline.png') repeat-x;
+  height: 37px;
+}
+#ruler .stars.one {
+  top: 20.5%;
+  width: 41px;
+}
+#ruler .stars.two {
+  top: 45.9%;
+  width: 82px;
+}
+#ruler .stars.three {
+  top: 71.3%;
+  width: 123px;
+}
+#ruler .stars.highlight {
+  background-image: url('images/star-small.png');
+}
+
 /* make sure #nell>div gets pointer events */
-#clouds, #clouds > *, #sprouts, #balloons, #awards, #mask, #video {
+#clouds, #clouds > *, #sprouts, #ruler, #ruler > *, #balloons, #awards,
+#mask, #video, #rotate {
   pointer-events: none;
 }
 /* don't highlight nell when she is tapped */

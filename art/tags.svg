@@ -17,7 +17,7 @@
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="tags.svg"
-   inkscape:export-filename="/home/cananian/Projects/OLPC/Narrative/nell-balloons/assets/www/images/tag-white-orange.png"
+   inkscape:export-filename="/home/cananian/Projects/OLPC/Narrative/nell-balloons/assets/www/images/tag-white-bat.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <sodipodi:namedview
@@ -27,11 +27,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.9148194"
+     inkscape:zoom="5.3083333"
      inkscape:cx="75"
      inkscape:cy="60"
      inkscape:document-units="px"
-     inkscape:current-layer="layer22"
+     inkscape:current-layer="layer16"
      showgrid="false"
      borderlayer="true"
      inkscape:window-width="1440"
@@ -3801,11 +3801,27 @@
     </rdf:RDF>
   </metadata>
   <g
+     style="display:none"
+     inkscape:label="Tag Bottom, Orange SOLID"
+     id="g10449"
+     inkscape:groupmode="layer"
+     sodipodi:insensitive="true">
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/cananian/Projects/OLPC/Narrative/nell-balloons/assets/www/images/tag-orange-orange.png"
+       inkscape:connector-curvature="0"
+       style="fill:#ff8000;fill-opacity:1;stroke:none;display:inline"
+       d="m 32.995789,1162.9939 c -16.62,0 -30.0000004,13.38 -30.0000004,30 l 0,54 c 0,16.62 13.3800004,30 30.0000004,30 l 84.000001,0 c 16.62,0 30,-13.38 30,-30 l 0,-54 c 0,-16.62 -13.38,-30 -30,-30 l -84.000001,0 z m 42,3 c 1.50209,0 2.71875,1.2166 2.71875,2.7187 0,1.5021 -1.21666,2.7188 -2.71875,2.7188 -1.50209,0 -2.71875,-1.2167 -2.71875,-2.7188 0,-1.5021 1.21666,-2.7187 2.71875,-2.7187 z"
+       id="path10451"
+       transform="translate(0,-1160)" />
+  </g>
+  <g
      inkscape:groupmode="layer"
      id="layer14"
      inkscape:label="Tag Bottom, Orange"
-     sodipodi:insensitive="true"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <path
        transform="translate(0,-1160)"
        id="rect15055"
@@ -3820,8 +3836,8 @@
      inkscape:groupmode="layer"
      id="layer24"
      inkscape:label="Tag Top, Orange"
-     sodipodi:insensitive="true"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <rect
        transform="translate(0,-1160)"
        ry="30"
@@ -3840,8 +3856,8 @@
      inkscape:groupmode="layer"
      id="layer12"
      inkscape:label="Tag Bottom, Black"
-     sodipodi:insensitive="true"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <path
        transform="translate(0,-1160)"
        inkscape:connector-curvature="0"
@@ -3912,13 +3928,12 @@
      style="display:inline"
      inkscape:label="Tag Bottom, White"
      id="g165231"
-     inkscape:groupmode="layer"
-     sodipodi:insensitive="true">
+     inkscape:groupmode="layer">
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
        inkscape:export-filename="/home/cananian/Projects/OLPC/Narrative/nell-balloons/assets/www/images/tag-white-empty.png"
-       style="fill:#f6f6f6;fill-opacity:0.85098039;stroke:none;display:inline"
+       style="fill:#f6f6f6;fill-opacity:0.94117647;stroke:none;display:inline"
        d="m 32.995793,1162.9939 c -16.62,0 -29.9999999,13.38 -29.9999999,30 l 0,54 c 0,16.62 13.3799999,30 29.9999999,30 l 83.999997,0 c 16.62,0 30,-13.38 30,-30 l 0,-54 c 0,-16.62 -13.38,-30 -30,-30 l -83.999997,0 z m 42,3 c 1.50209,0 2.71875,1.2167 2.71875,2.7187 0,1.5021 -1.21666,2.7188 -2.71875,2.7188 -1.50209,0 -2.71875,-1.2167 -2.71875,-2.7188 0,-1.502 1.21666,-2.7187 2.71875,-2.7187 z"
        id="path165233"
        inkscape:connector-curvature="0"
@@ -4253,7 +4268,7 @@
     </g>
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Orange"
      id="layer22"
      inkscape:groupmode="layer"
@@ -4896,7 +4911,7 @@
     </g>
   </g>
   <g
-     style="display:none"
+     style="display:inline"
      inkscape:label="Bat"
      id="layer16"
      inkscape:groupmode="layer"

@@ -128,12 +128,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         handleButtonPress(this.color);
     };
 
-    var MenuStar = function(altitude) {
-        ClickableElement.call(this, 'star');
+    var MenuTag = function(altitude) {
+        ClickableElement.call(this, 'tag');
         this.altitude = altitude;
     };
-    MenuStar.prototype = Object.create(ClickableElement.prototype);
-    MenuStar.prototype.handleClick = function() {
+    MenuTag.prototype = Object.create(ClickableElement.prototype);
+    MenuTag.prototype.handleClick = function() {
         this.altitudeClicked(this.altitude);
     };
 
@@ -384,14 +384,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     createButtons();
 
     altitudeStars = [];
-    var createStars = function() {
+    var createMenuTags = function() {
         ['ground', 'troposphere', 'stratosphere', 'mesosphere'].forEach(function(altitude) {
-            var s = new MenuStar(altitude);
-            s.attach(document.querySelector('#menu > .stars > .'+altitude));
+            var s = new MenuTag(altitude);
+            s.attach(document.querySelector('#menu .awards .'+altitude));
             altitudeStars.push(s);
         });
     };
-    createStars();
+    createMenuTags();
 
 
     var balloons = [];
@@ -518,7 +518,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
                                          'levelClass');
     };
-    MenuStar.prototype.altitudeClicked =
+    MenuTag.prototype.altitudeClicked =
         GameMode.Menu.start.bind(GameMode.Menu);
 
     GameMode.OverlayMode = function(bodyClass) {

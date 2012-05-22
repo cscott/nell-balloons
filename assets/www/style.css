@@ -943,10 +943,9 @@ body { background: #008; }
 }
 
 /* ------------------ menu layout ---------------------- */
-#menu > .level,
-#menu > .nells,
-#menu > .clouds,
-#menu > .stars {
+#menu .nells,
+#menu .clouds,
+#menu .awards {
   position: absolute;
   left: 0; right: 0;
   top: 0; bottom: 0;
@@ -964,7 +963,7 @@ body { background: #008; }
 #menu .stratosphere { bottom: 50%; }
 #menu .mesosphere { bottom: 75%; }
 
-#menu .level .background {
+#menu .level > .background {
   position: absolute;
   width: 400%; height: 400%;
   bottom: 0; left: 0;
@@ -977,11 +976,11 @@ body { background: #008; }
   transform: scale(0.25,0.25);
   transform-origin: bottom left;
 }
-#menu .level.grass .background {
+#menu .level.grass > .background {
   background-color: #000;
   background-image: url('images/grass-back.png');
 }
-#menu .level.grass .background .stars {
+#menu .level.grass > .background .stars {
   position: absolute; left: 0; top: 0; height: 25%; width: 25%;
   background: url('images/star-tile.png') repeat;
   -webkit-transform: scale(4,4);
@@ -1023,32 +1022,77 @@ body { background: #008; }
   -moz-transform: scale(.522,.522);
   -moz-transform-origin: bottom right;
 }
-#menu > .sprout {
+#menu .sprout {
   position: absolute;
   background-image: url('images/sprout1-lgr.png');
   width: 326px; height: 1207px;
-  bottom: 36px; left: 13px;
+  bottom: 30px; left: 13px;
 }
-#menu > .clouds .grass {
+#menu .clouds .grass {
   position: absolute; bottom: 0; left: 0;
-  width: 200%; height: 243px;
-  background: url('images/grass-front.png') repeat-x;
+  width: 200%;
+  background-repeat: repeat-x;
   -webkit-transform: scale(0.5,0.5);
   -webkit-transform-origin: bottom left;
   -moz-transform: scale(0.5,0.5);
   -moz-transform-origin: bottom left;
 }
-#menu > .stars .star {
-  position: absolute; bottom: 50%; left: 37px;
+#menu .level.grass .clouds .grass {
+  height: 243px;
+  background-image: url('images/grass-front.png');
+}
+#menu .awards .stars {
+  position: absolute;
+  bottom: 50%; height: 92px; margin-bottom: -46px;
+  left: 50%; width: 390px; margin-left: -180px; /* left: 234px */
+  text-align: center; white-space: nowrap;
+}
+#menu .awards .stars .star {
+  display: inline-block;
   width: 102px; height: 92px;
-  margin-bottom: -46px;
-  background: url('images/star.png') no-repeat;
+  margin: 0 14px;
+  background: url('images/star-outline.png') no-repeat;
 }
-#menu > .stars .star.hover {
-  background-image: url('images/star-bright.png');
+#menu .awards .stars.one .star:first-child,
+#menu .awards .stars.two .star:first-child,
+#menu .awards .stars.two .star:first-child + .star,
+#menu .awards .stars.three .star:first-child,
+#menu .awards .stars.three .star:first-child + .star,
+#menu .awards .stars.three .star:first-child + .star + .star {
+  background-image: url('images/star.png');
 }
-/* rotate & pulse the stars to make it clear they are touchable */
-@-webkit-keyframes menu-star-throb {
+#menu .awards .tag {
+  position: absolute; bottom: 50%; left: 27px;
+  width: 150px; height: 120px;
+  margin-bottom: -65px; /* cheat down 5px */
+  background: url('images/tag-white-empty.png') no-repeat;
+  display: block;
+}
+#menu .awards .tag.hover {
+  /* use CSS to do tag highlighting */
+  -webkit-border-radius: 32px;
+  -moz-border-radius: 32px;
+  border-radius: 32px;
+  -webkit-box-shadow: 0 0 10px 10px rgba(255,255,255,0.6);
+  -moz-box-shadow: 0 0 10px 10px rgba(255,255,255,0.6);
+  box-shadow: 0 0 10px 10px rgba(255,255,255,0.6);
+  background-color: rgba(255,255,255,0.8);
+}
+/* tags from grass level */
+#menu .level.grass .awards .ground .tag {
+  background-image: url('images/tag-orange-solid.png');
+}
+#menu .level.grass .awards .troposphere .tag {
+  background-image: url('images/tag-orange-orange.png');
+}
+#menu .level.grass .awards .stratosphere .tag {
+  background-image: url('images/tag-white-orange.png');
+}
+#menu .level.grass .awards .mesosphere .tag {
+  background-image: url('images/tag-white-orange-bw.png');
+}
+/* pulse the tags to make it clear they are touchable */
+@-webkit-keyframes menu-tag-throb {
   0% {
     -webkit-transform: scale(1) translate3d(0,0,0);
   }
@@ -1056,7 +1100,7 @@ body { background: #008; }
     -webkit-transform: scale(0.8) translate3d(0,0,0);
   }
 }
-@-moz-keyframes menu-star-throb {
+@-moz-keyframes menu-tag-throb {
   0% {
     -moz-transform: scale(1);
   }
@@ -1064,24 +1108,24 @@ body { background: #008; }
     -moz-transform: scale(0.8);
   }
 }
-.menu #menu > .stars .star {
-  -webkit-animation: menu-star-throb 1s infinite alternate ease-in;
-  -moz-animation: menu-star-throb 1s infinite alternate ease-in;
+.menu #menu .awards .tag {
+  -webkit-animation: menu-tag-throb 1s infinite alternate ease-in;
+  -moz-animation: menu-tag-throb 1s infinite alternate ease-in;
 }
-#menu > .stars .star.hover {
+#menu .awards .tag.hover {
   -webkit-animation-play-state: paused;
   -moz-animation-play-state: paused;
 }
-#menu > .clouds,
-#menu > .sprout,
-#menu > .stars,
+#menu .clouds,
+#menu .sprout,
+#menu .awards,
 #menu .ground,
 #menu .troposphere,
 #menu .stratosphere,
 #menu .mesosphere {
   pointer-events: none;
 }
-#menu > .stars > div > * { pointer-events: all; }
+#menu .awards .tag { pointer-events: all; }
 .nells > div > div { pointer-events: all; }
 
 /* ------- "please rotate" animation -------- */

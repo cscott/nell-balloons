@@ -167,6 +167,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
+
+        funf.record('born', this.color);
     };
     Balloon.prototype.reset = function(color) {
         color = color || random.choice(buttons).color;
@@ -757,7 +759,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                     }
                     isBorn = true;
                     b.reset();
-                    funf.record('born', b.color);
                 }
                 b.refresh();
             }
@@ -815,15 +816,18 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             if (GameMode.currentMode !== GameMode.Rotate) {
                 GameMode.Rotate.setUnderMode(GameMode.currentMode);
                 GameMode.switchTo(GameMode.Rotate);
+                funf.record('orientation', 'landscape');
             }
         } else if (window.orientation === 90 || window.orientation === -90) {
             if (GameMode.currentMode === GameMode.Rotate) {
                 GameMode.switchTo(GameMode.currentMode.underMode);
+                funf.record('orientation', 'portrait');
             }
         }
     };
 
     function onDeviceReady() {
+        funf.record('startColor', nell.color);
         // start in menu screen
         window.GameMode = GameMode;
         GameMode.Menu.switchLevel(LEVELS[0]);
@@ -849,7 +853,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
-        funf.record('startColor', nell.color);
         // add top-level "anim" class unless we're on xoom/honeycomb
         var isHoneycomb = window.device &&
             (window.device.platform==='Android') &&

@@ -25,8 +25,8 @@ require([], function() {
 </style>
 </head>
 
-<body class="anim n9 menu rotate">
-<div id="game"><div id="level" class="grass mesosphere">
+<body class="anim n9 menu">
+<div id="game"><div id="level" class="grass troposphere">
  <div id="background">
   <div class="troposphere">
    <div class="cloud c2"></div>
@@ -74,6 +74,29 @@ require([], function() {
          class="award a5"></div><div class="award a6"></div><div
          class="award a7"></div><div class="award a8"></div>
  </div>
+ <div id="ruler">
+   <div class="background"><div class="foreground" style="height:33%"></div></div>
+   <div class="ground">
+    <div class="stars one"></div>
+    <div class="stars two"></div>
+    <div class="stars three"></div>
+   </div>
+   <div class="troposphere">
+    <div class="stars one"></div>
+    <div class="stars two highlight"></div>
+    <div class="stars three"></div>
+   </div>
+   <div class="stratosphere">
+    <div class="stars one"></div>
+    <div class="stars two"></div>
+    <div class="stars three"></div>
+   </div>
+   <div class="mesosphere">
+    <div class="stars one"></div>
+    <div class="stars two"></div>
+    <div class="stars three"></div>
+   </div>
+ </div>
  <div id="clouds">
   <div class="bug"></div>
   <div class="grass"></div>
@@ -95,13 +118,11 @@ require([], function() {
 <a class="yellow"></a><a class="lilac"></a><a class="black"></a><a class="orange"></a>
 </div>
 
-<div id="menu">
- <div class="level grass">
-  <div class="background">
-    <div class="mesosphere">
-      <div class="stars"></div>
-    </div>
-  </div>
+<div id="menu"><div class="level grass">
+ <div class="background">
+   <div class="mesosphere">
+     <div class="stars"></div>
+   </div>
  </div>
  <div class="nells">
   <div class="ground">
@@ -129,16 +150,36 @@ require([], function() {
   </div>
  </div><!-- end of nells -->
  <div class="sprout"></div>
- <div class="stars">
-  <div class="ground"><div class="star"></div></div>
-  <div class="troposphere"><div class="star"></div></div>
-  <div class="stratosphere"><div class="star"></div></div>
-  <div class="mesosphere"><div class="star"></div></div>
+ <div class="awards">
+  <div class="ground">
+   <div class="stars three">
+<span class="star"></span><span class="star"></span><span class="star"></span>
+   </div>
+   <div class="tag"></div>
+  </div>
+  <div class="troposphere">
+   <div class="stars two">
+<span class="star"></span><span class="star"></span><span class="star"></span>
+   </div>
+   <div class="tag"></div>
+  </div>
+  <div class="stratosphere">
+   <div class="stars one">
+<span class="star"></span><span class="star"></span><span class="star"></span>
+   </div>
+   <div class="tag hover"></div>
+  </div>
+  <div class="mesosphere">
+   <div class="stars">
+<span class="star"></span><span class="star"></span><span class="star"></span>
+   </div>
+   <div class="tag"></div>
+  </div>
  </div>
  <div class="clouds">
   <div class="grass"></div>
  </div>
-</div>
+</div></div>
 
 <div id="mask"></div>
 <div id="video"></div>

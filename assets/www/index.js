@@ -792,6 +792,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var onPopState = function() {
         var State = event.state;
+        if (!State) { return; }
+        if (!State.mode) { return; }
         switch (State.mode) {
         case 'Playing':
             GameMode.Playing.switchLevel(LEVELS[State.level]);

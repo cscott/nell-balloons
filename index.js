@@ -518,6 +518,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
                                          'levelClass');
     };
+    GameMode.Menu.setExposed = function(altitude) {
+        var shadeElem = document.querySelector('#menu .level');
+        var old = this.currentExposed && ('exposed-'+this.currentExposed);
+        _switchClass(shadeElem, old, 'exposed-'+altitude);
+        this.currentExposed = altitude;
+    };
     MenuTag.prototype.altitudeClicked =
         GameMode.Menu.start.bind(GameMode.Menu);
 
@@ -792,6 +798,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var onPopState = function() {
         var State = event.state;
+        if (!State) { return; }
+        if (!State.mode) { return; }
         switch (State.mode) {
         case 'Playing':
             GameMode.Playing.switchLevel(LEVELS[State.level]);
@@ -831,6 +839,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // start in menu screen
         window.GameMode = GameMode;
         GameMode.Menu.switchLevel(LEVELS[0]);
+        GameMode.Menu.setExposed('ground');
         GameMode.switchTo(GameMode.Menu);
         if (HTML5_HISTORY) {
             history.replaceState(GameMode.currentMode.toJSON(),

@@ -1041,6 +1041,51 @@ body { background: #008; }
   height: 243px;
   background-image: url('images/grass-front.png');
 }
+#menu .clouds .cloudshade,
+#menu .clouds .cloudshade > * {
+  position: absolute; left: 0; right: 0;
+}
+#menu .clouds .cloudshade {
+  top: 0;
+  height: 100%; /* overridden below */
+ -webkit-transition: height 1s ease-in-out;
+ -moz-transition: height 1s ease-in-out;
+ transition: height 1s ease-in-out;
+}
+/* set cloudshade to all the classes you want to expose */
+#menu .exposed-ground       .clouds .cloudshade { height: 75%; }
+#menu .exposed-troposphere  .clouds .cloudshade { height: 50%; }
+#menu .exposed-stratosphere .clouds .cloudshade { height: 25%; }
+#menu .exposed-mesosphere   .clouds .cloudshade { height: 0;   }
+#menu .clouds .cloudshade .top {
+  top: 0; bottom: 225px;
+  background: url('images/cloud-tile.png') repeat;
+  background-position: bottom left;
+}
+#menu .clouds .cloudshade .bottom {
+  /* overhang bottom of element a little bit */
+  bottom: -25px; height: 250px;
+  background: url('images/cloud-tile-bottom.png') repeat-x;
+}
+
+#menu .awards > * {
+  visibility: hidden;
+  -webkit-transition: visibility 0s linear 1s;
+  -moz-transition: visibility 0s linear 1s;
+  transition: visibility 0s linear 1s;
+}
+#menu .exposed-ground .awards > .ground,
+#menu .exposed-troposphere .awards > .ground,
+#menu .exposed-troposphere .awards > .troposphere,
+#menu .exposed-stratosphere .awards > .ground,
+#menu .exposed-stratosphere .awards > .troposphere,
+#menu .exposed-stratosphere .awards > .stratosphere,
+#menu .exposed-mesosphere .awards > * {
+  visibility: visible;
+  -webkit-transition-delay: 0s;
+  -moz-transition-delay: 0s;
+  transition-delay: 0s;
+}
 #menu .awards .stars {
   position: absolute;
   bottom: 50%; height: 92px; margin-bottom: -46px;

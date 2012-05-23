@@ -19,12 +19,12 @@ define(['./webintent'], function(WebIntent) {
         window.device && window.device.platform==='Android') {
         Funf.prototype.record = function(name, value) {
             var wi = new WebIntent();
-            var o = { name:name, value:value };
+            var o = { name:name, value:value, millis: Date.now() };
             wi.sendBroadcast({
                 action: FUNF_ACTION_RECORD,
                 extras: {
                     DATABASE_NAME: FUNF_DATABASE_NAME,
-                    TIMESTAMP: Date.now(),
+                    TIMESTAMP: Math.floor(Date.now()/1000),
                     NAME: this.appName,
                     VALUE: JSON.stringify(o)
                 }

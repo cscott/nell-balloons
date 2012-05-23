@@ -1088,18 +1088,20 @@ body { background: #008; }
   -webkit-transition: visibility 0s linear 1s;
   -moz-transition: visibility 0s linear 1s;
   transition: visibility 0s linear 1s;
+  pointer-events: none;
 }
-#menu .exposed-ground .awards > .ground,
-#menu .exposed-troposphere .awards > .ground,
-#menu .exposed-troposphere .awards > .troposphere,
-#menu .exposed-stratosphere .awards > .ground,
-#menu .exposed-stratosphere .awards > .troposphere,
-#menu .exposed-stratosphere .awards > .stratosphere,
-#menu .exposed-mesosphere .awards > * {
+.menu #menu .exposed-ground .awards > .ground,
+.menu #menu .exposed-troposphere .awards > .ground,
+.menu #menu .exposed-troposphere .awards > .troposphere,
+.menu #menu .exposed-stratosphere .awards > .ground,
+.menu #menu .exposed-stratosphere .awards > .troposphere,
+.menu #menu .exposed-stratosphere .awards > .stratosphere,
+.menu #menu .exposed-mesosphere .awards > * {
   visibility: visible;
   -webkit-transition-delay: 0s;
   -moz-transition-delay: 0s;
   transition-delay: 0s;
+  pointer-events: all;
 }
 #menu .awards .stars {
   position: absolute;
@@ -1185,7 +1187,7 @@ body { background: #008; }
 #menu .mesosphere {
   pointer-events: none;
 }
-#menu .awards .tag { pointer-events: all; }
+.menu #menu .awards .tag { pointer-events: all; }
 .nells > div > div { pointer-events: all; }
 
 /* ------- "please rotate" animation -------- */

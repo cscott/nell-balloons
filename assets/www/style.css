@@ -142,6 +142,9 @@ body { background: #008; }
   background-image: url('images/grass-back.png');
   background-repeat: repeat-x;
   background-position: bottom;
+  /* CSS3 gradient */
+  background-image: -webkit-linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+  background-image: -moz-linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
 .grass #background .satellite1,
 .grass #background .satellite2,
@@ -989,6 +992,8 @@ body { background: #008; }
 #menu .level.grass > .background {
   background-color: #000;
   background-image: url('images/grass-back.png');
+  background-image: -webkit-linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+  background-image: -moz-linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
 #menu .level.grass > .background .stars {
   position: absolute; left: 0; top: 0; height: 25%; width: 25%;

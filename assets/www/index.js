@@ -3,7 +3,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
-    var MAX_BALLOON_SPEED_Y = 1000 / 1000; /* pixels per ms */
+    var MAX_BALLOON_SPEED_Y =  800 / 1000; /* pixels per ms */
     var X_SPEED_FRACTION = 0.25; // fraction of y speed
 
     var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y; /* pixels per ms */
@@ -177,6 +177,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // now reset properties
         this.x = Math.floor(random() * this.maxx);
         this.y = balloonsElement.offsetHeight;
+        this.fastY = this.y - this.height;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
@@ -234,7 +235,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                         // deal w/ race -- maybe we lost this one already!
                         elem.classList.add('show');
                     }
-                    elem.style.WebkitTransform='';
+                    elem.style.WebkitTransform =
+                        elem.style.MozTransform =
+                        elem.style.transform = '';
                     var flex = document.querySelector('#awards .award.flex');
                     flex.style.display = 'none';
 
@@ -243,7 +246,19 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }
             return;
         }
-        this.y -= dt * this.speedy;
+        // faster until we get past the grass at the bottom.
+        if (this.y > this.fastY) {
+            // amount of time taken to get above fastY pixels at
+            // MAX_BALLOON_SPEED_Y;
+            var fastT = (this.y - this.fastY) / MAX_BALLOON_SPEED_Y;
+            if (fastT > dt) {
+                this.y -= dt * MAX_BALLOON_SPEED_Y;
+            } else {
+                this.y = this.fastY - (dt-fastT) * this.speedy;
+            }
+        } else {
+            this.y -= dt * this.speedy;
+        }
         this.x += dt * this.speedx;
         if (this.x < 0) {
             this.x = 0; this.speedx = 0;
@@ -291,7 +306,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var offsetX = elem.offsetLeft + elem.offsetParent.offsetLeft;
             var x = Math.round(this.x - offsetX + 23 /* center on balloon */);
             var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
-            elem.style.WebkitTransform='translate3d('+x+'px,'+y+'px,0)';
+            elem.style.WebkitTransform=
+                elem.style.MozTransform=
+                elem.style.transform='translate3d('+x+'px,'+y+'px,0)';
             sprout.grow();
             saveScore();
         } else if (isSquirt) {

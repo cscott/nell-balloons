@@ -110,6 +110,7 @@ define([], function() {
             audio.play();
         };
         this.unloop = function() {
+            if (!audio.loop) { return; /* only unloop once */ }
             audio.pause();
             audio.removeAttribute('loop');
             audio.removeEventListener('ended', loopFunc, false);

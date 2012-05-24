@@ -30,6 +30,7 @@ body { background: #008; }
  padding:0; margin: 0;
  -webkit-tap-highlight-color: rgba(0,0,0,0);
  tap-highlight-color: rgba(0,0,0,0);
+ pointer-events: none;
 }
 #buttons > a.black  { background-color: #030303; }
 #buttons > a.lilac  { background-color: #ce72b9; }
@@ -40,6 +41,14 @@ body { background: #008; }
 #buttons > a.hover {
  background-image: url('images/button-overlay-hover.png');
 }
+.game #buttons > a {
+  pointer-events: all;
+}
+.video #buttons > a,
+.rotate #buttons > a,
+.leveldone #buttons > a {
+  pointer-events: all;
+}
 
 #mask {
  top: 0; bottom: 0;
@@ -47,14 +56,26 @@ body { background: #008; }
 }
 #video {
  position: absolute;
- top: 50%; left: 50%;
- /* 1280x720 :: 800x450 */
+ left: 0; top: 50%;
+ /* 1280x720 :: 800x450 .. plus 10px border */
+ width: 100%; height: 460px;
+ margin-top: -230px;
+ text-align: center;
+ white-space: nowrap;
+ /* overflow style very important, keeps us from 'zooming' when you
+  * double tap on (hidden!) #video element, despite pointer-events: none
+  * *and* overflow: hidden style on <body>. */
+ overflow: hidden;
+}
+#video > .inner {
+ display: inline-block;
  width: 800px; height: 450px;
- margin-left: -400px; margin-top: -225px;
- background: #fff;
  border: 5px solid black;
 }
 #mask, #video, #menu, #rotate {
+  display: none;
+}
+.anim #mask, .anim #video, .anim #menu, .anim #rotate {
  /* transition effect knowledge gleaned from:
   *   http://www.greywyvern.com/?post=337
   * thanks! */
@@ -63,6 +84,7 @@ body { background: #008; }
  transition: visibility 0s linear 700ms, opacity 700ms ease-in-out;
  opacity: 0;
  visibility: hidden;
+ display: block;
 }
 .video #mask,
 .rotate #mask { opacity: 0.8; }
@@ -79,6 +101,7 @@ body { background: #008; }
   -webkit-transition-delay: 0s;
   -moz-transition-delay: 0s;
   transition-delay: 0s;
+  display: block;
 }
 .video #game *,
 .paused #game * {
@@ -132,6 +155,11 @@ body { background: #008; }
   background-image: url('images/grass-back.png');
   background-repeat: repeat-x;
   background-position: bottom;
+}
+.anim .grass #background {
+  /* CSS3 gradient */
+  background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+  background-image: -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
 .grass #background .satellite1,
 .grass #background .satellite2,
@@ -300,13 +328,28 @@ body { background: #008; }
   background-image: url('images/star-small.png');
 }
 
+@-webkit-keyframes leveldone-throb {
+  0% { -webkit-transform: translate3d(0,0,0); }
+ 100% { -webkit-transform: translate3d(0,0,0) scale(2); }
+}
+@-moz-keyframes leveldone-throb {
+  0% { -moz-transform: scale(1); }
+ 100% { -moz-transform: scale(2); }
+}
+.leveldone #ruler .stars.highlight {
+  -webkit-animation: leveldone-throb 0.35s infinite alternate ease-in;
+  -moz-animation: leveldone-throb 0.35s infinite alternate ease-in;
+  -webkit-transform-origin: 30% 50%;
+  -moz-transform-origin: 30% 50%;
+}
+
 /* make sure #nell>div gets pointer events */
 #clouds, #clouds > *, #sprouts, #ruler, #ruler > *, #balloons, #awards,
 #mask, #video, #rotate {
   pointer-events: none;
 }
 /* don't highlight nell when she is tapped */
-#nell, #nell * {
+.nells > div > div {
  -webkit-tap-highlight-color: rgba(0,0,0,0);
  tap-highlight-color: rgba(0,0,0,0);
 }
@@ -980,6 +1023,10 @@ body { background: #008; }
   background-color: #000;
   background-image: url('images/grass-back.png');
 }
+.anim #menu .level.grass > .background {
+  background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+  background-image: -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+}
 #menu .level.grass > .background .stars {
   position: absolute; left: 0; top: 0; height: 25%; width: 25%;
   background: url('images/star-tile.png') repeat;
@@ -1073,14 +1120,15 @@ body { background: #008; }
   -webkit-transition: visibility 0s linear 1s;
   -moz-transition: visibility 0s linear 1s;
   transition: visibility 0s linear 1s;
+  pointer-events: none;
 }
-#menu .exposed-ground .awards > .ground,
-#menu .exposed-troposphere .awards > .ground,
-#menu .exposed-troposphere .awards > .troposphere,
-#menu .exposed-stratosphere .awards > .ground,
-#menu .exposed-stratosphere .awards > .troposphere,
-#menu .exposed-stratosphere .awards > .stratosphere,
-#menu .exposed-mesosphere .awards > * {
+.menu #menu .exposed-ground .awards > .ground,
+.menu #menu .exposed-troposphere .awards > .ground,
+.menu #menu .exposed-troposphere .awards > .troposphere,
+.menu #menu .exposed-stratosphere .awards > .ground,
+.menu #menu .exposed-stratosphere .awards > .troposphere,
+.menu #menu .exposed-stratosphere .awards > .stratosphere,
+.menu #menu .exposed-mesosphere .awards > * {
   visibility: visible;
   -webkit-transition-delay: 0s;
   -moz-transition-delay: 0s;
@@ -1112,6 +1160,8 @@ body { background: #008; }
   margin-bottom: -65px; /* cheat down 5px */
   background: url('images/tag-white-empty.png') no-repeat;
   display: block;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  tap-highlight-color: rgba(0,0,0,0);
 }
 #menu .awards .tag.hover {
   /* use CSS to do tag highlighting */
@@ -1170,7 +1220,7 @@ body { background: #008; }
 #menu .mesosphere {
   pointer-events: none;
 }
-#menu .awards .tag { pointer-events: all; }
+.menu #menu .awards .tag { pointer-events: all; }
 .nells > div > div { pointer-events: all; }
 
 /* ------- "please rotate" animation -------- */

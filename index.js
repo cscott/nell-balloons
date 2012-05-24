@@ -3,7 +3,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
-    var MAX_BALLOON_SPEED_Y = 1000 / 1000; /* pixels per ms */
+    var MAX_BALLOON_SPEED_Y =  800 / 1000; /* pixels per ms */
     var X_SPEED_FRACTION = 0.25; // fraction of y speed
 
     var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y; /* pixels per ms */
@@ -17,22 +17,22 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var balloonsElement = document.getElementById('balloons');
     var funf = nell.funf = score.funf = new Funf('NellBalloons'+version);
     var buttons, handleButtonPress;
-    var refresh, refreshID = null;
+    var refresh;
     var SPROUTS;
 
-    var AWARDS = [['a1', 1/2+1/3],
-                  ['a2', 1/4+1/6],
-                  ['a3', 1/8+1/9],
-                  ['a4', 1/16+1/12],
-                  ['a5', 1/32+1/15],
-                  ['a6', 1/64+1/18],
-                  ['a7', 1/128+1/21],
-                  ['a8', 1/256+1/24]];
-    // XXX remove all but first two rewards for first week deployment
-    AWARDS.forEach(function(a) { a[1] = 0; });
-    AWARDS[0][1] = 0.9;
-    AWARDS[0][2] = 0.1;
-    // XXX end award hack
+    var AWARDS = [['a1', 1/2/*+1/3*/],
+                  ['a2', 1/4/*+1/6*/],
+                  ['a3', 1/8/*+1/9*/],
+                  ['a4', 1/16/*+1/12*/],
+                  ['a5', 1/32/*+1/15*/],
+                  ['a6', 1/64/*+1/18*/]];
+
+    var elForEach = function(elementList, func) {
+        var i;
+        for (i=0; i<elementList.length; i++) {
+            func(elementList[i], i);
+        }
+    };
 
     var pickAward = function() {
         var i;
@@ -60,6 +60,23 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 return;
             }
         }
+    };
+    var checkForFinishedLevel = function() {
+        for (i=0; i<AWARDS.length; i++) {
+            var sprout = SPROUTS[AWARDS[i][0]];
+            if (sprout.size < 0) {
+                return; // level not done yet!
+            }
+        }
+        // ok, level done!
+        console.assert(GameMode.currentMode === GameMode.Playing);
+        funf.record('leveldone', JSON.stringify(GameMode.currentMode));
+        stopMusic();
+        // play congratulatory sound!
+        LEVEL_SOUNDS[0].play();
+        // XXX award stars!
+        GameMode.LevelDone.push();
+        // XXX save score, award stars, etc!
     };
 
     var ColoredElement = function(element, color) {
@@ -103,6 +120,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
         this.domElement.classList.add('hover');
         event.preventDefault();
+        if (this.fast && this.ignoreMouse) { this.handleClick(); }
     };
     ClickableElement.prototype.unhighlight = function(event) {
         switch (event.type) {
@@ -113,7 +131,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.domElement.classList.remove('hover');
         event.preventDefault();
         if (event.type !== 'touchcancel' &&
-            event.type !== 'mouseout') {
+            event.type !== 'mouseout' &&
+            !(this.fast && this.ignoreMouse)) {
             this.handleClick();
         }
         this.ignoreMouse = false;
@@ -122,9 +141,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var Button = function(color) {
         ClickableElement.call(this, color);
         this.attach(buttonsElement);
+        this.fast = true; // fast button response
     };
     Button.prototype = Object.create(ClickableElement.prototype);
     Button.prototype.handleClick = function() {
+        if (GameMode.currentMode !== GameMode.Playing) { return; }
         handleButtonPress(this.color);
     };
 
@@ -164,6 +185,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // now reset properties
         this.x = Math.floor(random() * this.maxx);
         this.y = balloonsElement.offsetHeight;
+        this.fastY = this.y - this.height;
         // speeds are in pixels / second.
         this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
         this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
@@ -221,14 +243,30 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                         // deal w/ race -- maybe we lost this one already!
                         elem.classList.add('show');
                     }
-                    elem.style.WebkitTransform='';
+                    elem.style.WebkitTransform =
+                        elem.style.MozTransform =
+                        elem.style.transform = '';
                     var flex = document.querySelector('#awards .award.flex');
                     flex.style.display = 'none';
+
+                    checkForFinishedLevel();
                 }
             }
             return;
         }
-        this.y -= dt * this.speedy;
+        // faster until we get past the grass at the bottom.
+        if (this.y > this.fastY) {
+            // amount of time taken to get above fastY pixels at
+            // MAX_BALLOON_SPEED_Y;
+            var fastT = (this.y - this.fastY) / MAX_BALLOON_SPEED_Y;
+            if (fastT > dt) {
+                this.y -= dt * MAX_BALLOON_SPEED_Y;
+            } else {
+                this.y = this.fastY - (dt-fastT) * this.speedy;
+            }
+        } else {
+            this.y -= dt * this.speedy;
+        }
         this.x += dt * this.speedx;
         if (this.x < 0) {
             this.x = 0; this.speedx = 0;
@@ -276,7 +314,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var offsetX = elem.offsetLeft + elem.offsetParent.offsetLeft;
             var x = Math.round(this.x - offsetX + 23 /* center on balloon */);
             var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
-            elem.style.WebkitTransform='translate3d('+x+'px,'+y+'px,0)';
+            elem.style.WebkitTransform=
+                elem.style.MozTransform=
+                elem.style.transform='translate3d('+x+'px,'+y+'px,0)';
             sprout.grow();
             saveScore();
         } else if (isSquirt) {
@@ -344,7 +384,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     // load recent score
     var loadScore = function() {
-        if (!(score.recent && score.recent.length === AWARDS.length)) {
+        if (!(score.recent && score.recent.length >= AWARDS.length)) {
             return;
         }
         AWARDS.forEach(function(a, i) {
@@ -362,7 +402,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         });
         score.save(nscore);
     };
-    loadScore();
+    //loadScore();
 
     buttons = [];
     var createButtons = function() {
@@ -454,6 +494,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
     var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
     var AWARD_SOUNDS = loadSounds(['sounds/award']);
+    var LEVEL_SOUNDS = loadSounds(['sounds/levelwin',
+                                   'sounds/levellose']);
 
     // utility method
     var _switchClass = function(elem, from, to, optProp) {
@@ -506,6 +548,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Menu.start = function(altitude) {
         GameMode.Playing.switchLevel(this.currentLevel);
         GameMode.Playing.switchAltitude(altitude);
+        GameMode.Playing.reset();
         GameMode.switchTo(GameMode.Playing);
         if (HTML5_HISTORY) { // Android/Honeycomb doesn't support this
             history.pushState(GameMode.currentMode.toJSON(),
@@ -537,6 +580,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             _switchClass(document.body, this.underMode, underMode, 'bodyClass'):
             underMode;
     };
+    GameMode.OverlayMode.prototype.push = function() {
+        this.setUnderMode(GameMode.currentMode);
+        GameMode.switchTo(this);
+    };
+    GameMode.OverlayMode.prototype.pop = function() {
+        console.assert(GameMode.currentMode === this);
+        GameMode.switchTo(this.underMode);
+    };
     GameMode.OverlayMode.prototype.enter = (function(superEnter) {
         return function() {
             superEnter.call(this);
@@ -552,6 +603,48 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         };
     })(GameMode.OverlayMode.prototype.leave);
 
+    GameMode.LevelDone = new GameMode.OverlayMode('leveldone');
+    GameMode.LevelDone.id = null;
+    GameMode.LevelDone.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            // in 5s, move to the Video overlay
+            var isAndroid = window.device &&
+                (window.device.platform==='Android');
+
+            var dt = (rulerStars===0) ? 0 : 5000;
+            this.switchTime = Date.now() + dt;
+            this.id = setTimeout(this.switchToVideo.bind(this),
+                                 /*android's setTimeout takes its sweet time*/
+                                 isAndroid && dt ? 500 : dt);
+        };
+    })(GameMode.LevelDone.enter);
+    GameMode.LevelDone.leave = (function(superLeave) {
+        return function() {
+            superLeave.call(this);
+            if (this.id === null) { return; }
+            clearTimeout(this.id);
+            this.id = null;
+        };
+    })(GameMode.LevelDone.leave);
+    GameMode.LevelDone.switchToVideo = function() {
+        // handle late-or-premature invocation on Android (sigh)
+        if (Date.now () < this.switchTime) {
+            this.id = setTimeout(this.switchToVideo.bind(this), 10);
+            return;
+        }
+        this.id = null;
+        this.pop();
+        //GameMode.Video.push();
+        if (GameMode.Playing.nextAltitude()) {
+            GameMode.Playing.reset();
+            GameMode.Menu.setExposed(GameMode.Playing.currentAltitude);//XXX HACK
+        } else {
+            GameMode.Menu.switchLevel(GameMode.Playing.currentLevel);
+            GameMode.switchTo(GameMode.Menu);
+        }
+    };
+
     GameMode.Video = new GameMode.OverlayMode('video');
     GameMode.Rotate = new GameMode.OverlayMode('rotate');
 
@@ -563,6 +656,28 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             altitude: this.currentAltitude
         };
     };
+    GameMode.Playing.reset = function() {
+        initialBalloonSpeedY = MIN_BALLOON_SPEED_Y;
+        balloons.forEach(function(b) { b.reset(); });
+        // XXX really want a "grow the sprouts" screen first.
+        AWARDS.forEach(function(a) {
+            SPROUTS[a[0]].setSize(-1);
+        });
+        elForEach(document.querySelectorAll('#awards .award'), function(a) {
+            a.classList.remove('show');
+            a.style.WebkitTransform =
+                a.style.MozTransform =
+                a.style.transform = '';
+        });
+        var flex = document.querySelector('#awards .award.flex');
+        flex.style.display = 'none';
+
+        elForEach(document.querySelectorAll('#ruler .stars'), function(s) {
+            s.classList.remove('highlight');
+        });
+        rulerHeight = 1; rulerStars = 0;
+        adjustRuler(false, 1);
+    };
     GameMode.Playing.switchLevel = function(level) {
         var levelElem = document.querySelector('#game #level');
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
@@ -573,15 +688,27 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.currentAltitude = _switchClass(levelElem,
                                             this.currentAltitude, altitude);
     };
+    GameMode.Playing.nextAltitude = function() {
+        var a = (GameLevel.altitude2num(this.currentAltitude) + 1) % 4;
+        if (a === 0) {
+            var l = this.currentLevel.nextLevel();
+            if (l===null) {
+                return false; // no more levels.
+            }
+            this.switchLevel(l);
+        }
+        this.switchAltitude(GameLevel.num2altitude(a));
+        return true;
+    };
     GameMode.Playing.pause = (function(superPause) {
         return function() {
             superPause.call(this);
             this.pauseTime = Date.now();
             funf.record('status', 'pause');
             stopMusic();
-            if (refreshID !== null) {
-                Compat.cancelAnimationFrame(refreshID);
-                refreshID = null;
+            if (refresh.id !== null) {
+                Compat.cancelAnimationFrame(refresh.id);
+                refresh.id = null;
             }
             if (accelID !== null) {
                 stopAccelerometer();
@@ -597,8 +724,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var timePaused = this.pauseTime - Date.now();
             funf.record('status', 'resume');
             playMusic(MUSIC_URL);
-            if (refreshID === null) {
-                refreshID = Compat.requestAnimationFrame(refresh);
+            refresh.lastFrame = Date.now();
+            if (refresh.id === null) {
+                refresh.id = Compat.requestAnimationFrame(refresh);
             }
             if (accelID === null && ENABLE_ACCEL) {
                 accelID = startAccelerometer();
@@ -608,18 +736,30 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             });
         };
     })(GameMode.Playing.resume);
-
+    GameMode.Playing.pauseTime = Date.now();
 
     // ------------ game levels --------------
     var GameLevel = function(levelClass) {
         this.levelClass = levelClass;
     };
     GameLevel.prototype = {};
+    GameLevel.prototype.nextLevel = function() { return null; };
     GameLevel.prototype.soundFor = function(altitude, color) {
     };
+    GameLevel.altitude2num = (function() {
+        var table = {ground: 0, troposphere: 1, stratosphere: 2, mesosphere: 3};
+        return function(a) { return table[a]; };
+    })();
+    GameLevel.num2altitude = (function() {
+        var table = [ 'ground', 'troposphere', 'stratosphere', 'mesosphere'];
+        return function(n) { return table[n]; };
+    })();
 
     var LEVELS = [ new GameLevel('grass') ]; // XXX
-    LEVELS.forEach(function(l, i) { l.num = i; });
+    LEVELS.forEach(function(l, i) {
+        l.num = i;
+        l.nextLevel = function() { return LEVELS[i+1] || null; };
+    });
     // default level (handy in case we
     GameMode.Playing.switchLevel(LEVELS[0]);
     GameMode.Playing.switchAltitude('ground');
@@ -648,7 +788,39 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
     };
 
-    var correctAnswer = function(color, balloonTime) {
+    var rulerForeground = document.querySelector('#ruler .foreground');
+    var rulerHeight = 1;
+    var RULER_SMOOTHING = 0.8;
+    var rulerStars = 0;
+
+    var adjustRuler = function(isCorrect, height /* 0-1 fraction */) {
+        var altitude = GameMode.Playing.currentAltitude;
+        var e, pct;
+        // correct answer bonus
+        if (isCorrect) { height -= 0.1; rulerHeight -= 0.05; }
+        // refect current % on the ruler.
+        rulerHeight = Math.max(0, Math.min(1, RULER_SMOOTHING * rulerHeight +
+                                           (1 - RULER_SMOOTHING) * height));
+        pct = 25* (rulerHeight + GameLevel.altitude2num(altitude));
+        rulerForeground.style.height = pct+'%';
+        // light up one, two, or three stars
+        var nStars = (rulerHeight < 0.28) ? 3 :
+            (rulerHeight < 0.54) ? 2 :
+            (rulerHeight < 0.79) ? 1 : 0;
+        var efors = function(s) {
+            return document.querySelector('#ruler .'+altitude+' .stars.' +
+                                          ['zero','one','two','three'][s]);
+        };
+        if (nStars !== rulerStars) {
+            e = efors(rulerStars);
+            if (e) { e.classList.remove('highlight'); }
+            rulerStars = nStars;
+            e = efors(rulerStars);
+            if (e) { e.classList.add('highlight'); }
+        }
+    };
+
+    var correctAnswer = function(color, balloonTime, balloonHeight) {
         funf.record('correct', color+':'+balloonTime);
         // maintain weighted averages
         correctTime = CORRECT_SMOOTHING * correctTime +
@@ -657,6 +829,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             (1-CORRECT_SMOOTHING);
         // adjust speeds based on new fractions
         adjustSpeeds(correctTime, correctFraction);
+        adjustRuler(true, balloonHeight);
     };
     var incorrectAnswer = function(how, balloonTime) {
         funf.record('incorrect', how+':'+balloonTime);
@@ -673,6 +846,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
         // adjust speeds based on new fractions
         adjustSpeeds(correctTimeCopy, correctFraction);
+        adjustRuler(false, 1);
     };
 
     var wrongLockoutID = null;
@@ -707,7 +881,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
-            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime);
+            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime,
+                          1-Math.max(0, best.y / balloonsElement.offsetHeight));
             // try to prevent a double tap being registered as a wrong answer.
             doubleTapColor = color;
             if (doubleTapLockoutID) {
@@ -748,38 +923,41 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     document.addEventListener(visibilityChange, onVisibilityChange,
                               false);
 
-    refresh = (function() {
-        var lastFrame = Date.now();
-        return function innerRefresh() {
-            var now = Date.now();
-            var isBorn = false, isEscape = false;
-            var i, b;
-            for (i=0; i<balloons.length; i++) {
-                b = balloons[i];
-                b.update(Math.min(now-lastFrame, 100));
-                if (b.isGone()) {
-                    if (!b.popped) {
-                        isEscape = true;
-                        incorrectAnswer('escape.'+b.color,
-                                        (now - b.bornTime) - b.pauseTime);
-                    }
-                    isBorn = true;
-                    b.reset();
+    refresh = function() {
+        refresh.id = null;
+        var now = Date.now();
+        var isBorn = false, isEscape = false;
+        var i, b;
+        var dt = Math.max(0, Math.min(now - refresh.lastFrame, 100));
+        for (i=0; i<balloons.length; i++) {
+            b = balloons[i];
+            b.update(dt);
+            if (b.isGone()) {
+                if (!b.popped) {
+                    isEscape = true;
+                    incorrectAnswer('escape.'+b.color,
+                                    (now - b.bornTime) - b.pauseTime);
                 }
-                b.refresh();
+                isBorn = true;
+                b.reset();
             }
-            // play sounds down here so we only start one per frame.
-            if (isEscape) {
-                random.choice(ESCAPE_SOUNDS).play();
-            }
-            if (isBorn) {
-                // XXX inflation sound here was very noisy =(
-            }
-            lastFrame = now;
-            // keep playing
-            refreshID = Compat.requestAnimationFrame(refresh);
-        };
-    })();
+            b.refresh();
+        }
+        // play sounds down here so we only start one per frame.
+        if (isEscape) {
+            random.choice(ESCAPE_SOUNDS).play();
+        }
+        if (isBorn) {
+            // XXX inflation sound here was very noisy =(
+        }
+        refresh.lastFrame = now;
+        // keep playing (if we haven't changed modes)
+        if (GameMode.currentMode===GameMode.Playing) {
+            refresh.id = Compat.requestAnimationFrame(refresh);
+        }
+    };
+    refresh.id = null;
+    refresh.lastFrame = Date.now();
 
     var handleNellTouch = function(ev) {
         if (ev.type === 'touchstart') {
@@ -813,22 +991,30 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
-    var onOrientationChange = function() {
+    var onOrientationChange = function(event) {
         // XXX this is xoom specific, we should really look at width/height
         var isXoom = (window.device &&
                       window.device.platform==='Android' &&
                       window.device.name==='tervigon');
         if (!isXoom) { return; }
 
-        if (window.orientation === 0 || window.orientation === 180) {
+        var isPortrait = !(window.orientation === 0 ||
+                           window.orientation === 180);
+        // Android sometimes gives bogus values on startup, so if this is the
+        // first call to onOrientationChange, use document body size instead
+        // (but note that document.body size is generally changed *after*
+        // the orientationchange event is fired)
+        if (!event) {
+            isPortrait = (window.outerHeight >= window.outerWidth);
+        }
+        if (!isPortrait) {
             if (GameMode.currentMode !== GameMode.Rotate) {
-                GameMode.Rotate.setUnderMode(GameMode.currentMode);
-                GameMode.switchTo(GameMode.Rotate);
+                GameMode.Rotate.push();
                 funf.record('orientation', 'landscape');
             }
-        } else if (window.orientation === 90 || window.orientation === -90) {
+        } else {
             if (GameMode.currentMode === GameMode.Rotate) {
-                GameMode.switchTo(GameMode.currentMode.underMode);
+                GameMode.Rotate.pop();
                 funf.record('orientation', 'portrait');
             }
         }
@@ -849,6 +1035,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         window.addEventListener('orientationchange',onOrientationChange,false);
         if ('orientation' in window) { onOrientationChange(); }
 
+        /* XXX: this is the "new hotness" way to detect orientation, but it's
+         * not supported by Honeycomb (maybe not by ICS either, I haven't
+         * checked). */
+        //var mql = window.matchMedia("(orientation: portrait)");
+        //console.log("MQL "+(mql.matches?"portrait":"landscape"));
+        //mql.addListener(function(m) {
+        //    console.log("MQL CHANGE: "+(m.matches?"portrait":"landscape"));
+        //});
+
         // phonegap
         document.addEventListener("backbutton", function() {
             if (HTML5_HISTORY) {
@@ -863,11 +1058,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
         // add top-level "anim" class unless we're on xoom/honeycomb
-        var isHoneycomb = window.device &&
+        var isXoom = window.device &&
             (window.device.platform==='Android') &&
-            (window.device.version==='3.2.1') &&
+            //(window.device.version==='3.2.1') &&
             (window.device.name==='tervigon');
-        if (!isHoneycomb) { document.body.classList.add('anim'); }
+        if (!isXoom) { document.body.classList.add('anim'); }
     }
     if (window.cordovaDetect) {
         document.addEventListener("deviceready", onDeviceReady, false);

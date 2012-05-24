@@ -65,6 +65,9 @@ body { background: #008; }
  border: 5px solid black;
 }
 #mask, #video, #menu, #rotate {
+  display: none;
+}
+.anim #mask, .anim #video, .anim #menu, .anim #rotate {
  /* transition effect knowledge gleaned from:
   *   http://www.greywyvern.com/?post=337
   * thanks! */
@@ -73,6 +76,7 @@ body { background: #008; }
  transition: visibility 0s linear 700ms, opacity 700ms ease-in-out;
  opacity: 0;
  visibility: hidden;
+ display: block;
 }
 .video #mask,
 .rotate #mask { opacity: 0.8; }
@@ -89,6 +93,7 @@ body { background: #008; }
   -webkit-transition-delay: 0s;
   -moz-transition-delay: 0s;
   transition-delay: 0s;
+  display: block;
 }
 .video #game *,
 .paused #game * {

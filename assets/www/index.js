@@ -816,20 +816,29 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
-    var onOrientationChange = function() {
+    var onOrientationChange = function(event) {
         // XXX this is xoom specific, we should really look at width/height
         var isXoom = (window.device &&
                       window.device.platform==='Android' &&
                       window.device.name==='tervigon');
         if (!isXoom) { return; }
 
-        if (window.orientation === 0 || window.orientation === 180) {
+        var isPortrait = !(window.orientation === 0 ||
+                           window.orientation === 180);
+        // Android sometimes gives bogus values on startup, so if this is the
+        // first call to onOrientationChange, use document body size instead
+        // (but note that document.body size is generally changed *after*
+        // the orientationchange event is fired)
+        if (!event) {
+            isPortrait = (window.outerHeight >= window.outerWidth);
+        }
+        if (!isPortrait) {
             if (GameMode.currentMode !== GameMode.Rotate) {
                 GameMode.Rotate.setUnderMode(GameMode.currentMode);
                 GameMode.switchTo(GameMode.Rotate);
                 funf.record('orientation', 'landscape');
             }
-        } else if (window.orientation === 90 || window.orientation === -90) {
+        } else {
             if (GameMode.currentMode === GameMode.Rotate) {
                 GameMode.switchTo(GameMode.currentMode.underMode);
                 funf.record('orientation', 'portrait');
@@ -851,6 +860,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
         window.addEventListener('orientationchange',onOrientationChange,false);
         if ('orientation' in window) { onOrientationChange(); }
+
+        /* XXX: this is the "new hotness" way to detect orientation, but it's
+         * not supported by Honeycomb (maybe not by ICS either, I haven't
+         * checked). */
+        //var mql = window.matchMedia("(orientation: portrait)");
+        //console.log("MQL "+(mql.matches?"portrait":"landscape"));
+        //mql.addListener(function(m) {
+        //    console.log("MQL CHANGE: "+(m.matches?"portrait":"landscape"));
+        //});
 
         // phonegap
         document.addEventListener("backbutton", function() {

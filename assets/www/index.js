@@ -103,6 +103,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
         this.domElement.classList.add('hover');
         event.preventDefault();
+        if (this.fast && this.ignoreMouse) { this.handleClick(); }
     };
     ClickableElement.prototype.unhighlight = function(event) {
         switch (event.type) {
@@ -113,7 +114,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.domElement.classList.remove('hover');
         event.preventDefault();
         if (event.type !== 'touchcancel' &&
-            event.type !== 'mouseout') {
+            event.type !== 'mouseout' &&
+            !(this.fast && this.ignoreMouse)) {
             this.handleClick();
         }
         this.ignoreMouse = false;
@@ -122,6 +124,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var Button = function(color) {
         ClickableElement.call(this, color);
         this.attach(buttonsElement);
+        this.fast = true; // fast button response
     };
     Button.prototype = Object.create(ClickableElement.prototype);
     Button.prototype.handleClick = function() {

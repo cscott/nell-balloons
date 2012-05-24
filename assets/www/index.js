@@ -68,7 +68,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // play congratulatory sound!
         LEVEL_SOUNDS[0].play();
         // XXX award stars!
-        GameMode.Video.push();
+        GameMode.LevelDone.push();
         // XXX save score, award stars, etc!
     };
 
@@ -576,6 +576,29 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 document.body.classList.remove(this.underMode.bodyClass);
         };
     })(GameMode.OverlayMode.prototype.leave);
+
+    GameMode.LevelDone = new GameMode.OverlayMode('leveldone');
+    GameMode.LevelDone.id = null;
+    GameMode.LevelDone.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            // in 5s, move to the Video overlay
+            this.id = setTimeout(this.switchToVideo.bind(this), 5000);
+        };
+    })(GameMode.LevelDone.enter);
+    GameMode.LevelDone.leave = (function(superLeave) {
+        return function() {
+            superLeave.call(this);
+            if (this.id === null) { return; }
+            clearTimeout(this.id);
+            this.id = null;
+        };
+    })(GameMode.LevelDone.leave);
+    GameMode.LevelDone.switchToVideo = function() {
+        this.id = null;
+        this.pop();
+        GameMode.Video.push();
+    };
 
     GameMode.Video = new GameMode.OverlayMode('video');
     GameMode.Rotate = new GameMode.OverlayMode('rotate');

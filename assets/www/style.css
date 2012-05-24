@@ -319,6 +319,21 @@ body { background: #008; }
   background-image: url('images/star-small.png');
 }
 
+@-webkit-keyframes leveldone-throb {
+  0% { -webkit-transform: translate3d(0,0,0); }
+ 100% { -webkit-transform: translate3d(0,0,0) scale(2); }
+}
+@-moz-keyframes leveldone-throb {
+  0% { -moz-transform: scale(1); }
+ 100% { -moz-transform: scale(2); }
+}
+.leveldone #ruler .stars.highlight {
+  -webkit-animation: leveldone-throb 0.35s infinite alternate ease-in;
+  -moz-animation: leveldone-throb 0.35s infinite alternate ease-in;
+  -webkit-transform-origin: 30% 50%;
+  -moz-transform-origin: 30% 50%;
+}
+
 /* make sure #nell>div gets pointer events */
 #clouds, #clouds > *, #sprouts, #ruler, #ruler > *, #balloons, #awards,
 #mask, #video, #rotate {

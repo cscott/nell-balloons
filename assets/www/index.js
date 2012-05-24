@@ -863,11 +863,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
         // add top-level "anim" class unless we're on xoom/honeycomb
-        var isHoneycomb = window.device &&
+        var isXoom = window.device &&
             (window.device.platform==='Android') &&
-            (window.device.version==='3.2.1') &&
+            //(window.device.version==='3.2.1') &&
             (window.device.name==='tervigon');
-        if (!isHoneycomb) { document.body.classList.add('anim'); }
+        if (!isXoom) { document.body.classList.add('anim'); }
     }
     if (window.cordovaDetect) {
         document.addEventListener("deviceready", onDeviceReady, false);

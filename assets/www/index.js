@@ -17,7 +17,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var balloonsElement = document.getElementById('balloons');
     var funf = nell.funf = score.funf = new Funf('NellBalloons'+version);
     var buttons, handleButtonPress;
-    var refresh, refreshID = null;
+    var refresh;
     var SPROUTS;
 
     var AWARDS = [['a1', 1/2+1/3],
@@ -25,14 +25,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                   ['a3', 1/8+1/9],
                   ['a4', 1/16+1/12],
                   ['a5', 1/32+1/15],
-                  ['a6', 1/64+1/18],
-                  ['a7', 1/128+1/21],
-                  ['a8', 1/256+1/24]];
-    // XXX remove all but first two rewards for first week deployment
-    AWARDS.forEach(function(a) { a[1] = 0; });
-    AWARDS[0][1] = 0.9;
-    AWARDS[0][2] = 0.1;
-    // XXX end award hack
+                  ['a6', 1/64+1/18]];
 
     var pickAward = function() {
         var i;
@@ -60,6 +53,23 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 return;
             }
         }
+    };
+    var checkForFinishedLevel = function() {
+        for (i=0; i<AWARDS.length; i++) {
+            var sprout = SPROUTS[AWARDS[i][0]];
+            if (sprout.size < 0) {
+                return; // level not done yet!
+            }
+        }
+        // ok, level done!
+        console.assert(GameMode.currentMode === GameMode.Playing);
+        funf.record('leveldone', JSON.stringify(GameMode.currentMode));
+        stopMusic();
+        // play congratulatory sound!
+        LEVEL_SOUNDS[0].play();
+        // XXX award stars!
+        GameMode.Video.push();
+        // XXX save score, award stars, etc!
     };
 
     var ColoredElement = function(element, color) {
@@ -227,6 +237,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                     elem.style.WebkitTransform='';
                     var flex = document.querySelector('#awards .award.flex');
                     flex.style.display = 'none';
+
+                    checkForFinishedLevel();
                 }
             }
             return;
@@ -347,7 +359,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     // load recent score
     var loadScore = function() {
-        if (!(score.recent && score.recent.length === AWARDS.length)) {
+        if (!(score.recent && score.recent.length >= AWARDS.length)) {
             return;
         }
         AWARDS.forEach(function(a, i) {
@@ -365,7 +377,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         });
         score.save(nscore);
     };
-    loadScore();
+    //loadScore();
 
     buttons = [];
     var createButtons = function() {
@@ -457,6 +469,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
     var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
     var AWARD_SOUNDS = loadSounds(['sounds/award']);
+    var LEVEL_SOUNDS = loadSounds(['sounds/levelwin',
+                                   'sounds/levellose']);
 
     // utility method
     var _switchClass = function(elem, from, to, optProp) {
@@ -540,6 +554,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             _switchClass(document.body, this.underMode, underMode, 'bodyClass'):
             underMode;
     };
+    GameMode.OverlayMode.prototype.push = function() {
+        this.setUnderMode(GameMode.currentMode);
+        GameMode.switchTo(this);
+    };
+    GameMode.OverlayMode.prototype.pop = function() {
+        console.assert(GameMode.currentMode === this);
+        GameMode.switchTo(this.underMode);
+    };
     GameMode.OverlayMode.prototype.enter = (function(superEnter) {
         return function() {
             superEnter.call(this);
@@ -582,9 +604,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             this.pauseTime = Date.now();
             funf.record('status', 'pause');
             stopMusic();
-            if (refreshID !== null) {
-                Compat.cancelAnimationFrame(refreshID);
-                refreshID = null;
+            if (refresh.id !== null) {
+                Compat.cancelAnimationFrame(refresh.id);
+                refresh.id = null;
             }
             if (accelID !== null) {
                 stopAccelerometer();
@@ -600,8 +622,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var timePaused = this.pauseTime - Date.now();
             funf.record('status', 'resume');
             playMusic(MUSIC_URL);
-            if (refreshID === null) {
-                refreshID = Compat.requestAnimationFrame(refresh);
+            refresh.lastFrame += timePaused;
+            if (refresh.id === null) {
+                refresh.id = Compat.requestAnimationFrame(refresh);
             }
             if (accelID === null && ENABLE_ACCEL) {
                 accelID = startAccelerometer();
@@ -611,7 +634,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             });
         };
     })(GameMode.Playing.resume);
-
+    GameMode.Playing.pauseTime = Date.now();
 
     // ------------ game levels --------------
     var GameLevel = function(levelClass) {
@@ -751,38 +774,41 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     document.addEventListener(visibilityChange, onVisibilityChange,
                               false);
 
-    refresh = (function() {
-        var lastFrame = Date.now();
-        return function innerRefresh() {
-            var now = Date.now();
-            var isBorn = false, isEscape = false;
-            var i, b;
-            for (i=0; i<balloons.length; i++) {
-                b = balloons[i];
-                b.update(Math.min(now-lastFrame, 100));
-                if (b.isGone()) {
-                    if (!b.popped) {
-                        isEscape = true;
-                        incorrectAnswer('escape.'+b.color,
-                                        (now - b.bornTime) - b.pauseTime);
-                    }
-                    isBorn = true;
-                    b.reset();
+    refresh = function() {
+        refresh.id = null;
+        var now = Date.now();
+        var isBorn = false, isEscape = false;
+        var i, b;
+        var dt = Math.max(0, Math.min(now - refresh.lastFrame, 100));
+        for (i=0; i<balloons.length; i++) {
+            b = balloons[i];
+            b.update(dt);
+            if (b.isGone()) {
+                if (!b.popped) {
+                    isEscape = true;
+                    incorrectAnswer('escape.'+b.color,
+                                    (now - b.bornTime) - b.pauseTime);
                 }
-                b.refresh();
+                isBorn = true;
+                b.reset();
             }
-            // play sounds down here so we only start one per frame.
-            if (isEscape) {
-                random.choice(ESCAPE_SOUNDS).play();
-            }
-            if (isBorn) {
-                // XXX inflation sound here was very noisy =(
-            }
-            lastFrame = now;
-            // keep playing
-            refreshID = Compat.requestAnimationFrame(refresh);
-        };
-    })();
+            b.refresh();
+        }
+        // play sounds down here so we only start one per frame.
+        if (isEscape) {
+            random.choice(ESCAPE_SOUNDS).play();
+        }
+        if (isBorn) {
+            // XXX inflation sound here was very noisy =(
+        }
+        refresh.lastFrame = now;
+        // keep playing (if we haven't changed modes)
+        if (GameMode.currentMode===GameMode.Playing) {
+            refresh.id = Compat.requestAnimationFrame(refresh);
+        }
+    };
+    refresh.id = null;
+    refresh.lastFrame = Date.now();
 
     var handleNellTouch = function(ev) {
         if (ev.type === 'touchstart') {
@@ -834,13 +860,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
         if (!isPortrait) {
             if (GameMode.currentMode !== GameMode.Rotate) {
-                GameMode.Rotate.setUnderMode(GameMode.currentMode);
-                GameMode.switchTo(GameMode.Rotate);
+                GameMode.Rotate.push();
                 funf.record('orientation', 'landscape');
             }
         } else {
             if (GameMode.currentMode === GameMode.Rotate) {
-                GameMode.switchTo(GameMode.currentMode.underMode);
+                GameMode.Rotate.pop();
                 funf.record('orientation', 'portrait');
             }
         }

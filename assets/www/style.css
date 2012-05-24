@@ -51,7 +51,6 @@ body { background: #008; }
  /* 1280x720 :: 800x450 .. plus 10px border */
  width: 100%; height: 460px;
  margin-top: -230px;
- background: #fff;
  text-align: center;
  white-space: nowrap;
  /* overflow style very important, keeps us from 'zooming' when you
@@ -59,7 +58,7 @@ body { background: #008; }
   * *and* overflow: hidden style on <body>. */
  overflow: hidden;
 }
-#video > * {
+#video > .inner {
  display: inline-block;
  width: 800px; height: 450px;
  border: 5px solid black;

@@ -138,6 +138,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
     Button.prototype = Object.create(ClickableElement.prototype);
     Button.prototype.handleClick = function() {
+        if (GameMode.currentMode !== GameMode.Playing) { return; }
         handleButtonPress(this.color);
     };
 

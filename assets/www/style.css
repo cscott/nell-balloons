@@ -30,6 +30,7 @@ body { background: #008; }
  padding:0; margin: 0;
  -webkit-tap-highlight-color: rgba(0,0,0,0);
  tap-highlight-color: rgba(0,0,0,0);
+ pointer-events: none;
 }
 #buttons > a.black  { background-color: #030303; }
 #buttons > a.lilac  { background-color: #ce72b9; }
@@ -39,6 +40,14 @@ body { background: #008; }
 
 #buttons > a.hover {
  background-image: url('images/button-overlay-hover.png');
+}
+.game #buttons > a {
+  pointer-events: all;
+}
+.video #buttons > a,
+.rotate #buttons > a,
+.leveldone #buttons > a {
+  pointer-events: all;
 }
 
 #mask {

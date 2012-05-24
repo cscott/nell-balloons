@@ -147,6 +147,8 @@ body { background: #008; }
   background-image: url('images/grass-back.png');
   background-repeat: repeat-x;
   background-position: bottom;
+}
+.anim .grass #background {
   /* CSS3 gradient */
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image: -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
@@ -997,6 +999,8 @@ body { background: #008; }
 #menu .level.grass > .background {
   background-color: #000;
   background-image: url('images/grass-back.png');
+}
+.anim #menu .level.grass > .background {
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image: -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }

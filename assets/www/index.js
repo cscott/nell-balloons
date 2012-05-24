@@ -20,12 +20,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var refresh;
     var SPROUTS;
 
-    var AWARDS = [['a1', 1/2+1/3],
-                  ['a2', 1/4+1/6],
-                  ['a3', 1/8+1/9],
-                  ['a4', 1/16+1/12],
-                  ['a5', 1/32+1/15],
-                  ['a6', 1/64+1/18]];
+    var AWARDS = [['a1', 1/2/*+1/3*/],
+                  ['a2', 1/4/*+1/6*/],
+                  ['a3', 1/8/*+1/9*/],
+                  ['a4', 1/16/*+1/12*/],
+                  ['a5', 1/32/*+1/15*/],
+                  ['a6', 1/64/*+1/18*/]];
 
     var pickAward = function() {
         var i;
@@ -674,7 +674,41 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
     };
 
-    var correctAnswer = function(color, balloonTime) {
+    var rulerForeground = document.querySelector('#ruler .foreground');
+    var rulerOffset = {
+        ground: 0, troposphere: 25, stratosphere: 50, mesosphere: 75
+    };
+    var rulerHeight = 1;
+    var RULER_SMOOTHING = 0.8;
+    var rulerStars = 0;
+
+    var adjustRuler = function(isCorrect, height /* 0-1 fraction */) {
+        var e, pct;
+        // correct answer bonus
+        if (isCorrect) { height -= 0.1; rulerHeight -= 0.05; }
+        // refect current % on the ruler.
+        rulerHeight = Math.max(0, Math.min(1, RULER_SMOOTHING * rulerHeight +
+                                           (1 - RULER_SMOOTHING) * height));
+        pct = 25*rulerHeight + rulerOffset[GameMode.Playing.currentAltitude];
+        rulerForeground.style.height = pct+'%';
+        // light up one, two, or three stars
+        var nStars = (rulerHeight < 0.28) ? 3 :
+            (rulerHeight < 0.54) ? 2 :
+            (rulerHeight < 0.79) ? 1 : 0;
+        var efors = function(s) {
+            return document.querySelector('#ruler .stars.' +
+                                          ['zero','one','two','three'][s]);
+        };
+        if (nStars !== rulerStars) {
+            e = efors(rulerStars);
+            if (e) { e.classList.remove('highlight'); }
+            rulerStars = nStars;
+            e = efors(rulerStars);
+            if (e) { e.classList.add('highlight'); }
+        }
+    };
+
+    var correctAnswer = function(color, balloonTime, balloonHeight) {
         funf.record('correct', color+':'+balloonTime);
         // maintain weighted averages
         correctTime = CORRECT_SMOOTHING * correctTime +
@@ -683,6 +717,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             (1-CORRECT_SMOOTHING);
         // adjust speeds based on new fractions
         adjustSpeeds(correctTime, correctFraction);
+        adjustRuler(true, balloonHeight);
     };
     var incorrectAnswer = function(how, balloonTime) {
         funf.record('incorrect', how+':'+balloonTime);
@@ -699,6 +734,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
         // adjust speeds based on new fractions
         adjustSpeeds(correctTimeCopy, correctFraction);
+        adjustRuler(false, 1);
     };
 
     var wrongLockoutID = null;
@@ -733,7 +769,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }, 500); // 0.5s time out after wrong answer
         } else {
             best.pop();
-            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime);
+            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime,
+                          1-Math.max(0, best.y / balloonsElement.offsetHeight));
             // try to prevent a double tap being registered as a wrong answer.
             doubleTapColor = color;
             if (doubleTapLockoutID) {

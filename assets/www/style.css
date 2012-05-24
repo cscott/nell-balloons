@@ -319,7 +319,7 @@ body { background: #008; }
   pointer-events: none;
 }
 /* don't highlight nell when she is tapped */
-#nell, #nell * {
+.nells > div > div {
  -webkit-tap-highlight-color: rgba(0,0,0,0);
  tap-highlight-color: rgba(0,0,0,0);
 }
@@ -1101,7 +1101,6 @@ body { background: #008; }
   -webkit-transition-delay: 0s;
   -moz-transition-delay: 0s;
   transition-delay: 0s;
-  pointer-events: all;
 }
 #menu .awards .stars {
   position: absolute;
@@ -1129,6 +1128,8 @@ body { background: #008; }
   margin-bottom: -65px; /* cheat down 5px */
   background: url('images/tag-white-empty.png') no-repeat;
   display: block;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  tap-highlight-color: rgba(0,0,0,0);
 }
 #menu .awards .tag.hover {
   /* use CSS to do tag highlighting */

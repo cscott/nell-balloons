@@ -20,12 +20,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var refresh;
     var SPROUTS;
 
-    var AWARDS = [['a1', 1/2/*+1/3*/],
-                  ['a2', 1/4/*+1/6*/],
-                  ['a3', 1/8/*+1/9*/],
-                  ['a4', 1/16/*+1/12*/],
-                  ['a5', 1/32/*+1/15*/],
-                  ['a6', 1/64/*+1/18*/]];
+    var AWARDS = [['a1', 1/2+1/2],
+                  ['a2', 1/4+1/4],
+                  ['a3', 1/8+1/6],
+                  ['a4', 1/16+1/8],
+                  ['a5', 1/32+1/10],
+                  ['a6', 1/64+1/12]];
 
     var elForEach = function(elementList, func) {
         var i;
@@ -70,7 +70,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
         // ok, level done!
         console.assert(GameMode.currentMode === GameMode.Playing);
-        funf.record('leveldone', JSON.stringify(GameMode.currentMode));
+        funf.record('leveldone', JSON.stringify({
+            stars: Ruler.stars,
+            level: GameMode.Playing.currentLevel.num,
+            altitude: GameLevel.altitude2num(GameMode.Playing.currentAltitude)
+        }));
         stopMusic();
         // play congratulatory sound!
         LEVEL_SOUNDS[0].play();
@@ -100,10 +104,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var ClickableElement = function(color) {
         ColoredElement.call(this, document.createElement('a'), color);
         this.domElement.href='#';
+        // android sometimes delivers events like:
+        // touchstart, <dom mutation> touchcancel, mousedown mouseup
+        // that results in double taps, which is bad.  ignore all mouse*
+        // events on android as a hacky workaround.
+        var isAndroid = !!window.cordovaDetect;
         ['mousedown', 'touchstart'].forEach(function(evname) {
+            if (isAndroid && evname[0]==='m') { return; }
             this.domElement.addEventListener(evname,this.highlight.bind(this), false);
         }.bind(this));
         ['mouseup','mouseout','touchcancel','touchend'].forEach(function(evname){
+            if (isAndroid && evname[0]==='m') { return; }
             this.domElement.addEventListener(evname, this.unhighlight.bind(this), false);
         }.bind(this));
         this.domElement.addEventListener('click', function(event) {
@@ -283,7 +294,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     Balloon.prototype.pop = function() {
         this.popped = true;
         // chance of award
-        var isAward = (random() < (1/6)); // 1-in-6 chance of an award
+        var isAward = (random() < (1/4)); // 1-in-6 chance of an award
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound
@@ -422,6 +433,32 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         });
     };
     createButtons();
+    // multitouch hack
+    var handleMultitouch = function(event) {
+        var changedTouches = event.changedTouches, i, j;
+        for (i=0; i<changedTouches.length; i++) {
+            var touch = changedTouches[i];
+            for (j=0; j<buttons.length; j++) {
+                var button = buttons[j];
+                if (touch.target === button.domElement) {
+                    if (event.type==='touchstart') {
+                        button.domElement.classList.add('hover');
+                        button.handleClick();
+                    } else {
+                        button.domElement.classList.remove('hover');
+                    }
+                }
+            }
+        }
+        event.stopPropagation();
+        event.preventDefault();
+        return false;
+    };
+    ['touchstart', 'touchend', 'touchcancel'].forEach(function(evname) {
+        document.getElementById('buttons').addEventListener(evname,
+                                                            handleMultitouch,
+                                                            true);
+    });
 
     altitudeStars = [];
     var createMenuTags = function() {
@@ -555,6 +592,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                               DOCUMENT_TITLE + ' | Play!',
                               '#play');
         }
+        funf.record('levelstart', JSON.stringify({
+            level: GameMode.Playing.currentLevel.num,
+            altitude: GameLevel.altitude2num(GameMode.Playing.currentAltitude)
+        }));
     };
     GameMode.Menu.switchLevel = function(level) {
         var levelElem = document.querySelector('#menu .level');
@@ -612,7 +653,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var isAndroid = window.device &&
                 (window.device.platform==='Android');
 
-            var dt = (rulerStars===0) ? 0 : 5000;
+            var dt = (Ruler.stars===0) ? 0 : 5000;
             this.switchTime = Date.now() + dt;
             this.id = setTimeout(this.switchToVideo.bind(this),
                                  /*android's setTimeout takes its sweet time*/
@@ -672,11 +713,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         var flex = document.querySelector('#awards .award.flex');
         flex.style.display = 'none';
 
-        elForEach(document.querySelectorAll('#ruler .stars'), function(s) {
-            s.classList.remove('highlight');
-        });
-        rulerHeight = 1; rulerStars = 0;
-        adjustRuler(false, 1);
+        Ruler.reset();
     };
     GameMode.Playing.switchLevel = function(level) {
         var levelElem = document.querySelector('#game #level');
@@ -788,37 +825,58 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
     };
 
-    var rulerForeground = document.querySelector('#ruler .foreground');
-    var rulerHeight = 1;
-    var RULER_SMOOTHING = 0.8;
-    var rulerStars = 0;
+    var Ruler = {
+        SMOOTHING: 0.85,
+        domElement: document.querySelector('#ruler .foreground'),
+        reset: function() {
+            this.smoothedHeight = 1;
+            this.height = 1;
+            this.stars = 0;
+            this.streak = 0;
+            elForEach(document.querySelectorAll('#ruler .stars'), function(s) {
+                s.classList.remove('highlight');
+            });
+            this.domElement.style.height = '100%';
+        },
+        adjust: function(isCorrect, height /* 0-1 fraction */) {
+            var altitude = GameMode.Playing.currentAltitude;
+            var e;
+            // correct answer bonus
+            if (isCorrect) {
+                height -= 0.1;
+                this.streak++;
+            } else {
+                this.streak = 0;
+                height = 1;
+            }
+            // reflect current % on the ruler element
+            this.smoothedHeight =
+                Math.max(0, Math.min(1, Ruler.SMOOTHING * this.smoothedHeight +
+                                     (1 - Ruler.SMOOTHING) * height));
+            this.height = this.smoothedHeight *
+                Math.max(0.28, Math.pow(0.98, this.streak));
 
-    var adjustRuler = function(isCorrect, height /* 0-1 fraction */) {
-        var altitude = GameMode.Playing.currentAltitude;
-        var e, pct;
-        // correct answer bonus
-        if (isCorrect) { height -= 0.1; rulerHeight -= 0.05; }
-        // refect current % on the ruler.
-        rulerHeight = Math.max(0, Math.min(1, RULER_SMOOTHING * rulerHeight +
-                                           (1 - RULER_SMOOTHING) * height));
-        pct = 25* (rulerHeight + GameLevel.altitude2num(altitude));
-        rulerForeground.style.height = pct+'%';
-        // light up one, two, or three stars
-        var nStars = (rulerHeight < 0.28) ? 3 :
-            (rulerHeight < 0.54) ? 2 :
-            (rulerHeight < 0.79) ? 1 : 0;
-        var efors = function(s) {
-            return document.querySelector('#ruler .'+altitude+' .stars.' +
-                                          ['zero','one','two','three'][s]);
-        };
-        if (nStars !== rulerStars) {
-            e = efors(rulerStars);
-            if (e) { e.classList.remove('highlight'); }
-            rulerStars = nStars;
-            e = efors(rulerStars);
-            if (e) { e.classList.add('highlight'); }
+            var pct = 25 * (this.height + GameLevel.altitude2num(altitude));
+            this.domElement.style.height = pct+'%';
+            // light up one, two, or three stars
+            var nStars = (this.height < 0.28) ? 3 :
+                (this.height < 0.54) ? 2 :
+                (this.height < 0.79) ? 1 : 0;
+
+            var efors = function(s) {
+                return document.querySelector('#ruler .'+altitude+' .stars.' +
+                                              ['zero','one','two','three'][s]);
+            };
+            if (nStars !== this.stars) {
+                e = efors(this.stars);
+                if (e) { e.classList.remove('highlight'); }
+                this.stars = nStars;
+                e = efors(this.stars);
+                if (e) { e.classList.add('highlight'); }
+            }
         }
     };
+    Ruler.reset();
 
     var correctAnswer = function(color, balloonTime, balloonHeight) {
         funf.record('correct', color+':'+balloonTime);
@@ -829,7 +887,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             (1-CORRECT_SMOOTHING);
         // adjust speeds based on new fractions
         adjustSpeeds(correctTime, correctFraction);
-        adjustRuler(true, balloonHeight);
+        Ruler.adjust(true, balloonHeight);
     };
     var incorrectAnswer = function(how, balloonTime) {
         funf.record('incorrect', how+':'+balloonTime);
@@ -846,7 +904,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
         // adjust speeds based on new fractions
         adjustSpeeds(correctTimeCopy, correctFraction);
-        adjustRuler(false, 1);
+        Ruler.adjust(false, 1);
     };
 
     var wrongLockoutID = null;
@@ -968,10 +1026,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         nell.switchColor();
     };
     ['mousedown','touchstart'].forEach(function(evname) {
-        var nellElems = document.querySelectorAll('.nells > div > div'), i;
-        for (i=0; i<nellElems.length; i++) {
-            nellElems[i].addEventListener(evname, handleNellTouch, false);
-        }
+        // hacky workaround for android: removeEventListener('mousedown')
+        // doesn't work on android (sigh) so don't register it to begin with
+        var isAndroid = !!window.cordovaDetect;
+        if (isAndroid && evname[0]==='m') { return; }
+
+        elForEach(document.querySelectorAll('.nells > div > div'),
+                  function(nellElem) {
+                      nellElem.addEventListener(evname, handleNellTouch, false);
+                  });
     });
 
     var onPopState = function() {

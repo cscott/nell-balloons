@@ -20,12 +20,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var refresh;
     var SPROUTS;
 
-    var AWARDS = [['a1', 1/2/*+1/3*/],
-                  ['a2', 1/4/*+1/6*/],
-                  ['a3', 1/8/*+1/9*/],
-                  ['a4', 1/16/*+1/12*/],
-                  ['a5', 1/32/*+1/15*/],
-                  ['a6', 1/64/*+1/18*/]];
+    var AWARDS = [['a1', 1/2+1/3],
+                  ['a2', 1/4+1/6],
+                  ['a3', 1/8+1/9],
+                  ['a4', 1/16+1/12],
+                  ['a5', 1/32+1/15],
+                  ['a6', 1/64+1/15]];
 
     var elForEach = function(elementList, func) {
         var i;
@@ -291,7 +291,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     Balloon.prototype.pop = function() {
         this.popped = true;
         // chance of award
-        var isAward = (random() < (1/6)); // 1-in-6 chance of an award
+        var isAward = (random() < (1/4)); // 1-in-6 chance of an award
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound
@@ -683,7 +683,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         elForEach(document.querySelectorAll('#ruler .stars'), function(s) {
             s.classList.remove('highlight');
         });
-        rulerHeight = 1; rulerStars = 0;
+        rulerHeight = 1; rulerStars = 0; rulerStreak = 0;
         adjustRuler(false, 1);
     };
     GameMode.Playing.switchLevel = function(level) {
@@ -800,15 +800,25 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var rulerHeight = 1;
     var RULER_SMOOTHING = 0.8;
     var rulerStars = 0;
+    var rulerStreak = 0;
 
     var adjustRuler = function(isCorrect, height /* 0-1 fraction */) {
         var altitude = GameMode.Playing.currentAltitude;
         var e, pct;
         // correct answer bonus
-        if (isCorrect) { height -= 0.1; rulerHeight -= 0.05; }
+        if (isCorrect) {
+            rulerStreak++;
+            height -= 0.1;
+            rulerHeight -= 0.05;
+        } else {
+            rulerStreak = 0;
+        }
         // refect current % on the ruler.
         rulerHeight = Math.max(0, Math.min(1, RULER_SMOOTHING * rulerHeight +
                                            (1 - RULER_SMOOTHING) * height));
+        if (rulerStreak > 3) {
+            rulerHeight *= Math.max(0.5, Math.pow(0.99, rulerStreak));
+        }
         pct = 25* (rulerHeight + GameLevel.altitude2num(altitude));
         rulerForeground.style.height = pct+'%';
         // light up one, two, or three stars

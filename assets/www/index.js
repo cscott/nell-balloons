@@ -100,10 +100,18 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var ClickableElement = function(color) {
         ColoredElement.call(this, document.createElement('a'), color);
         this.domElement.href='#';
+        // android sometimes delivers events like:
+        // touchstart, <dom mutation> touchcancel, mousedown mouseup
+        // that results in double taps, which is bad.  ignore all mouse*
+        // events on android as a hacky workaround.
+        var isAndroid = window.device &&
+            (window.device.platform==='Android');
         ['mousedown', 'touchstart'].forEach(function(evname) {
+            if (isAndroid && evname[0]==='m') { return; }
             this.domElement.addEventListener(evname,this.highlight.bind(this), false);
         }.bind(this));
         ['mouseup','mouseout','touchcancel','touchend'].forEach(function(evname){
+            if (isAndroid && evname[0]==='m') { return; }
             this.domElement.addEventListener(evname, this.unhighlight.bind(this), false);
         }.bind(this));
         this.domElement.addEventListener('click', function(event) {

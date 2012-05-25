@@ -72,11 +72,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         if (GameMode.currentMode !== GameMode.Playing) {
             return; /* we're already transitioning */
         }
-        funf.record('leveldone', JSON.stringify({
+        funf.record('mode', {
+            name: 'playing',
+            type: 'levelcomplete',
             stars: Ruler.stars,
+            streak: Ruler.streak,
+            smoothedHeight: Ruler.smoothedHeight,
             level: GameMode.Playing.currentLevel.num,
             altitude: GameLevel.altitude2num(GameMode.Playing.currentAltitude)
-        }));
+        });
         stopMusic();
         // play congratulatory sound!
         LEVEL_SOUNDS[0].play();
@@ -597,6 +601,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Menu.toJSON = function() {
         return { mode: 'Menu', level: this.currentLevel.num };
     };
+    GameMode.Menu.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            funf.record('mode', { name: 'menu' });
+        };
+    })(GameMode.Menu.enter);
     GameMode.Menu.start = function(altitude) {
         GameMode.Playing.switchLevel(this.currentLevel);
         GameMode.Playing.switchAltitude(altitude);
@@ -607,10 +617,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                               DOCUMENT_TITLE + ' | Play!',
                               '#play');
         }
-        funf.record('levelstart', JSON.stringify({
+        funf.record('mode', {
+            name: 'playing',
+            type: 'levelstart',
             level: GameMode.Playing.currentLevel.num,
             altitude: GameLevel.altitude2num(GameMode.Playing.currentAltitude)
-        }));
+        });
     };
     GameMode.Menu.switchLevel = function(level) {
         var levelElem = document.querySelector('#menu .level');
@@ -938,7 +950,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     Ruler.reset();
 
     var correctAnswer = function(color, balloonTime, balloonHeight) {
-        funf.record('correct', color+':'+balloonTime);
+        funf.record('correct', { color: color, time: balloonTime });
         // maintain weighted averages
         correctTime = CORRECT_SMOOTHING * correctTime +
             (1-CORRECT_SMOOTHING) * balloonTime;
@@ -949,7 +961,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         Ruler.adjust(true, balloonHeight);
     };
     var incorrectAnswer = function(how, balloonTime) {
-        funf.record('incorrect', how+':'+balloonTime);
+        funf.record('incorrect', { type: how, time: balloonTime });
 
         // maintain weighted averages
         // since this answer is incorrect, use the time only if it

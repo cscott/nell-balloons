@@ -18,6 +18,10 @@ define(['./webintent'], function(WebIntent) {
         window.Cordova && window.Cordova.exec &&
         window.device && window.device.platform==='Android') {
         Funf.prototype.record = function(name, value) {
+            if (typeof value === 'object' /* includes arrays */) {
+                // protect complex values from funf flattening
+                value = JSON.stringify(value);
+            }
             var wi = new WebIntent();
             var o = { name:name, value:value, millis: Date.now() };
             wi.sendBroadcast({

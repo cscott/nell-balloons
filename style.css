@@ -112,17 +112,26 @@ body { background: #008; }
  -moz-transition: -moz-transform 1s ease-in-out;
  transition: transform 1s ease-in-out;
 }
+#sprouts {
+ -webkit-transition: -webkit-transform 0s ease-in-out 1.5s;
+ -moz-transition: -moz-transform 0s ease-in-out 1.5s;
+ transition: transform 0s ease-in-out 1.5s;
+}
 #level.ground {       -webkit-transform: translate3d(0,0,0); }
 #level.troposphere {  -webkit-transform: translate3d(0,25%,0); }
 #level.stratosphere { -webkit-transform: translate3d(0,50%,0); }
 #level.mesosphere {   -webkit-transform: translate3d(0,75%,0); }
 #level.ground #balloons,
+#level.ground #sprouts,
 #level.ground #awards {  -webkit-transform: translate3d(0,0,0); }
 #level.troposphere #balloons,
+#level.troposphere #sprouts,
 #level.troposphere #awards { -webkit-transform: translate3d(0,-100%,0); }
 #level.stratosphere #balloons,
+#level.stratosphere #sprouts,
 #level.stratosphere #awards { -webkit-transform: translate3d(0,-200%,0); }
 #level.mesosphere #balloons,
+#level.mesosphere #sprouts,
 #level.mesosphere #awards { -webkit-transform: translate3d(0,-300%,0); }
 
 /* Graphics */
@@ -141,95 +150,97 @@ body { background: #008; }
 #background > .troposphere  { bottom: 25%; }
 #background > .stratosphere { bottom: 50%; }
 #background > .mesosphere   { bottom: 75%; }
-.grass #background {
+.level.grass #background {
   background-color: #000;
   background-image: url('images/grass-back.png');
   background-repeat: repeat-x;
   background-position: bottom;
 }
-.anim .grass #background {
+.anim .level.grass #background {
   /* CSS3 gradient */
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image: -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
-.grass #background .satellite1,
-.grass #background .satellite2,
-.grass #background .cloud {
+.level.grass #background .satellite1,
+.level.grass #background .satellite2,
+.level.grass #background .cloud {
   position: absolute;
   width: 200%; min-width: 1600px;
   left: 0;
   background-repeat: repeat-x;
 }
 
-.grass #background .satellite1 {
+.level.grass #background .satellite1 {
   height: 362px;
   background-image: url('images/satellite1.png');
   bottom: 25%;
 }
-.grass #background .satellite2 {
+.level.grass #background .satellite2 {
   height: 117px;
   background-image: url('images/satellite2.png');
   top: 25%;
 }
 
-.grass #background .cloud {
+.level.grass #background .cloud {
   height: 162px;
   background-image: url('images/cloud-small.png');
 }
-.grass #background .c1 { background-position: 166px 0; bottom: 75%; }
-.grass #background .c2 { background-position: -100px 0; bottom: 50%; }
-.grass #background .c3 { background-position: 433px 0; bottom: 25%; }
+.level.grass #background .c1 { background-position: 166px 0; bottom: 75%; }
+.level.grass #background .c2 { background-position: -100px 0; bottom: 50%; }
+.level.grass #background .c3 { background-position: 433px 0; bottom: 25%; }
 
-.grass #background .stars {
+.level.grass #background .stars {
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
   background: url('images/star-tile.png') repeat;
 }
-#awards .strip, #sprouts {
+#awards .strip,
+#sprouts {
   text-align: center;
   white-space: nowrap;
 }
-.grass #awards .strip {
+.level.grass #awards .strip {
   position: absolute;
   left: 0; right: 0;
   height: 124px; bottom: 2px;
 }
-.grass #awards .award, .grass #sprouts .award {
+.level.grass #awards .award,
+.level.grass #sprouts .award {
   display: inline-block;
   width: 90px;
   background-repeat: no-repeat;
   margin-left: 5px; margin-right: 5px;
 }
-.grass #awards .award {
+.level.grass #awards .award {
   height: 124px;
   background-image: url('images/award.png'); /* blank fallback image */
   -webkit-transform: translate3d(0,138px,0);
 }
-.grass #awards .award.a1 {
+.level.grass #awards .award.a1 {
   background-image: url('images/award1.png');
 }
-.grass #awards .award.a2 {
+.level.grass #awards .award.a2 {
   background-image: url('images/award2.png');
 }
-.grass #awards .award.a3 {
+.level.grass #awards .award.a3 {
   background-image: url('images/award3.png');
 }
-.grass #awards .award.a4 {
+.level.grass #awards .award.a4 {
   background-image: url('images/award4.png');
 }
-.grass #awards .award.a5 {
+.level.grass #awards .award.a5 {
   background-image: url('images/award5.png');
 }
-.grass #awards .award.a6 {
+.level.grass #awards .award.a6 {
   background-image: url('images/award6.png');
 }
-.grass #awards .award.a7 {
+.level.grass #awards .award.a7 {
   background-image: url('images/award7.png');
 }
-.grass #awards .award.a8 {
+.level.grass #awards .award.a8 {
   background-image: url('images/award8.png');
 }
-.grass #awards .award.show {
+.level.grass #awards .award.show {
   -webkit-transform: translate3d(0,0,0) !important;
   -webkit-transition-property: -webkit-transform;
   -webkit-transition-duration: 1.5s;
@@ -240,15 +251,18 @@ body { background: #008; }
   -moz-transition-duration: 1.5s;
   -moz-transition-timing-function: ease-in-out;
 }
-.grass #awards .award.flex {
+.level.grass #awards .award.flex {
   position: absolute;
   top: 0; left: 0;
   display: none;
 }
-.grass #sprouts .award {
+.level.grass #sprouts .award {
   background-image: url('images/sprout1-lg.png');
   background-position: bottom right;
-  width: 238px; height: 885px;
+  width: 238px;
+  /* bottom-justify a 885px box */
+  height: 885px; margin-top: -885px;
+  position: relative; top: 100%;
   /* adjust to effective width of 100px to match shields */
   margin-left: -20px; margin-right: -118px;
   -webkit-transform: translate3d(0,138px,0) scale(.143,.078);
@@ -263,13 +277,13 @@ body { background: #008; }
   -moz-transition-timing-function: ease-in-out;
   -moz-transform-origin: 70px bottom;
 }
-.grass #sprouts .award.show {
+.level.grass #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
   -moz-transform: translate(0,0);
 }
-.grass #sprouts {
-  height: 885px;
-  bottom: 104px;
+.level.grass #sprouts {
+  height: 25%;
+  bottom: 97px;
 }
 
 #ruler {
@@ -281,12 +295,12 @@ body { background: #008; }
   height: 25%;
 }
 #ruler > .background,
-#ruler .foreground {
+#ruler > .background > .foreground {
   position: absolute;
   bottom: 0; left: 0; width: 38px; height: 100%;
   background: url('images/ruler-tile-dk.png') repeat-y bottom left;
 }
-#ruler .foreground {
+#ruler > .background > .foreground {
   height: 100%; /* override on element */
   background-image: url('images/ruler-tile.png');
   -webkit-transition: height 1s ease;
@@ -327,7 +341,7 @@ body { background: #008; }
   0% { -moz-transform: scale(1); }
  100% { -moz-transform: scale(2); }
 }
-.leveldone #ruler .stars.highlight {
+.starthrob #ruler .stars.highlight {
   -webkit-animation: leveldone-throb 0.35s infinite alternate ease-in;
   -moz-animation: leveldone-throb 0.35s infinite alternate ease-in;
   -webkit-transform-origin: 30% 50%;
@@ -407,24 +421,24 @@ body { background: #008; }
 .nells .jet {
   width: 561px; height: 305px;
 }
-.nells .jet .foreground,
-.nells .jet .background {
+.nells .jet > .foreground,
+.nells .jet > .background {
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
   background-repeat: no-repeat;
 }
 
-.nells .jet .background {
+.nells .jet > .background {
   background-image: url('images/jet1.png');
 }
-.nells .jet .foreground {
+.nells .jet > .foreground {
   background-image: url('images/jet2.png');
 }
 #nell > .mesosphere {
   width: 255px; height: 626px;
 
 }
-#nell > .mesosphere .astronaut {
+#nell > .mesosphere > .astronaut {
    position: absolute;
    bottom: 153px; left: 0;
 }
@@ -433,23 +447,23 @@ body { background: #008; }
    -webkit-transform-origin: 127px 400px;
    -moz-transform-origin: 127px 400px;
 }
-.nells .astronaut .nellscaler {
+.nells .astronaut > .nellscaler {
   position: absolute; top: 36px; left: -99px;
   -webkit-transform-origin: top center;
   -webkit-transform: rotate(-39.5deg);
   -moz-transform-origin: top center;
   -moz-transform: rotate(-39.5deg);
 }
-.nells .astronaut .foreground,
-.nells .astronaut .background {
+.nells .astronaut > .foreground,
+.nells .astronaut > .background {
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
   background-repeat: no-repeat;
 }
-.nells .astronaut .background {
+.nells .astronaut > .background {
   background-image: url('images/astronaut1.png');
 }
-.nells .astronaut .foreground {
+.nells .astronaut > .foreground {
   background-image: url('images/astronaut2.png');
 }
 /* layout for nell parts */
@@ -463,68 +477,68 @@ body { background: #008; }
   top: 0; bottom: 0;
   background-repeat: no-repeat;
 }
-.nells .nell .hair { background-image: url('images/nell-hair.png'); }
-.nells .nell .body { background-image: url('images/nell-body.png'); }
-.nells .nell .head { background-image: url('images/nell-head.png'); }
+.nells .nell > .hair { background-image: url('images/nell-hair.png'); }
+.nells .nell > .body { background-image: url('images/nell-body.png'); }
+.nells .nell > .head { background-image: url('images/nell-head.png'); }
 
-.nells .nell .body, /* default */
-.nells .nell .head, /* default */
-.n0 .nells .nell .body,
-.n0 .nells .nell .head { background-position: 0px 0px; }
-.n1 .nells .nell .body,
-.n1 .nells .nell .head { background-position: -321px 0px; }
-.n2 .nells .nell .body,
-.n2 .nells .nell .head { background-position: -642px 0px; }
-.n3 .nells .nell .body,
-.n3 .nells .nell .head { background-position: -963px 0px; }
-.n4 .nells .nell .body,
-.n4 .nells .nell .head { background-position: -1284px 0px; }
-.n5 .nells .nell .body,
-.n5 .nells .nell .head { background-position: -1605px 0px; }
-.n6 .nells .nell .body,
-.n6 .nells .nell .head { background-position: -1926px 0px; }
-.n7 .nells .nell .body,
-.n7 .nells .nell .head { background-position: -2247px 0px; }
-.n8 .nells .nell .body,
-.n8 .nells .nell .head { background-position: -2568px 0px; }
-.n9 .nells .nell .body,
-.n9 .nells .nell .head { background-position: -2889px 0px; }
-.n10 .nells .nell .body,
-.n10 .nells .nell .head { background-position: -3210px 0px; }
+.nells .nell > .body, /* default */
+.nells .nell > .head, /* default */
+.n0 .nells .nell > .body,
+.n0 .nells .nell > .head { background-position: 0px 0px; }
+.n1 .nells .nell > .body,
+.n1 .nells .nell > .head { background-position: -321px 0px; }
+.n2 .nells .nell > .body,
+.n2 .nells .nell > .head { background-position: -642px 0px; }
+.n3 .nells .nell > .body,
+.n3 .nells .nell > .head { background-position: -963px 0px; }
+.n4 .nells .nell > .body,
+.n4 .nells .nell > .head { background-position: -1284px 0px; }
+.n5 .nells .nell > .body,
+.n5 .nells .nell > .head { background-position: -1605px 0px; }
+.n6 .nells .nell > .body,
+.n6 .nells .nell > .head { background-position: -1926px 0px; }
+.n7 .nells .nell > .body,
+.n7 .nells .nell > .head { background-position: -2247px 0px; }
+.n8 .nells .nell > .body,
+.n8 .nells .nell > .head { background-position: -2568px 0px; }
+.n9 .nells .nell > .body,
+.n9 .nells .nell > .head { background-position: -2889px 0px; }
+.n10 .nells .nell > .body,
+.n10 .nells .nell > .head { background-position: -3210px 0px; }
 
-.grass #clouds {
+.level.grass #clouds {
   /* bias cloud level up so it's easy to center clouds on altitude boundaries */
   bottom: 152px;
   /* this makes the grass peek out the bottom, so allow that */
   overflow: visible;
 }
-.grass #clouds > div {
+.level.grass #clouds > div {
   position: absolute;
   left: 0; right: 0; height: 294px;
   background: url('images/clouds.png') repeat-x;
   background-position: -200px 0;
 }
-.grass #clouds > .troposphere {
+.level.grass #clouds > .troposphere {
   top: 0;
 }
-.grass #clouds > .stratosphere {
+.level.grass #clouds > .stratosphere {
   top: -100%;
 }
-.grass #clouds > .mesosphere {
+.level.grass #clouds > .mesosphere {
   top: -200%;
   -webkit-animation-delay: -1s;
 }
-.grass #clouds > .bug {
+.level.grass #clouds > .bug {
   position: absolute;
   bottom: -152px; height: 388px;
   left: 227px; width: 151px;
   background: url('images/grass-hero.png') no-repeat;
 }
-.grass #clouds > .grass {
+.level.grass #clouds > .grass {
   height: 243px; bottom: -152px;
   background: url('images/grass-front.png') repeat-x;
 }
-.grass #clouds > .stars {
+.level.grass #clouds > .stars {
   top: -300%;
   background-image: url('images/star.png');
   background-position: bottom left;
@@ -571,49 +585,49 @@ body { background: #008; }
 }
 
 /* payloads for "grass" level */
-.grass.ground #balloons .payload { display: none; }
-.grass.troposphere #balloons .black .payload {
+.level.grass.ground #balloons .payload { display: none; }
+.level.grass.troposphere #balloons .black > .payload {
   background-image: url('images/tag-black-bat.png');
 }
-.grass.troposphere #balloons .lilac .payload {
+.level.grass.troposphere #balloons .lilac > .payload {
   background-image: url('images/tag-lilac-mat.png');
 }
-.grass.troposphere #balloons .orange .payload {
+.level.grass.troposphere #balloons .orange > .payload {
   background-image: url('images/tag-orange-orange.png');
 }
-.grass.troposphere #balloons .yellow .payload {
+.level.grass.troposphere #balloons .yellow > .payload {
   background-image: url('images/tag-yellow-banana.png');
 }
 
-.grass.stratosphere #balloons .balloon {
+.level.grass.stratosphere #balloons .balloon {
   background-image: url('images/balloon-white.png');
 }
-.grass.stratosphere #balloons .black .payload {
+.level.grass.stratosphere #balloons .black > .payload {
   background-image: url('images/tag-white-bat.png');
 }
-.grass.stratosphere #balloons .lilac .payload {
+.level.grass.stratosphere #balloons .lilac > .payload {
   background-image: url('images/tag-white-mat.png');
 }
-.grass.stratosphere #balloons .orange .payload {
+.level.grass.stratosphere #balloons .orange > .payload {
   background-image: url('images/tag-white-orange.png');
 }
-.grass.stratosphere #balloons .yellow .payload {
+.level.grass.stratosphere #balloons .yellow > .payload {
   background-image: url('images/tag-white-banana.png');
 }
 
-.grass.mesosphere #balloons .balloon {
+.level.grass.mesosphere #balloons .balloon {
   background-image: url('images/balloon-white.png');
 }
-.grass.mesosphere #balloons .black .payload {
+.level.grass.mesosphere #balloons .black > .payload {
   background-image: url('images/tag-white-bat-bw.png');
 }
-.grass.mesosphere #balloons .lilac .payload {
+.level.grass.mesosphere #balloons .lilac > .payload {
   background-image: url('images/tag-white-mat-bw.png');
 }
-.grass.mesosphere #balloons .orange .payload {
+.level.grass.mesosphere #balloons .orange > .payload {
   background-image: url('images/tag-white-orange-bw.png');
 }
-.grass.mesosphere #balloons .yellow .payload {
+.level.grass.mesosphere #balloons .yellow > .payload {
   background-image: url('images/tag-white-banana-bw.png');
 }
 
@@ -874,7 +888,7 @@ body { background: #008; }
       -moz-transform: translate(0,0);
     }
 }
-.anim #nell .mesosphere .astronaut {
+.anim #nell .mesosphere > .astronaut {
     -webkit-animation: astronaut-bob 20s infinite both ease-in-out;
     -moz-animation: astronaut-bob 20s infinite both ease-in-out;
 }
@@ -896,24 +910,24 @@ body { background: #008; }
     background-position: 1109px 0px;
   }
 }
-.grass #clouds > div {
+.level.grass #clouds > div {
   -webkit-animation: clouds-drift 180s infinite normal none linear;
   -moz-animation: clouds-drift 180s infinite normal none linear;
 }
-.grass #clouds > .stratosphere {
+.level.grass #clouds > .stratosphere {
   -webkit-animation-delay: -60s;
   -webkit-animation-duration: 160s;
   -moz-animation-delay: -60s;
   -moz-animation-duration: 160s;
 }
-.grass #clouds > .mesosphere {
+.level.grass #clouds > .mesosphere {
   -webkit-animation-delay: -120s;
   -webkit-animation-duration: 140s;
   -moz-animation-delay: -120s;
   -moz-animation-duration: 140s;
 }
-.grass #clouds > .stars,
-.grass #clouds > .grass {
+.level.grass #clouds > .stars,
+.level.grass #clouds > .grass {
   -webkit-animation: none;
   -moz-animation: none;
 }
@@ -941,11 +955,11 @@ body { background: #008; }
       -moz-transform: rotate(1deg);
     }
 }
-.grass #clouds > .bug {
+.level.grass #clouds > .bug {
     -webkit-animation: none;
     -moz-animation: none;
 }
-.anim .grass #clouds > .bug {
+.anim .level.grass #clouds > .bug {
     -webkit-animation: bug-shake 5000ms infinite both ease-in-out;
     -moz-animation: bug-shake 5000ms infinite both ease-in-out;
     -webkit-transform-origin: center right;
@@ -969,9 +983,9 @@ body { background: #008; }
     -moz-transform: translate(0px,0);
   }
 }
-.grass #background .cloud,
-.grass #background .satellite1,
-.grass #background .satellite2 {
+.level.grass #background .cloud,
+.level.grass #background .satellite1,
+.level.grass #background .satellite2 {
   -webkit-animation: background-drift 200s infinite normal none linear;
   -moz-animation: background-drift 200s infinite normal none linear;
 }
@@ -1079,11 +1093,11 @@ body { background: #008; }
   height: 243px;
   background-image: url('images/grass-front.png');
 }
-#menu .clouds .cloudshade,
-#menu .clouds .cloudshade > * {
+#menu .clouds > .cloudshade,
+#menu .clouds > .cloudshade > * {
   position: absolute; left: 0; right: 0;
 }
-#menu .clouds .cloudshade {
+#menu .clouds > .cloudshade {
   top: 0;
   height: 100%; /* overridden below */
  -webkit-transition: height 1s ease-in-out;
@@ -1091,16 +1105,16 @@ body { background: #008; }
  transition: height 1s ease-in-out;
 }
 /* set cloudshade to all the classes you want to expose */
-#menu .exposed-ground       .clouds .cloudshade { height: 75%; }
-#menu .exposed-troposphere  .clouds .cloudshade { height: 50%; }
-#menu .exposed-stratosphere .clouds .cloudshade { height: 25%; }
-#menu .exposed-mesosphere   .clouds .cloudshade { height: 0;   }
-#menu .clouds .cloudshade .top {
+#menu .exposed-ground       .clouds > .cloudshade { height: 75%; }
+#menu .exposed-troposphere  .clouds > .cloudshade { height: 50%; }
+#menu .exposed-stratosphere .clouds > .cloudshade { height: 25%; }
+#menu .exposed-mesosphere   .clouds > .cloudshade { height: 0;   }
+#menu .clouds > .cloudshade > .top {
   top: 0; bottom: 225px;
   background: url('images/cloud-tile.png') repeat;
   background-position: bottom left;
 }
-#menu .clouds .cloudshade .bottom {
+#menu .clouds > .cloudshade > .bottom {
   /* overhang bottom of element a little bit */
   bottom: -25px; height: 250px;
   background: url('images/cloud-tile-bottom.png') repeat-x;
@@ -1216,18 +1230,18 @@ body { background: #008; }
 
 /* ------- "please rotate" animation -------- */
 #rotate,
-#rotate .background,
-#rotate .foreground {
+#rotate > .background,
+#rotate > .foreground {
   position: absolute;
   left: 0; right: 0;
   top: 0; bottom: 0;
   background-repeat: no-repeat;
   background-position: center right;
 }
-#rotate .background {
+#rotate > .background {
   background-image: url('images/xoom-rotate-bg.png');
 }
-#rotate .foreground {
+#rotate > .foreground {
   background-image: url('images/xoom-rotate-fg.png');
 }
 @-webkit-keyframes rotate-throb {
@@ -1246,7 +1260,7 @@ body { background: #008; }
     opacity: 1;
   }
 }
-.rotate #rotate .background {
+.rotate #rotate > .background {
   -webkit-animation: rotate-throb 1s infinite alternate ease;
   -moz-animation: rotate-throb 1s infinite alternate ease;
 }

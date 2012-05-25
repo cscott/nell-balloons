@@ -392,6 +392,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.domElement.style.WebkitTransform =
             this.domElement.style.MozTransform =
             this.domElement.style.transform = transform;
+        this.setTime();
+    };
+    Sprout.prototype.setTime = function(time, delay) {
+        this.domElement.style.webkitTransitionDuration=
+            this.domElement.style.mozTransitionDuration=
+            this.domElement.style.transitionDuration=(time || '');
+        this.domElement.style.webkitTransitionDelay=
+            this.domElement.style.mozTransitionDelay=
+            this.domElement.style.transitionDelay=(delay || '');
     };
     SPROUTS = {};
     AWARDS.forEach(function(a) {
@@ -701,21 +710,33 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         };
     })(GameMode.StarThrob.enter);
     GameMode.StarThrob.nextMode = function() {
+        // android massacres this animation, sigh.
+        var isAndroid = !!window.cordovaDetect;
         // grow sprouts up to next level
         AWARDS.forEach(function(a) {
             var sprout = SPROUTS[a[0]];
             if (sprout.size >= 0) {
-                sprout.setSize(SPROUT_SCALES.length);
+                if (!isAndroid) {
+                    sprout.setSize(SPROUT_SCALES.length);
+                    sprout.setTime('3s');
+                } else {
+                    sprout.setSize(-1);
+                }
             }
         });
+        if (isAndroid) { GameMode.LevelDone.delayMs = 0; }
         GameMode.LevelDone.push();
     };
 
-    GameMode.LevelDone = new GameMode.TransitionOverlayMode('leveldone', 2000);
+    GameMode.LevelDone = new GameMode.TransitionOverlayMode('leveldone', 3000);
     GameMode.LevelDone.nextMode = function() {
         //GameMode.Video.push();
         if (GameMode.Playing.nextAltitude()) {
             GameMode.Playing.reset();
+            AWARDS.forEach(function(a) {
+                var sprout = SPROUTS[a[0]];
+                sprout.setTime('0s', '1s');
+            });
             GameMode.Menu.setExposed(GameMode.Playing.currentAltitude);//XXX HACK
         } else {
             GameMode.Menu.switchLevel(GameMode.Playing.currentLevel);
@@ -737,9 +758,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Playing.reset = function() {
         initialBalloonSpeedY = MIN_BALLOON_SPEED_Y;
         balloons.forEach(function(b) { b.reset(); });
-        // XXX really want a "grow the sprouts" screen first.
         AWARDS.forEach(function(a) {
-            SPROUTS[a[0]].setSize(-1);
+            var sprout = SPROUTS[a[0]];
+            sprout.setSize(-1);
+            sprout.setTime('0s');
         });
         elForEach(document.querySelectorAll('#awards .award'), function(a) {
             a.classList.remove('show');

@@ -259,7 +259,10 @@ body { background: #008; }
 .level.grass #sprouts .award {
   background-image: url('images/sprout1-lg.png');
   background-position: bottom right;
-  width: 238px; height: 100%;
+  width: 238px;
+  /* bottom-justify a 885px box */
+  height: 885px; margin-top: -885px;
+  position: relative; top: 100%;
   /* adjust to effective width of 100px to match shields */
   margin-left: -20px; margin-right: -118px;
   -webkit-transform: translate3d(0,138px,0) scale(.143,.078);

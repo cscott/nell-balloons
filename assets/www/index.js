@@ -621,9 +621,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         };
     })(GameMode.Menu.enter);
     GameMode.Menu.start = function(altitude) {
-        GameMode.Playing.switchLevel(this.currentLevel);
-        GameMode.Playing.switchAltitude(altitude);
-        GameMode.Playing.reset();
+        // allow resuming the current level w/o reset
+        if (GameMode.Playing.currentLevel !== this.currentLevel ||
+            GameMode.Playing.currentAltitude !== altitude) {
+            GameMode.Playing.switchLevel(this.currentLevel);
+            GameMode.Playing.switchAltitude(altitude);
+            GameMode.Playing.reset();
+        }
         GameMode.switchTo(GameMode.Playing);
         if (HTML5_HISTORY) { // Android/Honeycomb doesn't support this
             history.pushState(GameMode.currentMode.toJSON(),
@@ -899,9 +903,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         l.num = i;
         l.nextLevel = function() { return LEVELS[i+1] || null; };
     });
-    // default level (handy in case we
-    GameMode.Playing.switchLevel(LEVELS[0]);
-    GameMode.Playing.switchAltitude('ground');
 
 
     // smoothing factor -- closer to 0 means more weight on present

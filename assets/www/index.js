@@ -309,6 +309,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // XXX drift x left and right?
     };
     Balloon.prototype.isGone = function() {
+        if (!this.born) { return false; }
         // returns true if balloon has floated past top of screen
         return (this.y < -this.height) || this.popDone;
     };

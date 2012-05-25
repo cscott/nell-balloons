@@ -108,8 +108,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // touchstart, <dom mutation> touchcancel, mousedown mouseup
         // that results in double taps, which is bad.  ignore all mouse*
         // events on android as a hacky workaround.
-        var isAndroid = window.device &&
-            (window.device.platform==='Android');
+        var isAndroid = !!window.cordovaDetect;
         ['mousedown', 'touchstart'].forEach(function(evname) {
             if (isAndroid && evname[0]==='m') { return; }
             this.domElement.addEventListener(evname,this.highlight.bind(this), false);
@@ -1027,10 +1026,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         nell.switchColor();
     };
     ['mousedown','touchstart'].forEach(function(evname) {
-        var nellElems = document.querySelectorAll('.nells > div > div'), i;
-        for (i=0; i<nellElems.length; i++) {
-            nellElems[i].addEventListener(evname, handleNellTouch, false);
-        }
+        // hacky workaround for android: removeEventListener('mousedown')
+        // doesn't work on android (sigh) so don't register it to begin with
+        var isAndroid = !!window.cordovaDetect;
+        if (isAndroid && evname[0]==='m') { return; }
+
+        elForEach(document.querySelectorAll('.nells > div > div'),
+                  function(nellElem) {
+                      nellElem.addEventListener(evname, handleNellTouch, false);
+                  });
     });
 
     var onPopState = function() {

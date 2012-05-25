@@ -69,7 +69,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }
         }
         // ok, level done!
-        console.assert(GameMode.currentMode === GameMode.Playing);
+        if (GameMode.currentMode !== GameMode.Playing) {
+            return; /* we're already transitioning */
+        }
         funf.record('leveldone', JSON.stringify({
             stars: Ruler.stars,
             level: GameMode.Playing.currentLevel.num,
@@ -78,8 +80,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         stopMusic();
         // play congratulatory sound!
         LEVEL_SOUNDS[0].play();
+        // record sprouts sizes
+        var sproutsizes = AWARDS.map(function(a) {
+            return SPROUTS[a[0]].size;
+        });
         // XXX award stars!
-        GameMode.LevelDone.push();
+        GameMode.StarThrob.push();
         // XXX save score, award stars, etc!
     };
 
@@ -644,38 +650,69 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         };
     })(GameMode.OverlayMode.prototype.leave);
 
-    GameMode.LevelDone = new GameMode.OverlayMode('leveldone');
-    GameMode.LevelDone.id = null;
-    GameMode.LevelDone.enter = (function(superEnter) {
+    GameMode.TransitionOverlayMode = function(bodyClass, delayMs) {
+        GameMode.OverlayMode.call(this, bodyClass);
+        this.delayMs = delayMs;
+        this.switchId = null;
+    };
+    GameMode.TransitionOverlayMode.prototype =
+        Object.create(GameMode.OverlayMode.prototype);
+    GameMode.TransitionOverlayMode.prototype.nextMode = function() { };
+    GameMode.TransitionOverlayMode.prototype.enter = (function(superEnter) {
         return function() {
             superEnter.call(this);
             // in 5s, move to the Video overlay
             var isAndroid = window.device &&
                 (window.device.platform==='Android');
 
-            var dt = (Ruler.stars===0) ? 0 : 5000;
+            var dt = this.delayMs;
             this.switchTime = Date.now() + dt;
-            this.id = setTimeout(this.switchToVideo.bind(this),
-                                 /*android's setTimeout takes its sweet time*/
-                                 isAndroid && dt ? 500 : dt);
+            this.switchId = setTimeout(this.switchMode.bind(this),
+                                       /* android's setTimeout takes its sweet
+                                        * time, so hack around it */
+                                       isAndroid && dt ? 500 : dt);
         };
-    })(GameMode.LevelDone.enter);
-    GameMode.LevelDone.leave = (function(superLeave) {
+    })(GameMode.TransitionOverlayMode.prototype.enter);
+    GameMode.TransitionOverlayMode.prototype.leave = (function(superLeave) {
         return function() {
             superLeave.call(this);
-            if (this.id === null) { return; }
-            clearTimeout(this.id);
-            this.id = null;
+            if (this.switchId === null) { return; }
+            clearTimeout(this.switchId);
+            this.switchId = null;
         };
-    })(GameMode.LevelDone.leave);
-    GameMode.LevelDone.switchToVideo = function() {
+    })(GameMode.TransitionOverlayMode.prototype.leave);
+    GameMode.TransitionOverlayMode.prototype.switchMode = function() {
         // handle late-or-premature invocation on Android (sigh)
         if (Date.now () < this.switchTime) {
-            this.id = setTimeout(this.switchToVideo.bind(this), 10);
+            this.switchId = setTimeout(this.switchMode.bind(this), 10);
             return;
         }
-        this.id = null;
+        this.switchId = null;
         this.pop();
+        this.nextMode(); // subclass will transition.
+    };
+
+    GameMode.StarThrob = new GameMode.TransitionOverlayMode('starthrob', 5000);
+    GameMode.StarThrob.enter = (function(superEnter) {
+        return function() {
+            // tweak the timing if there are no stars to flash
+            this.delayMs = (Ruler.stars===0) ? 0 : 5000;
+            superEnter.call(this);
+        };
+    })(GameMode.StarThrob.enter);
+    GameMode.StarThrob.nextMode = function() {
+        // grow sprouts up to next level
+        AWARDS.forEach(function(a) {
+            var sprout = SPROUTS[a[0]];
+            if (sprout.size >= 0) {
+                sprout.setSize(SPROUT_SCALES.length);
+            }
+        });
+        GameMode.LevelDone.push();
+    };
+
+    GameMode.LevelDone = new GameMode.TransitionOverlayMode('leveldone', 2000);
+    GameMode.LevelDone.nextMode = function() {
         //GameMode.Video.push();
         if (GameMode.Playing.nextAltitude()) {
             GameMode.Playing.reset();

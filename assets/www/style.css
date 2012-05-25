@@ -112,17 +112,26 @@ body { background: #008; }
  -moz-transition: -moz-transform 1s ease-in-out;
  transition: transform 1s ease-in-out;
 }
+#sprouts {
+ -webkit-transition: -webkit-transform 0s ease-in-out 1.5s;
+ -moz-transition: -moz-transform 0s ease-in-out 1.5s;
+ transition: transform 0s ease-in-out 1.5s;
+}
 #level.ground {       -webkit-transform: translate3d(0,0,0); }
 #level.troposphere {  -webkit-transform: translate3d(0,25%,0); }
 #level.stratosphere { -webkit-transform: translate3d(0,50%,0); }
 #level.mesosphere {   -webkit-transform: translate3d(0,75%,0); }
 #level.ground #balloons,
+#level.ground #sprouts,
 #level.ground #awards {  -webkit-transform: translate3d(0,0,0); }
 #level.troposphere #balloons,
+#level.troposphere #sprouts,
 #level.troposphere #awards { -webkit-transform: translate3d(0,-100%,0); }
 #level.stratosphere #balloons,
+#level.stratosphere #sprouts,
 #level.stratosphere #awards { -webkit-transform: translate3d(0,-200%,0); }
 #level.mesosphere #balloons,
+#level.mesosphere #sprouts,
 #level.mesosphere #awards { -webkit-transform: translate3d(0,-300%,0); }
 
 /* Graphics */
@@ -250,7 +259,7 @@ body { background: #008; }
 .level.grass #sprouts .award {
   background-image: url('images/sprout1-lg.png');
   background-position: bottom right;
-  width: 238px; height: 885px;
+  width: 238px; height: 100%;
   /* adjust to effective width of 100px to match shields */
   margin-left: -20px; margin-right: -118px;
   -webkit-transform: translate3d(0,138px,0) scale(.143,.078);
@@ -270,8 +279,8 @@ body { background: #008; }
   -moz-transform: translate(0,0);
 }
 .level.grass #sprouts {
-  height: 885px;
-  bottom: 104px;
+  height: 25%;
+  bottom: 97px;
 }
 
 #ruler {
@@ -329,7 +338,7 @@ body { background: #008; }
   0% { -moz-transform: scale(1); }
  100% { -moz-transform: scale(2); }
 }
-.leveldone #ruler .stars.highlight {
+.starthrob #ruler .stars.highlight {
   -webkit-animation: leveldone-throb 0.35s infinite alternate ease-in;
   -moz-animation: leveldone-throb 0.35s infinite alternate ease-in;
   -webkit-transform-origin: 30% 50%;

@@ -5,6 +5,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
     var MAX_BALLOON_SPEED_Y =  800 / 1000; /* pixels per ms */
     var X_SPEED_FRACTION = 0.25; // fraction of y speed
+    var BALLOON_SEPARATION_MS = 1000;
 
     var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y; /* pixels per ms */
 
@@ -799,7 +800,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
     GameMode.Playing.reset = function() {
         initialBalloonSpeedY = MIN_BALLOON_SPEED_Y;
-        balloons.forEach(function(b) { b.reset(); });
+        balloons.forEach(function(b, i) {
+            b.reset();
+            b.bornTimeout = 1000 + (i*BALLOON_SEPARATION_MS);
+            // race here with sizing of balloonselement, sigh.
+            // i hope balloons are never more than a thousand pixels big
+            b.x = balloonsElement.offsetWidth || -1000;
+            b.y = balloonsElement.offsetHeight || -1000;
+            b.refresh();
+        });
         AWARDS.forEach(function(a) {
             var sprout = SPROUTS[a[0]];
             sprout.setSize(-1);
@@ -1091,6 +1100,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 }
                 isBorn = true;
                 b.reset();
+                // enforce separation between balloons
+                if ((now - refresh.lastBorn) < BALLOON_SEPARATION_MS) {
+                    b.bornTimeout = BALLOON_SEPARATION_MS -
+                        (now - refresh.lastBorn);
+                    refresh.lastBorn += BALLOON_SEPARATION_MS;
+                } else {
+                    refresh.lastBorn = now;
+                }
             }
             b.refresh();
         }
@@ -1109,6 +1126,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
     refresh.id = null;
     refresh.lastFrame = Date.now();
+    refresh.lastBorn = 0;
 
     var handleNellTouch = function(ev) {
         if (ev.type === 'touchstart') {

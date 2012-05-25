@@ -670,7 +670,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             this.switchId = setTimeout(this.switchMode.bind(this),
                                        /* android's setTimeout takes its sweet
                                         * time, so hack around it */
-                                       isAndroid && dt ? 500 : dt);
+                                       isAndroid && dt ? 250 : dt);
         };
     })(GameMode.TransitionOverlayMode.prototype.enter);
     GameMode.TransitionOverlayMode.prototype.leave = (function(superLeave) {

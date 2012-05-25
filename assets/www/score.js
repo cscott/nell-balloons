@@ -12,58 +12,55 @@ define(['./lawnchair/lawnchair'], function(Lawnchair) {
         });
     };
 
-    var compare = function(scorea, scoreb) {
-        // scores are arrays.  compare from last element to first
-        if (scorea.length !== scoreb.length) {
-            return scorea.length - scoreb.length;
-        }
-        var n = scorea.length-1;
-        for ( ; n>=0; n--) {
-            if (scorea[n] !== scoreb[n]) {
-                return scorea[n] - scoreb[n];
-            }
-        }
-        return 0;
-    };
-
-    var Score = function(lawnchair, best, bestTime, recent, recentTime) {
+    var Score = function(lawnchair, unlocked) {
         this.lawnchair = lawnchair;
-        this.best = best;
-        this.bestTime = bestTime;
-        this.recent = recent;
-        this.recentTime = recentTime;
+        this.unlocked = unlocked || {};
     };
     Score.prototype = {};
-    Score.prototype.save = function(nscore) {
-        this.recent = nscore;
-        this.recentTime = Date.now();
-        this.lawnchair.save({key: 'recent', value: this.recent,
-                        timestamp: this.recentTime});
-        // is this a new high score?
-        if ((!this.best) || compare(nscore, this.best) > 0) {
-            this.best = this.recent;
-            this.bestTime = this.recentTime;
-            this.lawnchair.save({key: 'best', value: this.best,
-                            timestamp: this.bestTime});
-            if (this.funf) {
-                // XXX work around bug in db2csv script which flattens
-                // the array into 10 separate 'highscore' entries if
-                // we don't convert this.best from an array to a string
-                this.funf.record('highscore', ""+this.best);
-            }
+    Score.prototype._get = function(level, altitude, create) {
+        if (!this.unlocked[level]) {
+            if (!create) { return {}; }
+            this.unlocked[level] = {};
         }
+        if (!this.unlocked[level][altitude]) {
+            if (!create) { return {}; }
+            this.unlocked[level][altitude] = {};
+        }
+        return this.unlocked[level][altitude];
+    };
+    Score.prototype.isCompleted = function(level, altitude) {
+        return !!(this._get(level, altitude).firstCompleted);
+    };
+    Score.prototype.numStars = function(level, altitude) {
+        return this._get(level, altitude).numStars || 0;
+    };
+    Score.prototype.setCompleted = function(level, altitude, numStars) {
+        var info = this._get(level, altitude, true/*create*/);
+        var prevStars = (info.numStars || 0);
+        var isNew = (!info.firstCompleted) || (numStars > prevStars);
+        if (!isNew) { return; }
+        // new high score / not previously unlocked
+        if (!info.firstCompleted) { info.firstCompleted = Date.now(); }
+        info.lastCompleted = Date.now();
+        info.numStars = numStars;
+        if (this.funf) {
+            this.funf.record('unlocked', {
+                level:level,
+                altitude:altitude,
+                numStars: numStars,
+                firstCompleted: info.firstCompleted
+            });
+        }
+        this.save();
+    };
+    Score.prototype.save = function() {
+        this.lawnchair.save({key: 'unlocked', value: this.unlocked});
     };
 
     var makeScoreAsync = function(callback) {
         var withLawnchair = function(lawnchair) {
-            getDefault(lawnchair, 'best', null, function(best) {
-                getDefault(lawnchair, 'recent', null, function(recent) {
-                    callback(new Score(lawnchair,
-                                       best && best.value,
-                                       best && best.timestamp,
-                                       recent && recent.value,
-                                       recent && recent.timestamp));
-                });
+            getDefault(lawnchair, 'unlocked', {}, function(unlocked) {
+                callback(new Score(lawnchair, unlocked.value));
             });
         };
         Lawnchair({name:'score'}, function() { withLawnchair(this); });

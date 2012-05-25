@@ -430,6 +430,32 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         });
     };
     createButtons();
+    // multitouch hack
+    var handleMultitouch = function(event) {
+        var changedTouches = event.changedTouches, i, j;
+        for (i=0; i<changedTouches.length; i++) {
+            var touch = changedTouches[i];
+            for (j=0; j<buttons.length; j++) {
+                var button = buttons[j];
+                if (touch.target === button.domElement) {
+                    if (event.type==='touchstart') {
+                        button.domElement.classList.add('hover');
+                        button.handleClick();
+                    } else {
+                        button.domElement.classList.remove('hover');
+                    }
+                }
+            }
+        }
+        event.stopPropagation();
+        event.preventDefault();
+        return false;
+    };
+    ['touchstart', 'touchend', 'touchcancel'].forEach(function(evname) {
+        document.getElementById('buttons').addEventListener(evname,
+                                                            handleMultitouch,
+                                                            true);
+    });
 
     altitudeStars = [];
     var createMenuTags = function() {

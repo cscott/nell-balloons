@@ -70,7 +70,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
         // ok, level done!
         console.assert(GameMode.currentMode === GameMode.Playing);
-        funf.record('leveldone', JSON.stringify(GameMode.currentMode));
+        funf.record('leveldone', JSON.stringify({
+            stars: Ruler.stars,
+            level: GameMode.Playing.currentLevel.num,
+            altitude: GameLevel.altitude2num(GameMode.Playing.currentAltitude)
+        }));
         stopMusic();
         // play congratulatory sound!
         LEVEL_SOUNDS[0].play();
@@ -589,6 +593,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                               DOCUMENT_TITLE + ' | Play!',
                               '#play');
         }
+        funf.record('levelstart', JSON.stringify({
+            level: GameMode.Playing.currentLevel.num,
+            altitude: GameLevel.altitude2num(GameMode.Playing.currentAltitude)
+        }));
     };
     GameMode.Menu.switchLevel = function(level) {
         var levelElem = document.querySelector('#menu .level');

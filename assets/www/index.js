@@ -1198,6 +1198,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     function onDeviceReady() {
         funf.record('startColor', nell.color);
+        funf.record('startVersion', version);
         // start in menu screen
         window.GameMode = GameMode;
         GameMode.Menu.switchLevel(LEVELS[0]);

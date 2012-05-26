@@ -1,5 +1,5 @@
 define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound', './version'], function(document, Alea, Compat, Funf, nell, score, Sound, version) {
-    var DOCUMENT_TITLE = document.title = "Balloons for Nell";
+    var DOCUMENT_TITLE = document.title = "Nell's Balloons";
     var MUSIC_URL = 'sounds/barrios_gavota';
     var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
     var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */

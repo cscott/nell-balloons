@@ -402,6 +402,11 @@ body { background: #008; }
 }
 #nell > .stratosphere {
   width: 561px; height: 305px;
+  -webkit-transform: translate3d(-10px,0,0);
+  -moz-transform: translate(-10px,0);
+}
+.anim #nell > .stratosphere {
+  /* rotation (even static rotation) makes everything slow on Honeycomb */
   -webkit-transform: rotate(8deg) translate3d(-10px,0,0);
   -moz-transform: rotate(8deg) translate(-10px,0);
 }
@@ -450,8 +455,14 @@ body { background: #008; }
 .nells .astronaut > .nellscaler {
   position: absolute; top: 36px; left: -99px;
   -webkit-transform-origin: top center;
-  -webkit-transform: rotate(-39.5deg);
   -moz-transform-origin: top center;
+  -webkit-transform: translate3d(100px,0,0);
+  -moz-transform: translate(100px,0);
+}
+#menu .nells .astronaut > .nellscaler,
+.anim .nells .astronaut > .nellscaler {
+  /* Honeycomb hates rotation */
+  -webkit-transform: rotate(-39.5deg);
   -moz-transform: rotate(-39.5deg);
 }
 .nells .astronaut > .foreground,
@@ -983,9 +994,9 @@ body { background: #008; }
     -moz-transform: translate(0px,0);
   }
 }
-.level.grass #background .cloud,
-.level.grass #background .satellite1,
-.level.grass #background .satellite2 {
+.anim .level.grass #background .cloud,
+.anim .level.grass #background .satellite1,
+.anim .level.grass #background .satellite2 {
   -webkit-animation: background-drift 200s infinite normal none linear;
   -moz-animation: background-drift 200s infinite normal none linear;
 }

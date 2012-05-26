@@ -10,7 +10,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y; /* pixels per ms */
 
     var NUM_BALLOONS = 2;
-    var ENABLE_ACCEL = true;
+    var ENABLE_ACCEL = false;
     var HTML5_HISTORY = history.pushState && history.replaceState;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');

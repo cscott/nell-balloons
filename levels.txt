@@ -1,0 +1,23 @@
+Levels:
+4 heights per level.  Each level is a different atmosphere/location?
+
+Level 1: ki6ymz-3 ?
+ - color matching
+ - colored picture matching
+ - white balloons, colored pictures
+ - white balloons, b&w pictures
+Level 2: horus 14
+ - letter matching w/ colors
+ - letter matching w/o colors
+ - word/picture matching w/ colors
+ - word/picture matching w/o colors
+Level 3:
+ - a hut / hut
+ - the hut / hut
+ - hut / huts
+ - hut / huts w/ multiples (huts = 2 huts, hut = 1 hut) 
+Level 4/5: same as level 2/3, but w/ four new words?
+Level 6/7: ""
+Level 8/9: ""
+now we're at the 16 word level.
+Level 10: four levels which shuffle the 2/3, 4/5, 6/7, and 8/9 words

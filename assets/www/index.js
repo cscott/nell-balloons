@@ -842,14 +842,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Video.leave = (function(superLeave) {
         return function() {
             this.maybeUnloadVideo();
-            console.log('video leave');
             superLeave.call(this);
         };
     })(GameMode.Video.leave);
     GameMode.Video.arrow = new ClickableElement('arrow');
     GameMode.Video.arrow.attach(document.querySelector('#video > .inner'));
     GameMode.Video.arrow.handleClick = function() {
-        console.log('click!');
         GameMode.LevelDone.push();
     };
 

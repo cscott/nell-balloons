@@ -660,6 +660,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         var levelElem = document.querySelector('#menu .level');
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
                                          'levelClass');
+        var dot = document.querySelector('#menu .levelnav .dot.on');
+        if (dot) { dot.classList.remove('on'); }
+        level.dot.classList.add('on');
+
+        var prev = document.querySelector('#menu .levelnav .prev');
+        prev.classList.remove('hidden');
+        if (!level.prevLevel) { prev.classList.add('hidden'); }
+
+        var next = document.querySelector('#menu .levelnav .next');
+        next.classList.remove('hidden');
+        if (!level.nextLevel) { next.classList.add('hidden'); }
     };
     GameMode.Menu.syncExposed = function() {
         for (i=0; i < ALTITUDES.length; i++) {
@@ -686,6 +697,20 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }
         });
     };
+    GameMode.Menu.prevClicked = function() {
+        if (!this.currentLevel.prevLevel) { return; }
+        this.switchLevel(this.currentLevel.prevLevel);
+    };
+    GameMode.Menu.nextClicked = function() {
+        if (!this.currentLevel.nextLevel) { return; }
+        this.switchLevel(this.currentLevel.nextLevel);
+    };
+    ['prev', 'next'].forEach(function(arrow) {
+        var e = new ClickableElement(arrow);
+        e.attach(document.querySelector('#menu .levelnav .inner'));
+        e.handleClick = GameMode.Menu[arrow+'Clicked'].bind(GameMode.Menu);
+        GameMode.Menu[arrow+'Arrow'] = e;
+    });
     MenuTag.prototype.altitudeClicked =
         GameMode.Menu.start.bind(GameMode.Menu);
 
@@ -915,7 +940,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Playing.nextAltitude = function() {
         var a = (ALTITUDES.toNum(this.currentAltitude) + 1) % ALTITUDES.length;
         if (a === 0) {
-            var l = this.currentLevel.nextLevel();
+            var l = this.currentLevel.nextLevel;
             if (l===null) {
                 return false; // no more levels.
             }
@@ -967,7 +992,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.levelClass = levelClass;
     };
     GameLevel.prototype = {};
-    GameLevel.prototype.nextLevel = function() { return null; };
     GameLevel.prototype.soundFor = function(altitude, color) {
     };
     GameLevel.prototype.videoFor = function(altitude, format) {
@@ -980,10 +1004,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
-    var LEVELS = [ new GameLevel('grass') ]; // XXX
+    var LEVELS = [ new GameLevel('grass')/*, new GameLevel('sand')*/ ]; // XXX
     LEVELS.forEach(function(l, i) {
         l.num = i;
-        l.nextLevel = function() { return LEVELS[i+1] || null; };
+        l.prevLevel = LEVELS[i-1] || null;
+        l.nextLevel = LEVELS[i+1] || null;
+        l.dot = document.createElement('div');
+        l.dot.classList.add('dot');
+        document.querySelector('#menu .levelnav .inner').appendChild(l.dot);
     });
 
 

@@ -41,13 +41,24 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
+    var awardCounter = 0;
     var pickAward = function() {
-        var i;
+        // every N awards, choose from only unwon awards
+        awardCounter = (awardCounter+1) % 6;
+        var i, sprout;
         for (i=0, sum=0; i<AWARDS.length; i++) {
+            if (!awardCounter) {
+                sprout = SPROUTS[AWARDS[i][0]];
+                if (sprout.size >=0) { continue; }
+            }
             sum += AWARDS[i][1];
         }
         var v = random() * sum;
         for (i=0, sum=0; i<AWARDS.length; i++) {
+            if (!awardCounter) {
+                sprout = SPROUTS[AWARDS[i][0]];
+                if (sprout.size >=0) { continue; }
+            }
             sum += AWARDS[i][1];
             if (v < sum) { return AWARDS[i][0]; }
         }

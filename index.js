@@ -11,6 +11,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = false;
+    var DEBUG_AWARD_OFTEN = false;
     var HTML5_HISTORY = history.pushState && history.replaceState;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');
@@ -40,13 +41,24 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
+    var awardCounter = 0;
     var pickAward = function() {
-        var i;
+        // every N awards, choose from only unwon awards
+        awardCounter = (awardCounter+1) % 6;
+        var i, sprout;
         for (i=0, sum=0; i<AWARDS.length; i++) {
+            if (!awardCounter) {
+                sprout = SPROUTS[AWARDS[i][0]];
+                if (sprout.size >=0) { continue; }
+            }
             sum += AWARDS[i][1];
         }
         var v = random() * sum;
         for (i=0, sum=0; i<AWARDS.length; i++) {
+            if (!awardCounter) {
+                sprout = SPROUTS[AWARDS[i][0]];
+                if (sprout.size >=0) { continue; }
+            }
             sum += AWARDS[i][1];
             if (v < sum) { return AWARDS[i][0]; }
         }
@@ -316,7 +328,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     Balloon.prototype.pop = function() {
         this.popped = true;
         // chance of award
-        var isAward = (random() < (1/4)); // 1-in-6 chance of an award
+        var isAward = (random() < (1/3.5)); // 1-in-4 chance of an award
+        // XXX: switch to "every 4th balloon is an award?"
+        if (DEBUG_AWARD_OFTEN) { isAward = true; } // award always, for testing
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound
@@ -646,6 +660,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         var levelElem = document.querySelector('#menu .level');
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
                                          'levelClass');
+        var dot = document.querySelector('#menu .levelnav .dot.on');
+        if (dot) { dot.classList.remove('on'); }
+        level.dot.classList.add('on');
+
+        var prev = document.querySelector('#menu .levelnav .prev');
+        prev.classList.remove('hidden');
+        if (!level.prevLevel) { prev.classList.add('hidden'); }
+
+        var next = document.querySelector('#menu .levelnav .next');
+        next.classList.remove('hidden');
+        if (!level.nextLevel) { next.classList.add('hidden'); }
     };
     GameMode.Menu.syncExposed = function() {
         for (i=0; i < ALTITUDES.length; i++) {
@@ -672,6 +697,20 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }
         });
     };
+    GameMode.Menu.prevClicked = function() {
+        if (!this.currentLevel.prevLevel) { return; }
+        this.switchLevel(this.currentLevel.prevLevel);
+    };
+    GameMode.Menu.nextClicked = function() {
+        if (!this.currentLevel.nextLevel) { return; }
+        this.switchLevel(this.currentLevel.nextLevel);
+    };
+    ['prev', 'next'].forEach(function(arrow) {
+        var e = new ClickableElement(arrow);
+        e.attach(document.querySelector('#menu .levelnav .inner'));
+        e.handleClick = GameMode.Menu[arrow+'Clicked'].bind(GameMode.Menu);
+        GameMode.Menu[arrow+'Arrow'] = e;
+    });
     MenuTag.prototype.altitudeClicked =
         GameMode.Menu.start.bind(GameMode.Menu);
 
@@ -686,7 +725,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             underMode;
     };
     GameMode.OverlayMode.prototype.push = function() {
-        this.setUnderMode(GameMode.currentMode);
+        this.setUnderMode(GameMode.currentMode.underMode ||
+                          GameMode.currentMode);
         GameMode.switchTo(this);
     };
     GameMode.OverlayMode.prototype.pop = function() {
@@ -719,7 +759,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.TransitionOverlayMode.prototype.enter = (function(superEnter) {
         return function() {
             superEnter.call(this);
-            // in 5s, move to the Video overlay
+            // in 5s, move to the next overlay
             var isAndroid = window.device &&
                 (window.device.platform==='Android');
 
@@ -773,13 +813,71 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 }
             }
         });
-        if (isAndroid) { GameMode.LevelDone.delayMs = 0; }
+        if (isAndroid) { GameMode.SproutsGrow.delayMs = 0; }
+        GameMode.SproutsGrow.push(); // delay while sprouts grow
+    };
+
+    GameMode.SproutsGrow = new GameMode.TransitionOverlayMode('sproutsgrow',
+                                                              3000);
+    GameMode.SproutsGrow.nextMode = function() { GameMode.Video.push(); };
+
+    GameMode.Video = new GameMode.OverlayMode('video');
+    GameMode.Video.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            this.maybeUnloadVideo();
+            // load the appropriate video and wait until ready to play
+            var level = GameMode.Playing.currentLevel;
+            var altitude = GameMode.Playing.currentAltitude;
+            var inner = document.querySelector('#video > .inner');
+            this.videoElement = document.createElement('video');
+            this.videoElement.preload = 'auto';
+            this.videoElement.volume = 1;
+            this.videoElement.muted = false; // xxx?
+            this.videoElement.addEventListener('canplay',
+                                               this.canPlay.bind(this), false);
+            // XXX something's wrong with mp4 rendering on webkit.
+            [/*'mp4',*/ 'webm'].forEach(function(videotype) {
+                var source = document.createElement('source');
+                source.type = 'video/' + videotype;
+                source.src = level.videoFor(altitude, videotype);
+                this.videoElement.appendChild(source);
+            }.bind(this));
+            inner.insertBefore(this.videoElement, inner.firstChild);
+            this.videoElement.load();
+        };
+    })(GameMode.Video.enter);
+    GameMode.Video.canPlay = function() {
+        // ready to play, let's do it!
+        this.videoElement.addEventListener('ended',
+                                           this.playEnded.bind(this), false);
+        this.videoElement.play();
+        document.querySelector('#video').classList.add('playing');
+    };
+    GameMode.Video.playEnded = function() {
+        document.querySelector('#video').classList.remove('playing');
+    };
+    GameMode.Video.maybeUnloadVideo = function() {
+        if (this.videoElement) {
+            this.videoElement.parentElement.removeChild(this.videoElement);
+            this.videoElement = null;
+        }
+        document.querySelector('#video').classList.remove('playing');
+    };
+    GameMode.Video.leave = (function(superLeave) {
+        return function() {
+            this.maybeUnloadVideo();
+            superLeave.call(this);
+        };
+    })(GameMode.Video.leave);
+    GameMode.Video.arrow = new ClickableElement('arrow');
+    GameMode.Video.arrow.attach(document.querySelector('#video > .inner'));
+    GameMode.Video.arrow.handleClick = function() {
         GameMode.LevelDone.push();
     };
 
-    GameMode.LevelDone = new GameMode.TransitionOverlayMode('leveldone', 3000);
+    GameMode.LevelDone = new GameMode.TransitionOverlayMode('leveldone', 0);
     GameMode.LevelDone.nextMode = function() {
-        //GameMode.Video.push();
         if (GameMode.Playing.nextAltitude()) {
             GameMode.Playing.reset();
             AWARDS.forEach(function(a) {
@@ -792,7 +890,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
-    GameMode.Video = new GameMode.OverlayMode('video');
     GameMode.Rotate = new GameMode.OverlayMode('rotate');
 
     GameMode.Playing = new GameMode('game');
@@ -843,7 +940,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Playing.nextAltitude = function() {
         var a = (ALTITUDES.toNum(this.currentAltitude) + 1) % ALTITUDES.length;
         if (a === 0) {
-            var l = this.currentLevel.nextLevel();
+            var l = this.currentLevel.nextLevel;
             if (l===null) {
                 return false; // no more levels.
             }
@@ -895,14 +992,26 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.levelClass = levelClass;
     };
     GameLevel.prototype = {};
-    GameLevel.prototype.nextLevel = function() { return null; };
     GameLevel.prototype.soundFor = function(altitude, color) {
     };
+    GameLevel.prototype.videoFor = function(altitude, format) {
+        var num = 0; // xxx iff this.levelClass='grass'
+        var url = "video/SpaceBalloon"+(1+num)+"-"+(1+ALTITUDES.toNum(altitude));
+        if (format==='mp4') {
+            return url + "-400k128-2pass.mp4";
+        } else {
+            return url + "-200k64.webm";
+        }
+    };
 
-    var LEVELS = [ new GameLevel('grass') ]; // XXX
+    var LEVELS = [ new GameLevel('grass')/*, new GameLevel('sand')*/ ]; // XXX
     LEVELS.forEach(function(l, i) {
         l.num = i;
-        l.nextLevel = function() { return LEVELS[i+1] || null; };
+        l.prevLevel = LEVELS[i-1] || null;
+        l.nextLevel = LEVELS[i+1] || null;
+        l.dot = document.createElement('div');
+        l.dot.classList.add('dot');
+        document.querySelector('#menu .levelnav .inner').appendChild(l.dot);
     });
 
 

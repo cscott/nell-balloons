@@ -59,10 +59,31 @@ body { background: #008; }
  overflow: hidden;
 }
 #video > .inner {
+ position: relative;
  display: inline-block;
  width: 800px; height: 450px;
  border: 5px solid black;
 }
+#video > .inner > video {
+ width: 800px; height: 450px;
+}
+#video > .inner > a.arrow {
+ display: inline-block;
+ position: absolute;
+ background-image: url('images/arrow-right.png');
+ width: 80px; height: 71px;
+ bottom: 6px; right: 6px;
+}
+#video.playing > .inner > a.arrow {
+ opacity: 0.3
+}
+#video > .inner > a.arrow.hover {
+ background-image: url('images/arrow-right-hover.png');
+ opacity: 1;
+}
+.video #video > .inner > a.arrow { pointer-events: all; }
+.video .nells > div > div { pointer-events: none; }
+
 #mask, #video, #menu, #rotate {
   display: none;
 }
@@ -1009,6 +1030,19 @@ body { background: #008; }
   left: 0; right: 0;
   top: 0; bottom: 0;
 }
+#menu > .level > .levelnav {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 3px; height: 71px;
+  text-align: center;
+  white-space: nowrap;
+}
+#menu > .level > .levelnav > .inner {
+  position: relative;
+  display: inline-block;
+  max-width: 458px;
+  width: 100%; height: 71px;
+}
 #menu .ground,
 #menu .troposphere,
 #menu .stratosphere,
@@ -1227,6 +1261,42 @@ body { background: #008; }
   -webkit-animation-play-state: paused;
   -moz-animation-play-state: paused;
 }
+
+#menu .levelnav > .inner > .prev,
+#menu .levelnav > .inner > .next {
+  display: inline-block;
+  position: absolute; top: 0;
+  width: 80px; height: 71px;
+}
+#menu .levelnav > .inner > .prev.hidden,
+#menu .levelnav > .inner > .next.hidden {
+  display: none;
+}
+#menu .levelnav > .inner > .prev {
+  background-image: url('images/arrow-left.png');
+  left: 0;
+}
+#menu .levelnav > .inner > .prev.hover {
+  background-image: url('images/arrow-left-hover.png');
+}
+#menu .levelnav > .inner > .next {
+  background-image: url('images/arrow-right.png');
+  right: 0;
+}
+#menu .levelnav > .inner > .next.hover {
+  background-image: url('images/arrow-right-hover.png');
+}
+#menu .levelnav > .inner > .dot {
+  display: inline-block;
+  width: 26px; height: 26px;
+  margin-top: 22px;
+  margin-left: 5px; margin-right: 4px; /* 9px spacing between dots */
+  background-image: url('images/dot-off.png');
+}
+#menu .levelnav > .inner > .dot.on {
+  background-image: url('images/dot-on.png');
+}
+
 #menu .clouds,
 #menu .sprout,
 #menu .awards,

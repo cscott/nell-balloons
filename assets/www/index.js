@@ -11,6 +11,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var NUM_BALLOONS = 2;
     var ENABLE_ACCEL = false;
+    var DEBUG_AWARD_OFTEN = false;
     var HTML5_HISTORY = history.pushState && history.replaceState;
     var random = Alea.Random();
     var gameElement = document.getElementById('game');
@@ -316,7 +317,9 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     Balloon.prototype.pop = function() {
         this.popped = true;
         // chance of award
-        var isAward = (random() < (1/4)); // 1-in-6 chance of an award
+        var isAward = (random() < (1/3.5)); // 1-in-4 chance of an award
+        // XXX: switch to "every 4th balloon is an award?"
+        if (DEBUG_AWARD_OFTEN) { isAward = true; } // award always, for testing
         // run popping animation & sound effect
         var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
         // play balloon burst sound

@@ -25,7 +25,7 @@ require([], function() {
 </style>
 </head>
 
-<body class="anim n9 menu">
+<body class="anim n9 game video">
 <div id="game"><div id="level" class="level grass troposphere">
  <div id="background">
   <div class="troposphere">
@@ -184,7 +184,13 @@ require([], function() {
 </div></div>
 
 <div id="mask"></div>
-<div id="video"><div class="inner"></div></div>
+<div id="video"><div class="inner">
+ <video>
+  <source src="video/SpaceBalloon1-1-400k128-2pass.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+  <source src="video/SpaceBalloon1-1-400k64.webm" type="video/webm" />
+ </video>
+ <a class="arrow" href="#"></a>
+</div></div>
 <div id="rotate">
  <div class="background"></div>
  <div class="foreground"></div>

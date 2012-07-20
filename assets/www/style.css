@@ -59,10 +59,31 @@ body { background: #008; }
  overflow: hidden;
 }
 #video > .inner {
+ position: relative;
  display: inline-block;
  width: 800px; height: 450px;
  border: 5px solid black;
 }
+#video > .inner > video {
+ width: 800px; height: 450px;
+}
+#video > .inner > a.arrow {
+ display: inline-block;
+ position: absolute;
+ background-image: url('images/arrow-right.png');
+ width: 80px; height: 71px;
+ bottom: 6px; right: 6px;
+}
+#video.playing > .inner > a.arrow {
+ opacity: 0.3
+}
+#video > .inner > a.arrow.hover {
+ background-image: url('images/arrow-right-hover.png');
+ opacity: 1;
+}
+.video #video > .inner > a.arrow { pointer-events: all; }
+.video .nells > div > div { pointer-events: none; }
+
 #mask, #video, #menu, #rotate {
   display: none;
 }

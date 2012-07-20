@@ -1259,7 +1259,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                   });
     });
 
-    var onPopState = function() {
+    var onPopState = function(event) {
         var State = event.state;
         if (!State) { return; }
         if (!State.mode) { return; }

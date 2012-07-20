@@ -546,8 +546,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var music;
     var playMusic = function(src) {
+        if (music && music.origSrc !== src) {
+            stopMusic();
+            music = null;
+        }
         if (!music) {
             music = new Sound.Track({ url: src, formats: ['ogg','mp3'] });
+            music.origSrc = src;
         }
         music.loop();
     };
@@ -643,6 +648,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             GameMode.Playing.switchAltitude(altitude);
             GameMode.Playing.reset();
         }
+        if (HTML5_HISTORY) { // update current menu level
+            history.replaceState(GameMode.currentMode.toJSON(),
+                                 DOCUMENT_TITLE+' | Menu', '#menu');
+        }
         GameMode.switchTo(GameMode.Playing);
         if (HTML5_HISTORY) { // Android/Honeycomb doesn't support this
             history.pushState(GameMode.currentMode.toJSON(),
@@ -671,8 +680,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         var next = document.querySelector('#menu .levelnav .next');
         next.classList.remove('hidden');
         if (!level.nextLevel) { next.classList.add('hidden'); }
+        // sync the exposed altitudes from the current score object
+        this.syncExposed();
     };
     GameMode.Menu.syncExposed = function() {
+        this.setExposed('none', 0);
+        if (this.currentLevel.prevLevel &&
+            !score.isCompleted(this.currentLevel.prevLevel.levelClass,
+                               ALTITUDES[ALTITUDES.length-1])) {
+            // this level isn't unlocked yet. hide everything.
+            return;
+        }
         for (i=0; i < ALTITUDES.length; i++) {
             var numStars =
                 score.numStars(this.currentLevel.levelClass, ALTITUDES[i]);
@@ -687,6 +705,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         var old = this.currentExposed && ('exposed-'+this.currentExposed);
         _switchClass(shadeElem, old, 'exposed-'+altitude);
         this.currentExposed = altitude;
+        if (altitude === 'none') { return; }
         // set the # of stars
         var starsElem = document.querySelector('#menu .awards > .'+altitude+' > .stars');
         ['zero','one','two','three'].forEach(function(name, num) {
@@ -786,8 +805,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             return;
         }
         this.switchId = null;
-        this.pop();
-        this.nextMode(); // subclass will transition.
+        // give subclass a chance to transition
+        if (!this.nextMode()) { this.pop(); }
     };
 
     GameMode.StarThrob = new GameMode.TransitionOverlayMode('starthrob', 5000);
@@ -815,11 +834,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         });
         if (isAndroid) { GameMode.SproutsGrow.delayMs = 0; }
         GameMode.SproutsGrow.push(); // delay while sprouts grow
+        return true; // did my own transition
     };
 
     GameMode.SproutsGrow = new GameMode.TransitionOverlayMode('sproutsgrow',
                                                               3000);
-    GameMode.SproutsGrow.nextMode = function() { GameMode.Video.push(); };
+    GameMode.SproutsGrow.nextMode = function() {
+        GameMode.Video.push();
+        return true;
+    };
 
     GameMode.Video = new GameMode.OverlayMode('video');
     GameMode.Video.enter = (function(superEnter) {
@@ -884,9 +907,16 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 var sprout = SPROUTS[a[0]];
                 sprout.setTime('0s', '1s');
             });
+            // reset sound to match new level
+            return false;
+        } else if (HTML5_HISTORY) {
+            this.currentLevel = GameMode.Playing.currentLevel;
+            history.back();
+            return true; // ???
         } else {
             GameMode.Menu.switchLevel(GameMode.Playing.currentLevel);
             GameMode.switchTo(GameMode.Menu);
+            return true;
         }
     };
 
@@ -972,7 +1002,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             superResume.call(this);
             var timePaused = this.pauseTime - Date.now();
             funf.record('status', 'resume');
-            playMusic(MUSIC_URL);
+            playMusic(this.currentLevel.audioUrl());
             refresh.lastFrame = Date.now();
             if (refresh.id === null) {
                 refresh.id = Compat.requestAnimationFrame(refresh);
@@ -992,11 +1022,17 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.levelClass = levelClass;
     };
     GameLevel.prototype = {};
-    GameLevel.prototype.soundFor = function(altitude, color) {
+    GameLevel.prototype.audioUrl = function() {
+        var base = 'sounds/';
+        switch (this.num) {
+        default:
+        case 0: base += 'barrios_gavota'; break;
+        case 1: base += 'letting-go'; break;
+        }
+        return base;
     };
     GameLevel.prototype.videoFor = function(altitude, format) {
-        var num = 0; // xxx iff this.levelClass='grass'
-        var url = "video/SpaceBalloon"+(1+num)+"-"+(1+ALTITUDES.toNum(altitude));
+        var url = "video/SpaceBalloon"+(1+this.num)+"-"+(1+ALTITUDES.toNum(altitude));
         if (format==='mp4') {
             return url + "-400k128-2pass.mp4";
         } else {
@@ -1270,7 +1306,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             GameMode.switchTo(GameMode.Playing);
             break;
         case 'Menu':
-            GameMode.Menu.switchLevel(LEVELS[State.level]);
+            if (GameMode.currentMode.currentLevel) {
+                GameMode.Menu.switchLevel(GameMode.currentMode.currentLevel);
+            } else {
+                GameMode.Menu.switchLevel(LEVELS[State.level]);
+            }
             GameMode.switchTo(GameMode.Menu);
             break;
         }

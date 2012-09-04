@@ -249,18 +249,19 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.domElement.classList.remove('payload-dropped');
         this.award = null;
         // ensure that unborn balloon is invisible
+        this.x = 0;
         this.y = balloonsElement.offsetHeight;
     };
     Balloon.prototype.refresh = function() {
         if (this.popped) { return; }
+        var transform = Math.round(this.x)+'px,'+Math.round(this.y)+'px';
         // the '3d' is actually very important here: it enables
-        // GPU acceleration of this transform.
-        var transform = 'translate3d('+
-            Math.round(this.x)+'px,'+
-            Math.round(this.y)+'px,0)';
+        // GPU acceleration of this transform on webkit
         this.domElement.style.WebkitTransform =
-            this.domElement.style.MozTransform =
-            this.domElement.style.transform = transform;
+            'translate3d('+transform+',0)';
+        this.domElement.style.MozTransform =
+            this.domElement.style.transform =
+            'translate('+transform;+')';
     };
     Balloon.prototype.update = function(dt /* milliseconds */) {
         if (!this.born) {
@@ -361,9 +362,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var offsetX = elem.offsetLeft + elem.offsetParent.offsetLeft;
             var x = Math.round(this.x - offsetX + 23 /* center on balloon */);
             var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
+            var transform = x+'px,'+y+'px';
             elem.style.WebkitTransform=
-                elem.style.MozTransform=
-                elem.style.transform='translate3d('+x+'px,'+y+'px,0)';
+                'translate3d('+transform+',0)';
+            elem.style.MozTransform=
+                elem.style.transform=
+                'translate('+transform+')';
             sprout.grow();
             saveScore();
         } else if (isSquirt) {
@@ -406,21 +410,22 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     Sprout.prototype.grow = function() { this.setSize(this.size+1); };
     Sprout.prototype.shrink = function() { this.setSize(this.size-1); };
     Sprout.prototype.setSize = function(nsize) {
-        var transform, scale;
+        var transform, wktransform, scale;
         nsize = Math.max(-1, Math.min(nsize, SPROUT_SCALES.length-1));
         nsize = Math.round(nsize); // must be an integer
         if (this.size === nsize) { return; /* no change */ }
         this.size = nsize;
         if (nsize < 0) {
             this.domElement.classList.remove('show');
-            transform = '';
+            transform = wktransform = '';
         } else {
             this.domElement.classList.add('show');
             scale = SPROUT_SCALES[nsize];
-            transform = 'translate3d(0,0,0) scale('+scale[0]+','+scale[1]+')';
+            transform = 'scale('+scale[0]+','+scale[1]+')';
+            wktransform = 'translate3d(0,0,0) ' + transform;
         }
-        this.domElement.style.WebkitTransform =
-            this.domElement.style.MozTransform =
+        this.domElement.style.WebkitTransform = wktransform;
+        this.domElement.style.MozTransform =
             this.domElement.style.transform = transform;
         this.setTime();
     };

@@ -4,6 +4,7 @@
  *
  */
 define([], function() {
+var Cordova = window.Cordova || { addConstructor: function() {} };
 var WebIntent = function() { 
 
 };

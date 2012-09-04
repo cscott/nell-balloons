@@ -1,4 +1,7 @@
-all: assets/www/images/nell-body.png assets/www/images/nell-head.png
+all: build-all
+
+images: assets/www/images/nell-body.png assets/www/images/nell-head.png
+
 # Combine nell images into a single sprite.
 NELLS=0 1 2 3 4 5 6 7 8 9 10
 assets/www/images/nell-body.png: \
@@ -7,3 +10,32 @@ assets/www/images/nell-body.png: \
 assets/www/images/nell-head.png: \
 	$(foreach n,$(NELLS),art/nell/nell-head$(n).png)
 	montage $^ -tile x1 -geometry +0+0 -background none $@
+
+#OPT=optimize=none
+OPT=
+
+build/index.js: assets/www/index.js # and other stuff
+	mkdir -p build
+	node r.js -o name=index out=$@ baseUrl=assets/www $(OPT)
+build-all: build/index.js
+	mkdir -p build/images build/sounds build/video
+	grep -v cordova assets/www/index.html | \
+	  sed -e 's/<html/<html manifest="offline.manifest" /' \
+	  > build/index.html
+	cp assets/www/require.js build/
+	cp assets/www/*.css build/
+	cp assets/www/images/* build/images
+	cp assets/www/sounds/* build/sounds
+	cp assets/www/video/*.jpg \
+	   assets/www/video/*.webm assets/www/video/*.mp4 build/video
+	# offline manifest (everything!)
+	( echo "CACHE MANIFEST" ; cd build ; find . -type f -print ) \
+		> build/offline.manifest
+	# domain name for github pages
+	echo nell-balloons.github.cscott.net > build/CNAME
+	# apache support for HTML5 offline manifest
+	echo "AddType text/cache-manifest .manifest" > build/.htaccess
+
+
+clean:
+	$(RM) -rf build

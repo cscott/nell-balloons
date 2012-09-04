@@ -29,7 +29,10 @@ build-all: build/index.js
 	cp assets/www/video/*.jpg \
 	   assets/www/video/*.webm assets/www/video/*.mp4 build/video
 	# offline manifest (everything!)
-	( echo "CACHE MANIFEST" ; cd build ; find . -type f -print ) \
+	( echo "CACHE MANIFEST" ; \
+	  echo -n '# ' ; find build -type f | xargs md5sum -b | md5sum; echo ; \
+	  echo "CACHE:" ; \
+	  cd build ; find . -type f -print | fgrep -v .manifest ) \
 		> build/offline.manifest
 	# domain name for github pages
 	echo nell-balloons.github.cscott.net > build/CNAME

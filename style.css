@@ -81,6 +81,7 @@ body { background: #008; }
  background-image: url('images/arrow-right-hover.png');
  opacity: 1;
 }
+.video #video > .inner > video { pointer-events: all; }
 .video #video > .inner > a.arrow { pointer-events: all; }
 .video .nells > div > div { pointer-events: none; }
 

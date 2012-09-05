@@ -1490,8 +1490,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         document.addEventListener('pause', onPause, false);
         document.addEventListener('resume', onResume, false);
         onVisibilityChange();
-        // add top-level "anim" class unless we're on xoom/honeycomb
-        var isXoom = window.device &&
+        // add top-level "anim" class unless we're on xoom/honeycomb/phonegap
+        var isXoom = window.cordovaDetect && window.device &&
             (window.device.platform==='Android') &&
             //(window.device.version==='3.2.1') &&
             (window.device.name==='tervigon');

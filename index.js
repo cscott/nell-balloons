@@ -3137,7 +3137,10 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
                 userAgent.indexOf("fennec") >= 0) {
                 isMobile = true;
             }
+            console.log('CSA: platform: '+platform);
+            console.log('CSA: userAgent: '+userAgent);
         }
+        console.log('CSA: isMobile: '+isMobile);
         if (isMobile) {
             // don't prompt to rotate screen on desktop browsers!
             if (window.matchMedia) { // most reliable method

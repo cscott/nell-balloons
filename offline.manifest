@@ -1,4 +1,8 @@
 CACHE MANIFEST
+# b92e5e6f9d94c9c57449bc5c8731baf2  -
+
+CACHE:
+./images/icon-48.png
 ./images/arrow-left-hover.png
 ./images/arrow-left.png
 ./images/arrow-right-hover.png
@@ -142,4 +146,3 @@ CACHE MANIFEST
 ./index.html
 ./require.js
 ./style.css
-./offline.manifest

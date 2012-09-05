@@ -1356,6 +1356,29 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     function onDeviceReady() {
         funf.record('startColor', nell.color);
         funf.record('startVersion', version);
+
+        // scale viewport width to be at least 800px
+        var onResize = function() {
+            var body = document.body;
+            var width = body.parentElement.offsetWidth;
+            if (width >= 800) {
+                body.style.width =
+                    body.style.height =
+                    body.style.WebkitTransform =
+                    body.style.MozTransform =
+                    body.style.transform = '';
+            } else {
+                var scale = width / 800;
+                body.style.width = '800px';
+                body.style.height = (100/scale)+'%';
+                var transform = 'scale('+scale+')';
+                body.style.WebkitTransform = 'translate3d(0,0,0) '+transform;
+                body.style.MozTransform = body.style.transform = transform;
+            }
+        };
+        window.addEventListener('resize', onResize, false);
+        onResize();
+
         // start in menu screen
         window.GameMode = GameMode;
         GameMode.Menu.switchLevel(LEVELS[0]);

@@ -88,10 +88,10 @@ body { background: #008; }
 .video #video > .inner > a.arrow { pointer-events: all; }
 .video .nells > div > div { pointer-events: none; }
 
-#mask, #video, #menu, #rotate {
+#mask, #video, #menu, #rotate, #install {
   display: none;
 }
-.anim #mask, .anim #video, .anim #menu, .anim #rotate {
+.anim #mask, .anim #video, .anim #menu, .anim #rotate, .anim #install {
  /* transition effect knowledge gleaned from:
   *   http://www.greywyvern.com/?post=337
   * thanks! */
@@ -103,14 +103,18 @@ body { background: #008; }
  display: block;
 }
 .video #mask,
-.rotate #mask { opacity: 0.8; }
+.rotate #mask,
+.install #mask { opacity: 0.8; }
 .video #video,
 .menu #menu,
-.rotate #rotate { opacity: 1; }
+.rotate #rotate,
+.install #install { opacity: 1; }
 .video #mask,
 .video #video,
 .rotate #mask,
 .rotate #rotate,
+.install #mask,
+.install #install,
 .menu #menu {
   visibility: visible;
   /* change the visibility property immediately */
@@ -1579,3 +1583,22 @@ body { background: #008; }
      -moz-animation: rotate-throb 1s infinite alternate ease;
           animation: rotate-throb 1s infinite alternate ease;
 }
+
+/* ------- "install as webapp" dialog ------- */
+#install {
+  position: absolute;
+  width: 500px;
+  left: 50%; top: 16px;
+  margin-left: -250px;
+  background: white;
+  -webkit-border-radius: 13px;
+     -moz-border-radius: 13px;
+          border-radius: 13px;
+  -webkit-box-shadow: 0 0 7px 7px rgba(0,0,0,0.6);
+     -moz-box-shadow: 0 0 7px 7px rgba(0,0,0,0.6);
+          box-shadow: 0 0 7px 7px rgba(0,0,0,0.6);
+  border: 2px solid black;
+  padding: 8px;
+  text-align: center;
+}
+#install, #install button { font: 18px sans; }

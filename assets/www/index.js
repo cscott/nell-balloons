@@ -749,13 +749,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             underMode;
     };
     GameMode.OverlayMode.prototype.push = function() {
+        this.lastMode = GameMode.currentMode;
         this.setUnderMode(GameMode.currentMode.underMode ||
                           GameMode.currentMode);
         GameMode.switchTo(this);
     };
     GameMode.OverlayMode.prototype.pop = function() {
         console.assert(GameMode.currentMode === this);
-        GameMode.switchTo(this.underMode);
+        GameMode.switchTo(this.lastMode);
     };
     GameMode.OverlayMode.prototype.enter = (function(superEnter) {
         return function() {
@@ -926,6 +927,22 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     GameMode.Rotate = new GameMode.OverlayMode('rotate');
+
+    GameMode.Install = new GameMode.OverlayMode('install');
+    document.querySelector('#install .yes').addEventListener('click',function(){
+        GameMode.Install.maybeInstall(true);
+    }, false);
+    document.querySelector('#install .no').addEventListener('click',function(){
+        GameMode.Install.maybeInstall(false);
+    }, false);
+    GameMode.Install.maybeInstall = function(doInstall) {
+        var cb = function() { GameMode.Install.pop(); };
+        if (doInstall) {
+            GameMode.Install.doInstall(cb);
+        } else {
+            cb();
+        }
+    };
 
     GameMode.Playing = new GameMode('game');
     GameMode.Playing.toJSON = function() {
@@ -1388,6 +1405,43 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                                  DOCUMENT_TITLE+' | Menu', '#menu');
             window.addEventListener('popstate', onPopState, false);
         }
+        // install webapp?
+        if (window && window.navigator &&
+            window.navigator.mozApps &&
+            window.navigator.mozApps.getSelf &&
+            window.navigator.mozApps.install) {
+            var request = window.navigator.mozApps.getSelf();
+            request.onsuccess = function() {
+                if (request.result) {
+                    /* we're already installed, do nothing */
+                    funf.record('installed', 'yes');
+                } else {
+                    /* not installed, prompt to install */
+                    funf.record('installed', 'no');
+                    GameMode.Install.doInstall = function(cb) {
+                        var request = window.navigator.mozApps.install(
+                            // XXX prefix not strictly required?
+                            'http://nell-balloons.github.cscott.net/'+
+                            'manifest.webapp');
+                        request.onsuccess = function() {
+                            funf.record('installed', 'success');
+                            cb(true);
+                        };
+                        request.onerror = function() {
+                            funf.record('installerror', this.error.name);
+                            cb(false);
+                        };
+                    };
+                    GameMode.Install.push();
+                }
+            };
+            request.onerror = function() {
+                funf.record('installerror', this.error.name);
+                console.log('Error checking installation status: ' +
+                            this.error.name);
+            };
+        }
+
         // orientation
         var isMobile = false;
         if (window.cordovaDetect) { isMobile = true; }

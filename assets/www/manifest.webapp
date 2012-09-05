@@ -1,0 +1,18 @@
+{
+  "version": "6.0",
+  "name": "Nell's Balloons",
+  "description": "Match letters and words as you pop balloons!",
+  "icons": {
+    "16": "/images/icon-16.ico",
+    "48": "/images/icon-48.png",
+    "128": "/images/icon-128.png"
+  },
+  "developer": {
+    "name": "C. Scott Ananian (OLPC)",
+    "url": "http://wiki.laptop.org/go/User:CScott"
+  },
+  "installs_allowed_from": ["*"],
+  "appcache_path": "/offline.manifest",
+  "fullscreen": "true",
+  "default_locale": "en"
+}

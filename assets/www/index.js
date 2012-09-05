@@ -1321,6 +1321,19 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
+    var processOrientation = function(isPortrait) {
+        if (!isPortrait) {
+            if (GameMode.currentMode !== GameMode.Rotate) {
+                GameMode.Rotate.push();
+                funf.record('orientation', 'landscape');
+            }
+        } else {
+            if (GameMode.currentMode === GameMode.Rotate) {
+                GameMode.Rotate.pop();
+                funf.record('orientation', 'portrait');
+            }
+        }
+    };
     var onOrientationChange = function(event) {
         // XXX this is xoom specific, we should really look at width/height
         var isXoom = (window.device &&
@@ -1337,17 +1350,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         if (!event) {
             isPortrait = (window.outerHeight >= window.outerWidth);
         }
-        if (!isPortrait) {
-            if (GameMode.currentMode !== GameMode.Rotate) {
-                GameMode.Rotate.push();
-                funf.record('orientation', 'landscape');
-            }
-        } else {
-            if (GameMode.currentMode === GameMode.Rotate) {
-                GameMode.Rotate.pop();
-                funf.record('orientation', 'portrait');
-            }
-        }
+        processOrientation(isPortrait);
     };
 
     function onDeviceReady() {
@@ -1362,17 +1365,40 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                                  DOCUMENT_TITLE+' | Menu', '#menu');
             window.addEventListener('popstate', onPopState, false);
         }
-        window.addEventListener('orientationchange',onOrientationChange,false);
-        if ('orientation' in window) { onOrientationChange(); }
-
-        /* XXX: this is the "new hotness" way to detect orientation, but it's
-         * not supported by Honeycomb (maybe not by ICS either, I haven't
-         * checked). */
-        //var mql = window.matchMedia("(orientation: portrait)");
-        //console.log("MQL "+(mql.matches?"portrait":"landscape"));
-        //mql.addListener(function(m) {
-        //    console.log("MQL CHANGE: "+(m.matches?"portrait":"landscape"));
-        //});
+        // orientation
+        var isMobile = false;
+        if (window.cordovaDetect) { isMobile = true; }
+        else if (window.navigator) {
+            // Hacky!  Why isn't there a simple method to tell whether
+            // device orientation can change? (not portrait/landscape, but
+            // orientation)
+            var platform = window.navigator.platform.toLowerCase();
+            var userAgent = window.navigator.userAgent.toLowerCase();
+            if (platform.indexOf("android") >= 0 ||
+                userAgent.indexOf("android;") >= 0 ||
+                userAgent.indexOf("tablet;") >= 0 ||
+                userAgent.indexOf("fennec") >= 0) {
+                isMobile = true;
+            }
+        }
+        if (isMobile) {
+            // don't prompt to rotate screen on desktop browsers!
+            if (window.matchMedia) { // most reliable method
+                // (not supported by Honeycomb)
+                var mql = window.matchMedia(
+                    "screen and (orientation: landscape)");
+                var queryListener = function(m) {
+                    var isPortrait = !(m.matches);
+                    processOrientation(isPortrait);
+                };
+                mql.addListener(queryListener);
+                queryListener(mql);
+            } else if ('orientation' in window) { // works on xoom
+                window.addEventListener('orientationchange',
+                                        onOrientationChange, false);
+                onOrientationChange();
+            }
+        }
 
         // phonegap
         document.addEventListener("backbutton", function() {

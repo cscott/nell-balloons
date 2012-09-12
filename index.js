@@ -436,9 +436,45 @@ define('funf',['./webintent'], function(WebIntent) {
     Funf.prototype = {};
     Funf.prototype.record = function(name, value) {
         console.log('CSA FUNF '+name+' / '+value);
+        try {
+            // send custom event; there's a Firefox add-on which will
+            // turn this into an Android Intent:
+            //     https://github.com/cscott/intent-addon
+            var event = document.createEvent('CustomEvent');
+            var o = { name: name, value: value, millis: Date.now() };
+            var intent = {
+                action: FUNF_ACTION_RECORD,
+                method: 'sendBroadcast',
+                extras: {
+                    DATABASE_NAME: FUNF_DATABASE_NAME,
+                    TIMESTAMP: Math.floor(Date.now()/1000),
+                    NAME: this.appName,
+                    VALUE: JSON.stringify(o)
+                }
+	    };
+            event.initCustomEvent("intent-addon", true, true, intent);
+	    document.documentElement.dispatchEvent(event);
+        } catch(e) {
+            console.log("Sending custom event failed: "+e);
+        }
     };
-    Funf.prototype.archive = function() { /* ignore */ };
-    // only define these methods if running on Android
+    Funf.prototype.archive = function() {
+        try {
+            var event = document.createEvent('CustomEvent');
+            var intent = {
+                action: FUNF_ACTION_ARCHIVE,
+                method: 'sendBroadcast',
+                extras: {
+                    DATABASE_NAME: FUNF_DATABASE_NAME
+                }
+	    };
+            event.initCustomEvent("intent-addon", true, true, intent);
+	    document.documentElement.dispatchEvent(event);
+        } catch(e) {
+            console.log("Sending custom event failed: "+e);
+        }
+    };
+    // redefine these methods if running on PhoneGap/Android
     if (window &&
         window.Cordova && window.Cordova.exec &&
         window.device && window.device.platform==='Android') {

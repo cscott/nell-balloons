@@ -14,6 +14,7 @@ define([], function() {
         'ogg': 'audio/ogg',
         'wav': 'audio/wav',
         'aac': 'audio/aac',
+        'webm': 'audio/webm',
         'm4a': 'audio/x-m4a'
     };
 

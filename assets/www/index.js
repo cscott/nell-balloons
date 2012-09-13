@@ -556,7 +556,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             music = null;
         }
         if (!music) {
-            music = new Sound.Track({ url: src, formats: ['ogg','mp3'] });
+            music = new Sound.Track({ url: src, formats: ['webm','ogg','mp3'] });
             music.origSrc = src;
         }
         music.loop();

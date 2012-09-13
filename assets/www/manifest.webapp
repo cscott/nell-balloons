@@ -12,7 +12,7 @@
     "url": "http://wiki.laptop.org/go/User:CScott"
   },
   "installs_allowed_from": ["*"],
-  "appcache_path": "/offline.manifest",
+  "appcache_path": "/manifest.appcache",
   "fullscreen": "true",
   "default_locale": "en"
 }

@@ -20,7 +20,7 @@ build/index.js: assets/www/index.js # and other stuff
 build-all: build/index.js
 	mkdir -p build/images build/sounds build/video
 	grep -v cordova assets/www/index.html | \
-	  sed -e 's/<html/<html manifest="offline.manifest" /' \
+	  sed -e 's/<html/<html manifest="manifest.appcache" /' \
 	  > build/index.html
 	cp res/drawable-mdpi/ic_launcher.png build/images/icon-48.png
 	cp assets/www/require.js build/
@@ -34,11 +34,11 @@ build-all: build/index.js
 	  echo -n '# ' ; find build -type f | xargs md5sum -b | md5sum; echo ; \
 	  echo "CACHE:" ; \
 	  cd build ; find . -type f -print | fgrep -v manifest ) \
-		> build/offline.manifest
+		> build/manifest.appcache
 	# domain name for github pages
 	echo nell-balloons.github.cscott.net > build/CNAME
 	# apache support for HTML5 offline manifest
-	( echo "AddType text/cache-manifest .manifest" ; \
+	( echo "AddType text/cache-manifest .appcache" ; \
 	  echo "AddType application/x-web-app-manifest+json .webapp" ; \
 	  echo "AddType application/webm .webm" ; \
 	  echo "AddType audio/ogg .ogg" ; \

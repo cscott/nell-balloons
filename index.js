@@ -1576,7 +1576,11 @@ define('sound',[], function() {
             audio.pause();
             audio.removeAttribute('loop');
             audio.removeEventListener('ended', loopFunc, false);
-            audio.currentTime = 0;
+            try {
+                audio.currentTime = 0;
+            } catch (e) {
+                console.log("AUDIO PROBLEM: "+e);
+            }
         };
     };
     if (window.cordovaDetect) {
@@ -2630,7 +2634,8 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
                 sprout.setTime('0s', '1s');
             });
             // reset sound to match new level
-            return false;
+            GameMode.switchTo(GameMode.Playing);
+            return true;
         } else if (HTML5_HISTORY) {
             this.currentLevel = GameMode.Playing.currentLevel;
             history.back();

@@ -860,6 +860,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var altitude = GameMode.Playing.currentAltitude;
             var inner = document.querySelector('#video > .inner');
             this.videoElement = document.createElement('video');
+            this.videoElement.autobuffer = true;
             this.videoElement.preload = 'auto';
             this.videoElement.volume = 1;
             this.videoElement.muted = false; // xxx?

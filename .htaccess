@@ -1,5 +1,6 @@
 AddType text/cache-manifest .manifest
 AddType application/x-web-app-manifest+json .webapp
 AddType video/webm .webm
+AddType audio/webm .weba
 AddType audio/ogg .ogg
 AddType audio/mpeg .mp3

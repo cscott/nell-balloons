@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# f939503def66c140a35e1cb22afc154f  -
+# d82809b51223fb5fa17707d02f827a7e  -
 
 CACHE:
 ./images/icon-48.png
@@ -105,6 +105,7 @@ CACHE:
 ./sounds/award.ogg
 ./sounds/barrios_gavota.mp3
 ./sounds/barrios_gavota.ogg
+./sounds/barrios_gavota.weba
 ./sounds/burst1.mp3
 ./sounds/burst1.ogg
 ./sounds/burst2.mp3

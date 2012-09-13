@@ -1476,6 +1476,7 @@ define('sound',[], function() {
         'ogg': 'audio/ogg',
         'wav': 'audio/wav',
         'aac': 'audio/aac',
+        'weba': 'audio/webm',
         'm4a': 'audio/x-m4a'
     };
 
@@ -2276,7 +2277,7 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
             music = null;
         }
         if (!music) {
-            music = new Sound.Track({ url: src, formats: ['ogg','mp3'] });
+            music = new Sound.Track({ url: src, formats: ['weba','ogg','mp3'] });
             music.origSrc = src;
         }
         music.loop();

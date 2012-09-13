@@ -914,7 +914,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 sprout.setTime('0s', '1s');
             });
             // reset sound to match new level
-            return false;
+            GameMode.switchTo(GameMode.Playing);
+            return true;
         } else if (HTML5_HISTORY) {
             this.currentLevel = GameMode.Playing.currentLevel;
             history.back();

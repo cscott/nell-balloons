@@ -37,6 +37,8 @@ build-all: build/index.js
 		> build/manifest.appcache
 	# domain name for github pages
 	echo nell-balloons.github.cscott.net > build/CNAME
+	# turn off jekyll for github pages
+	touch build/.nojekyll
 	# apache support for HTML5 offline manifest
 	( echo "AddType text/cache-manifest .appcache" ; \
 	  echo "AddType application/x-web-app-manifest+json .webapp" ; \

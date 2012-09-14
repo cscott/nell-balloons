@@ -21,6 +21,46 @@
       media="screen and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" />
 <title>Balloons for Nell</title>
 <link rel="stylesheet" href="style.css" />
+<script type="text/javascript">
+/* a little thunk to handle/monitor the appcache */
+// Check if a new cache is available on page load.
+window.addEventListener('load', function(e) {
+  var STATES = ["uncached", "idle", "checking", "downloading",
+                "updateready", "obsolete"];
+  var cache = window.applicationCache;
+  if (!cache) return;
+  ["cached", "checking", "downloading", "error", "noupdate",
+   "obsolete", "progress", "updateready"].forEach(function(evname) {
+     cache.addEventListener(evname, function(e) {
+       var online, status, type, message;
+       online = (navigator.onLine) ? 'yes' : 'no';
+       status = STATES[cache.status];
+       type = e.type;
+       message = "AppCache: ";
+       message+= 'online: ' + online;
+       message+= ', event: ' + type;
+       message+= ', status: ' + status;
+       if (type == 'error' && navigator.onLine) {
+         message+= ' (probably a syntax error in manifest)';
+       }
+       console.log(message);
+     }, false);
+  });
+  cache.addEventListener('updateready', function(e) {
+    if (cache.status == cache.UPDATEREADY) {
+      console.log("AppCache: out of date, reloading.");
+      // Browser downloaded a new app cache.
+      // Swap it in and reload the page to get the new hotness.
+      cache.swapCache();
+      // one might confirm here.  we will just force-reload.
+      window.location.reload();
+    } else {
+      // Manifest didn't changed. Nothing new to server.
+      console.log("AppCache: up to date");
+    }
+  }, false);
+}, false);
+</script>
 <script src="require.js" data-main="index.js" type="text/javascript"></script>
 </head>
 <body>

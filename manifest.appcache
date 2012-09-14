@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# d82809b51223fb5fa17707d02f827a7e  -
+# b47585296f98f98c51399a44bfff65fb  -
 
 CACHE:
 ./images/icon-48.png
@@ -101,40 +101,22 @@ CACHE:
 ./images/xoom-rotate-bg.png
 ./images/xoom-rotate-fg.png
 ./index.js
-./sounds/award.mp3
 ./sounds/award.ogg
-./sounds/barrios_gavota.mp3
-./sounds/barrios_gavota.ogg
-./sounds/barrios_gavota.weba
-./sounds/burst1.mp3
+./sounds/barrios_gavota.webm
 ./sounds/burst1.ogg
-./sounds/burst2.mp3
 ./sounds/burst2.ogg
-./sounds/burst3.mp3
 ./sounds/burst3.ogg
-./sounds/burst4.mp3
 ./sounds/burst4.ogg
-./sounds/burst5.mp3
 ./sounds/burst5.ogg
-./sounds/burst6.mp3
 ./sounds/burst6.ogg
-./sounds/burst7.mp3
 ./sounds/burst7.ogg
-./sounds/deflate1.mp3
 ./sounds/deflate1.ogg
-./sounds/deflate2.mp3
 ./sounds/deflate2.ogg
-./sounds/inflate.mp3
 ./sounds/inflate.ogg
-./sounds/letting-go.mp3
 ./sounds/letting-go.ogg
-./sounds/levellose.mp3
 ./sounds/levellose.ogg
-./sounds/levelwin.mp3
 ./sounds/levelwin.ogg
-./sounds/wrong1.mp3
 ./sounds/wrong1.ogg
-./sounds/wrong2.mp3
 ./sounds/wrong2.ogg
 ./video/SpaceBalloon1-1.jpg
 ./video/SpaceBalloon1-2.jpg

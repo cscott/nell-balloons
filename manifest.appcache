@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# fac5cfe8e00f7e6939548bb19ca7f5c0  -
+# 1e4849b602bd95904e56dea4db73d63c  -
 
 CACHE:
 ./images/icon-48.png
@@ -38,6 +38,7 @@ CACHE:
 ./images/dot-group.png
 ./images/dot-off.png
 ./images/dot-on.png
+./images/download-icon.png
 ./images/grass-back.png
 ./images/grass-front.png
 ./images/grass-hero.png

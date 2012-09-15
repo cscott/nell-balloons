@@ -46,7 +46,14 @@ window.addEventListener('load', function(e) {
        console.log(message);
      }, false);
   });
+  cache.addEventListener('downloading', function(e) {
+     document.body.classList.add('download');
+  }, false);
+  cache.addEventListener('cached', function(e) {
+     document.body.classList.remove('download');
+  }, false);
   cache.addEventListener('updateready', function(e) {
+    document.body.classList.remove('download');
     if (cache.status == cache.UPDATEREADY) {
       console.log("AppCache: out of date, reloading.");
       // Browser downloaded a new app cache.
@@ -56,7 +63,7 @@ window.addEventListener('load', function(e) {
       window.location.reload();
     } else {
       // Manifest didn't changed. Nothing new to server.
-      console.log("AppCache: up to date");
+      console.log("AppCache: up to date: "+STATES[cache.status]);
     }
   }, false);
 }, false);
@@ -232,6 +239,8 @@ window.addEventListener('load', function(e) {
   <button autofocus" class="yes">Yes</button>
   <button class="no">No</button>
 </div>
-  
+
+<div id="download"></div>
+
 </body>
 </html>

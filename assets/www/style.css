@@ -1602,3 +1602,13 @@ body { background: #008; }
   text-align: center;
 }
 #install, #install button { font: 18px sans; }
+
+/* appcache download progress icon */
+#download {
+  position: absolute;
+  width: 62px; height: 62px;
+  background: url('images/download-icon.png');
+  bottom: 5px; right: 20px;
+  display: none;
+}
+.menu.download #download { display: block; }

@@ -12,6 +12,10 @@ define(['./webintent'], function(WebIntent) {
     };
     Funf.prototype = {};
     Funf.prototype.record = function(name, value) {
+        if (typeof value === 'object' /* includes arrays */) {
+            // protect complex values from funf flattening
+            value = JSON.stringify(value);
+        }
         console.log('CSA FUNF '+name+' / '+value);
         try {
             // send custom event; there's a Firefox add-on which will

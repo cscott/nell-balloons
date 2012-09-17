@@ -2595,8 +2595,7 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
             }
             this.videoElement.volume = 1;
             this.videoElement.muted = false; // xxx?
-            this.videoElement.addEventListener('canplay',
-                                               this.canPlay.bind(this), false);
+            this.videoElement.poster = level.videoFor(altitude, 'jpg');
             // XXX something's wrong with mp4 rendering on webkit.
             // ... also on firefox:
             //    https://bugzilla.mozilla.org/show_bug.cgi?id=790950
@@ -2607,7 +2606,7 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
                 this.videoElement.appendChild(source);
             }.bind(this));
             inner.insertBefore(this.videoElement, inner.firstChild);
-            this.videoElement.load();
+            this.canPlay();
         };
     })(GameMode.Video.enter);
     GameMode.Video.canPlay = function() {
@@ -2791,7 +2790,9 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
     GameLevel.prototype.videoFor = function(altitude, format) {
         var url = "video/SpaceBalloon"+(1+this.num)+"-"+(1+ALTITUDES.toNum(altitude));
         if (format==='mp4') {
-            return url + "-400k128-2pass.mp4";
+            return url + "-baseline.mp4";
+        } else if (format==='jpg') {
+            return url + '.jpg';
         } else {
             return url + "-200k64.webm";
         }

@@ -26,9 +26,9 @@ build-all: build/index.js
 	cp assets/www/require.js build/
 	cp assets/www/*.css assets/www/*.webapp build/
 	cp assets/www/images/* build/images
-	cp assets/www/sounds/* build/sounds
+	cp assets/www/sounds/*.webm build/sounds
 	cp assets/www/video/*.jpg \
-	   assets/www/video/*.webm assets/www/video/*.mp4 build/video
+	   assets/www/video/*.webm build/video
 	# offline manifest (everything!)
 	( echo "CACHE MANIFEST" ; \
 	  echo -n '# ' ; find build -type f | xargs md5sum -b | md5sum; echo ; \

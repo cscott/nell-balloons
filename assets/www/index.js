@@ -1063,6 +1063,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         default:
         case 0: base += 'barrios_gavota'; break;
         case 1: base += 'letting-go'; break;
+        case 2: base += 'red-wing'; break;
         }
         return base;
     };

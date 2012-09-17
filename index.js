@@ -2277,7 +2277,10 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
             music = null;
         }
         if (!music) {
-            music = new Sound.Track({ url: src, formats: ['webm','ogg','mp3'] });
+            // bug with ogg on firefox/android:
+            //  https://bugzilla.mozilla.org/show_bug.cgi?id=791017
+            // use webm on all platforms for now, save some space.
+            music = new Sound.Track({ url: src, formats: ['webm'/*,'ogg','mp3'*/] });
             music.origSrc = src;
         }
         music.loop();
@@ -2290,8 +2293,11 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
 
     var loadSounds = function(sounds) {
         return sounds.map(function(url) {
+            // bug with ogg on firefox/android:
+            //  https://bugzilla.mozilla.org/show_bug.cgi?id=791017
+            // use webm on all platforms for now, save some space.
             return new Sound.Effect({url: url, instances: 2,
-                                     formats: ['ogg','mp3'] });
+                                     formats: ['webm'/*,'ogg','mp3'*/] });
         });
     };
 
@@ -2581,13 +2587,19 @@ define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 
             var altitude = GameMode.Playing.currentAltitude;
             var inner = document.querySelector('#video > .inner');
             this.videoElement = document.createElement('video');
-            this.videoElement.autobuffer = true;
-            this.videoElement.preload = 'auto';
+            if (false) {
+                /* these break appcache on firefox! */
+                // https://bugzilla.mozilla.org/show_bug.cgi?id=741351
+                this.videoElement.autobuffer = true;
+                this.videoElement.preload = 'auto';
+            }
             this.videoElement.volume = 1;
             this.videoElement.muted = false; // xxx?
             this.videoElement.addEventListener('canplay',
                                                this.canPlay.bind(this), false);
             // XXX something's wrong with mp4 rendering on webkit.
+            // ... also on firefox:
+            //    https://bugzilla.mozilla.org/show_bug.cgi?id=790950
             [/*'mp4',*/ 'webm'].forEach(function(videotype) {
                 var source = document.createElement('source');
                 source.type = 'video/' + videotype;

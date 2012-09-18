@@ -184,6 +184,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
 
     var Button = function(color) {
         ClickableElement.call(this, color);
+        this.domElement.appendChild(document.createElement('span'));
         this.attach(buttonsElement);
         this.fast = true; // fast button response
     };
@@ -490,7 +491,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var touch = changedTouches[i];
             for (j=0; j<buttons.length; j++) {
                 var button = buttons[j];
-                if (touch.target === button.domElement) {
+                if (touch.target === button.domElement ||
+                    touch.target === button.domElement.firstChild) {
                     if (event.type==='touchstart') {
                         button.domElement.classList.add('hover');
                         button.handleClick();
@@ -993,12 +995,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         Ruler.reset();
     };
     GameMode.Playing.switchLevel = function(level) {
-        var levelElem = document.querySelector('#game #level');
+        var levelElem = document.querySelector('#gamelevel.level');
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
                                          'levelClass');
+        // XXX re-randomize the button order?
     };
     GameMode.Playing.switchAltitude = function(altitude) {
-        var levelElem = document.querySelector('#game #level');
+        var levelElem = document.querySelector('#gamelevel.level');
         this.currentAltitude = _switchClass(levelElem,
                                             this.currentAltitude, altitude);
     };
@@ -1078,7 +1081,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         }
     };
 
-    var LEVELS = [ new GameLevel('grass')/*, new GameLevel('sand')*/ ]; // XXX
+    var LEVELS = [
+        new GameLevel('grass'),
+        new GameLevel('mountains')/*,
+        new GameLevel('sand'),*/
+    ];
     LEVELS.forEach(function(l, i) {
         l.num = i;
         l.prevLevel = LEVELS[i-1] || null;

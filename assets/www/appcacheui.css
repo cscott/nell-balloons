@@ -68,13 +68,13 @@ body.appcache-allinfo #appcache_info.appcache-checking,
 body.appcache-allinfo #appcache_info.appcache-noupdate,
 body.appcache-allinfo #appcache_info.appcache-error,
 #appcache_info.appcache-cached {
-  top: -2em;
+  top: -4em;
 
-  -webkit-transition: top 0.5s ease 3s;
-  -moz-transition: top 0.5s ease 3s;
-  -ms-transition: top 0.5s ease 3s;
-  -o-transition: top 0.5s ease 3s;
-  transition: top 0.5s ease 3s;
+  -webkit-transition: top 0.5s ease 5s;
+  -moz-transition: top 0.5s ease 5s;
+  -ms-transition: top 0.5s ease 5s;
+  -o-transition: top 0.5s ease 5s;
+  transition: top 0.5s ease 5s;
 }
 
 /* English (default) strings */

@@ -202,7 +202,7 @@ body { background: #008; }
   background-color: #000;
   background-repeat: repeat-x;
   background-position: bottom;
-  background-size: 1px 100%;
+  background-size: 100% 100%;
 }
 .level.grass #background {
   background-image: url('images/level1-back.png');
@@ -1404,7 +1404,7 @@ body { background: #008; }
   bottom: 0; left: 0;
   background-repeat: repeat-x;
   background-position: bottom;
-  background-size: 1px 100%;
+  background-size: 100% 100%;
 }
 #menu .level.grass > .background {
   background-color: #000;

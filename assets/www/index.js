@@ -1476,6 +1476,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var userAgent = window.navigator.userAgent.toLowerCase();
             if (platform.indexOf("android") >= 0 ||
                 userAgent.indexOf("android;") >= 0 ||
+                userAgent.indexOf(" android ") >= 0 ||
                 userAgent.indexOf("tablet;") >= 0 ||
                 userAgent.indexOf("fennec") >= 0) {
                 isMobile = true;

@@ -211,7 +211,7 @@ body { background: #008; }
   /* CSS3 gradient */
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
-  background-image:         linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+  background-image:         linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
 .level.mountains #background {
   background-image: url('images/level2-back.png');
@@ -219,7 +219,7 @@ body { background: #008; }
 .anim .level.mountains #background {
   background-image: -webkit-linear-gradient(bottom, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
-  background-image:         linear-gradient(bottom, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
+  background-image:         linear-gradient(to top, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
 }
 #background .satellite1,
 #background .satellite2,
@@ -1422,12 +1422,12 @@ body { background: #008; }
 .anim #menu .level.grass > .background {
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
-  background-image:         linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
+  background-image:         linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
 .anim #menu .level.mountains > .background {
   background-image: -webkit-linear-gradient(bottom, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
-  background-image:         linear-gradient(bottom, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
+  background-image:         linear-gradient(to top, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
 }
 #menu .level.grass > .background .stars,
 #menu .level.mountains > .background .stars {

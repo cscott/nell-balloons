@@ -23,7 +23,8 @@ build-all: build/index.js
 	  sed -e 's/<html/<html manifest="manifest.appcache" /' \
 	  > build/index.html
 	cp res/drawable-mdpi/ic_launcher.png build/images/icon-48.png
-	cp assets/www/require.js assets/www/install.html build/
+	cp assets/www/require.js assets/www/appcacheui.js \
+           assets/www/install.html build/
 	cp assets/www/*.css assets/www/*.webapp build/
 	cp assets/www/images/* build/images
 	cp assets/www/sounds/*.webm build/sounds

@@ -1074,7 +1074,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         } else if (format==='jpg') {
             return url + '.jpg';
         } else {
-            return url + "-200k64.webm";
+            return url + "-256k32k.webm";
         }
     };
 

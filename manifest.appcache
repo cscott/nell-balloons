@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# e1c5edb50d23002465840f6b64f6c554  -
+# 43a32742c425cc8198b37ecadc7ad245  -
 
 CACHE:
 ./images/icon-48.png
@@ -29,8 +29,20 @@ CACHE:
 ./images/balloon-white.png
 ./images/balloon-yellow.png
 ./images/bang.png
+./images/button-b.png
+./images/button-bat.png
+./images/button-c.png
+./images/button-cab.png
+./images/button-cat.png
+./images/button-m.png
+./images/button-mat.png
 ./images/button-overlay-hover.png
 ./images/button-overlay.png
+./images/button-t.png
+./images/button-word-bat.png
+./images/button-word-cab.png
+./images/button-word-cat.png
+./images/button-word-mat.png
 ./images/cloud-small.png
 ./images/cloud-tile-bottom.png
 ./images/cloud-tile.png
@@ -39,14 +51,18 @@ CACHE:
 ./images/dot-off.png
 ./images/dot-on.png
 ./images/download-icon.png
-./images/grass-back.png
-./images/grass-front.png
 ./images/grass-hero.png
 ./images/hotair.png
 ./images/icon-128.png
 ./images/icon-16.ico
 ./images/jet1.png
 ./images/jet2.png
+./images/level1-back.png
+./images/level1-grass-front.png
+./images/level2-back.png
+./images/level2-grass-front.png
+./images/level2-menu-back.png
+./images/level2-mountains.png
 ./images/nell-body.png
 ./images/nell-hair.png
 ./images/nell-head.png
@@ -114,18 +130,30 @@ CACHE:
 ./sounds/deflate1.webm
 ./sounds/deflate2.webm
 ./sounds/inflate.webm
+./sounds/letting-go.webm
 ./sounds/levellose.webm
 ./sounds/levelwin.webm
+./sounds/red-wing.webm
 ./sounds/wrong1.webm
 ./sounds/wrong2.webm
 ./video/SpaceBalloon1-1.jpg
 ./video/SpaceBalloon1-2.jpg
 ./video/SpaceBalloon1-3.jpg
 ./video/SpaceBalloon1-4.jpg
-./video/SpaceBalloon1-1-200k64.webm
-./video/SpaceBalloon1-2-200k64.webm
-./video/SpaceBalloon1-3-200k64.webm
-./video/SpaceBalloon1-4-200k64.webm
+./video/SpaceBalloon2-1.jpg
+./video/SpaceBalloon2-2.jpg
+./video/SpaceBalloon2-3.jpg
+./video/SpaceBalloon2-4.jpg
+./video/SpaceBalloon1-1-256k32k.webm
+./video/SpaceBalloon1-2-256k32k.webm
+./video/SpaceBalloon1-3-256k32k.webm
+./video/SpaceBalloon1-4-256k32k.webm
+./video/SpaceBalloon2-1-256k32k.webm
+./video/SpaceBalloon2-2-256k32k.webm
+./video/SpaceBalloon2-3-256k32k.webm
+./video/SpaceBalloon2-4-256k32k.webm
 ./index.html
+./appcacheui.js
 ./require.js
+./appcacheui.css
 ./style.css

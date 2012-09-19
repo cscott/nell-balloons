@@ -19,60 +19,22 @@
 <link rel="apple-touch-startup-image"
       href="images/splash-640x920.png"
       media="screen and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" />
-<title>Balloons for Nell</title>
+<title>Nell's Balloons</title>
+<link rel="stylesheet" href="appcacheui.css" />
 <link rel="stylesheet" href="style.css" />
-<script type="text/javascript">
-/* a little thunk to handle/monitor the appcache */
-// Check if a new cache is available on page load.
-window.addEventListener('load', function(e) {
-  var STATES = ["uncached", "idle", "checking", "downloading",
-                "updateready", "obsolete"];
-  var cache = window.applicationCache;
-  if (!cache) return;
-  ["cached", "checking", "downloading", "error", "noupdate",
-   "obsolete", "progress", "updateready"].forEach(function(evname) {
-     cache.addEventListener(evname, function(e) {
-       var online, status, type, message;
-       online = (navigator.onLine) ? 'yes' : 'no';
-       status = STATES[cache.status];
-       type = e.type;
-       message = "AppCache: ";
-       message+= 'online: ' + online;
-       message+= ', event: ' + type;
-       message+= ', status: ' + status;
-       if (type == 'error' && navigator.onLine) {
-         message+= ' (probably a syntax error in manifest)';
-       }
-       console.log(message);
-     }, false);
-  });
-  cache.addEventListener('downloading', function(e) {
-     document.body.classList.add('download');
-  }, false);
-  cache.addEventListener('cached', function(e) {
-     document.body.classList.remove('download');
-  }, false);
-  cache.addEventListener('updateready', function(e) {
-    document.body.classList.remove('download');
-    if (cache.status == cache.UPDATEREADY) {
-      console.log("AppCache: out of date, reloading.");
-      // Browser downloaded a new app cache.
-      // Swap it in and reload the page to get the new hotness.
-      cache.swapCache();
-      // one might confirm here.  we will just force-reload.
-      window.location.reload();
-    } else {
-      // Manifest didn't changed. Nothing new to server.
-      console.log("AppCache: up to date: "+STATES[cache.status]);
-    }
-  }, false);
-}, false);
+<script>/* configure require.js */
+var require = { waitSeconds: 30 };
 </script>
 <script src="require.js" data-main="index.js" type="text/javascript"></script>
 </head>
-<body>
-<div id="game"><div id="level" class="level">
+<body class='appcache-allinfo'>
+<script type="text/javascript" src="appcacheui.js"></script>
+<div id="gamelevel" class="level">
+<div id="game"><div id="level">
  <div id="background">
+  <div class="ground">
+   <div class="mountain"></div>
+  </div>
   <div class="troposphere">
    <div class="cloud c2"></div>
   </div>
@@ -159,9 +121,11 @@ window.addEventListener('load', function(e) {
  </div>
 </div></div>
 <div id="buttons"></div>
+</div><!-- gamelevel -->
 
 <div id="menu"><div class="level">
  <div class="background">
+   <div class="mountains"></div>
    <div class="mesosphere">
      <div class="stars"></div>
    </div>
@@ -226,7 +190,8 @@ window.addEventListener('load', function(e) {
 </div></div>
 
 <div id="mask"></div>
-<div id="video"><div class="inner"></div></div>
+<div id="video"><div class="inner">
+</div></div>
 <div id="rotate">
  <div class="background"></div>
  <div class="foreground"></div>

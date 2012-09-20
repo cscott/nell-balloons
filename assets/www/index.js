@@ -203,6 +203,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.altitudeClicked(this.altitude);
     };
 
+    var BALLOON_VARIANTS = ['var1','var2','var3','var4'];
     var Balloon = function(color) {
         color = color || random.choice(buttons).color;
         ColoredElement.call(this, document.createElement('div'), color);
@@ -238,16 +239,23 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         funf.record('born', this.color);
     };
     Balloon.prototype.reset = function(color) {
+        // change color
         color = color || random.choice(buttons).color;
         if (color !== this.color) {
             ColoredElement.prototype.reset.call(this, color);
         }
+        // swap variant
+        BALLOON_VARIANTS.forEach(function(v) {
+            this.domElement.classList.remove(v);
+        }.bind(this));
+        this.domElement.classList.add(random.choice(BALLOON_VARIANTS));
+        // reset other properties.
         this.born = false; this.bornTime = this.pauseTime = 0;
         this.bornTimeout = 0; // born immediately by default
         this.popped = this.popDone = false;
-        this.domElement.classList.remove('popped');
-        this.domElement.classList.remove('squirt');
-        this.domElement.classList.remove('payload-dropped');
+        ['popped','squirt','payload-dropped'].forEach(function(c) {
+            this.domElement.classList.remove(c);
+        }.bind(this));
         this.award = null;
         // ensure that unborn balloon is invisible
         this.x = 0;

@@ -1095,7 +1095,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         new GameLevel('level3'), // "sand"
         new GameLevel('level4')  // "snow"
     ];
-    LEVELS.length=2; // only first two levels are done.
+    LEVELS.length=3; // only first three levels are done.
     LEVELS.forEach(function(l, i) {
         l.num = i;
         l.prevLevel = LEVELS[i-1] || null;

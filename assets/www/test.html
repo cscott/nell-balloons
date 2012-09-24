@@ -28,6 +28,9 @@ require([], function() {
 }
 
 #b0 { -webkit-transform: translate3d(100px,-100px,0); }
+#b1 { -webkit-transform: translate3d(200px,50px,0); }
+#b2 { -webkit-transform: translate3d(300px,150px,0); }
+#b3 { -webkit-transform: translate3d(400px,250px,0); }
 </style>
 </head>
 
@@ -39,6 +42,7 @@ require([], function() {
    <div class="mountain"></div>
   </div>
   <div class="troposphere">
+   <div class="sun"></div>
    <div class="cloud c2"></div>
   </div>
   <div class="stratosphere">
@@ -77,7 +81,12 @@ require([], function() {
    </div>
   </div>
  </div>
- <div id="balloons"><div id="b0" class="orange"><div class="payload"></div><div class="balloon"></div></div></div>
+ <div id="balloons">
+  <div id="b0" class="orange"><div class="payload"></div><div class="balloon"></div></div>
+  <div id="b1" class="yellow"><div class="payload"></div><div class="balloon"></div></div>
+  <div id="b2" class="lilac"><div class="payload"></div><div class="balloon"></div></div>
+  <div id="b3" class="black"><div class="payload"></div><div class="balloon"></div></div>
+ </div>
  <div id="sprouts">
     <div class="award a1 show"></div><div class="award a2"></div><div
          class="award a3"></div><div class="award a4"></div><div
@@ -130,6 +139,9 @@ require([], function() {
 <div id="menu"><div class="level level2 exposed-troposphere">
  <div class="background">
    <div class="mountains"></div>
+   <div class="stratosphere">
+     <div class="sun"></div>
+   </div>
    <div class="mesosphere">
      <div class="stars"></div>
    </div>

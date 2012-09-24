@@ -255,6 +255,16 @@ body { background: #008; }
   background: url('images/star-tile.png') repeat;
 }
 
+.level.level2 #background .cloud.c1 {
+  background: url('images/meteor.png') no-repeat;
+  height: 253px;
+  margin-bottom: -125px;
+  background-position: 100px 0;
+}
+.anim .level.level2 #background .cloud.c1 {
+  background-position: 0 0;
+}
+
 .level.level2 #background .mountain {
   position: absolute; left: 0; right: 0; bottom: 0;
   height: 495px;
@@ -1362,6 +1372,36 @@ body { background: #008; }
   -webkit-animation: background-drift 200s infinite normal none linear;
      -moz-animation: background-drift 200s infinite normal none linear;
           animation: background-drift 200s infinite normal none linear;
+}
+
+@-webkit-keyframes meteor-background-drift {
+  0% {
+    -webkit-transform: translate3d(800px,0,0);
+  }
+  100% {
+    -webkit-transform: translate3d(-800px,0,0);
+  }
+}
+@-moz-keyframes meteor-background-drift {
+  0% {
+    -moz-transform: translate(800px,0);
+  }
+  100% {
+    -moz-transform: translate(-800px,0);
+  }
+}
+@keyframes meteor-background-drift {
+  0% {
+    transform: translate(800px,0);
+  }
+  100% {
+    transform: translate(-800px,0);
+  }
+}
+.anim .level.level2 #background .cloud.c1 {
+  -webkit-animation: meteor-background-drift 200s infinite normal none linear;
+     -moz-animation: meteor-background-drift 200s infinite normal none linear;
+          animation: meteor-background-drift 200s infinite normal none linear;
 }
 
 /* ------------------ menu layout ---------------------- */

@@ -1090,10 +1090,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var LEVELS = [
-        new GameLevel('grass'),
-        new GameLevel('mountains')/*,
-        new GameLevel('sand'),*/
+        new GameLevel('level1'), // "grass"
+        new GameLevel('level2'), // "mountains"
+        new GameLevel('level3'), // "sand"
+        new GameLevel('level4')  // "snow"
     ];
+    LEVELS.length=2; // only first two levels are done.
     LEVELS.forEach(function(l, i) {
         l.num = i;
         l.prevLevel = LEVELS[i-1] || null;

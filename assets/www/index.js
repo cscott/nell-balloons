@@ -406,6 +406,16 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         stepsTo(1, [0.287, 0.156]); // orig size (68x138)
         stepsTo(5, [0.857, 0.469]); // 3x size   (203x415) (~25px per step)
         stepsTo(16,[1.000, 1.000]); // large               (~25px per step)
+
+        // HALVE THE NUMBER OF STEPS (original was too fine grained)
+        function decimateBy(n) {
+            var i;
+            for (i=0; n*i < scales.length; i++) {
+                scales[i] = scales[n*i];
+            }
+            scales.length = i;
+        }
+        decimateBy(2);
         Object.freeze(scales);
         return scales;
     })();

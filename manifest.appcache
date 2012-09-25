@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 1cb47a2befbaa36c3194b71862fff802  -
+# b872e7489f0a45ed9e3938653771d1c3  -
 
 CACHE:
 ./images/icon-48.png
@@ -51,18 +51,22 @@ CACHE:
 ./images/dot-off.png
 ./images/dot-on.png
 ./images/download-icon.png
-./images/grass-hero.png
 ./images/hotair.png
 ./images/icon-128.png
 ./images/icon-16.ico
 ./images/jet1.png
 ./images/jet2.png
 ./images/level1-back.png
+./images/level1-bug.png
 ./images/level1-grass-front.png
 ./images/level2-back.png
 ./images/level2-grass-front.png
 ./images/level2-menu-back.png
 ./images/level2-mountains.png
+./images/level3-back.png
+./images/level3-sand.png
+./images/level3-sun.png
+./images/meteor.png
 ./images/nell-body.png
 ./images/nell-hair.png
 ./images/nell-head.png
@@ -70,10 +74,13 @@ CACHE:
 ./images/ruler-tile.png
 ./images/satellite1.png
 ./images/satellite2.png
+./images/shuttle.png
 ./images/splash-320x460.png
 ./images/splash-640x920.png
 ./images/splash-768x1004.png
+./images/sprout1-lg-level3.png
 ./images/sprout1-lg.png
+./images/sprout1-lgr-level3.png
 ./images/sprout1-lgr.png
 ./images/star-bright.png
 ./images/star-outline.png
@@ -98,6 +105,10 @@ CACHE:
 ./images/tag-white-bat-bw.png
 ./images/tag-white-bat.png
 ./images/tag-white-c.png
+./images/tag-white-cab-bw.png
+./images/tag-white-cab.png
+./images/tag-white-cat-bw.png
+./images/tag-white-cat.png
 ./images/tag-white-empty.png
 ./images/tag-white-m.png
 ./images/tag-white-mat-bw.png
@@ -144,6 +155,10 @@ CACHE:
 ./video/SpaceBalloon2-2.jpg
 ./video/SpaceBalloon2-3.jpg
 ./video/SpaceBalloon2-4.jpg
+./video/SpaceBalloon3-1.jpg
+./video/SpaceBalloon3-2.jpg
+./video/SpaceBalloon3-3.jpg
+./video/SpaceBalloon3-4.jpg
 ./video/SpaceBalloon1-1-256k32k.webm
 ./video/SpaceBalloon1-2-256k32k.webm
 ./video/SpaceBalloon1-3-256k32k.webm
@@ -152,6 +167,10 @@ CACHE:
 ./video/SpaceBalloon2-2-256k32k.webm
 ./video/SpaceBalloon2-3-256k32k.webm
 ./video/SpaceBalloon2-4-256k32k.webm
+./video/SpaceBalloon3-1-256k32k.webm
+./video/SpaceBalloon3-2-256k32k.webm
+./video/SpaceBalloon3-3-256k32k.webm
+./video/SpaceBalloon3-4-256k32k.webm
 ./index.html
 ./appcacheui.js
 ./require.js

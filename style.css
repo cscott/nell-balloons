@@ -204,23 +204,35 @@ body { background: #008; }
   background-position: bottom;
   background-size: 100% 100%;
 }
-.level.grass #background {
+
+/* different backgrounds for each level */
+.level.level1 #background {
   background-image: url('images/level1-back.png');
 }
-.anim .level.grass #background {
+.anim .level.level1 #background {
   /* CSS3 gradient */
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:         linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
-.level.mountains #background {
+.level.level2 #background {
   background-image: url('images/level2-back.png');
 }
-.anim .level.mountains #background {
+.anim .level.level2 #background {
   background-image: -webkit-linear-gradient(bottom, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
   background-image:         linear-gradient(to top, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
 }
+.level.level3 #background {
+  background-image: url('images/level3-back.png');
+}
+.anim .level.level3 #background {
+  background-image: -webkit-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
+  background-image:    -moz-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
+  background-image:         linear-gradient(to bottom, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
+}
+
+
 #background .satellite1,
 #background .satellite2,
 #background .cloud {
@@ -240,6 +252,12 @@ body { background: #008; }
   background-image: url('images/satellite2.png');
   top: 25%;
 }
+.level.level3 #background .satellite2 {
+  height: 216px;
+  background-image: url('images/shuttle.png');
+  background-repeat: no-repeat;
+  margin-top: -121px;
+}
 
 #background .cloud {
   height: 162px;
@@ -255,11 +273,35 @@ body { background: #008; }
   background: url('images/star-tile.png') repeat;
 }
 
-.level.mountains #background .mountain {
+.level.level2 #background .cloud.c1 {
+  background: url('images/meteor.png') no-repeat;
+  height: 253px;
+  margin-bottom: -125px;
+  background-position: 100px 0;
+}
+.anim .level.level2 #background .cloud.c1 {
+  background-position: 0 0;
+}
+
+#background .mountain {
   position: absolute; left: 0; right: 0; bottom: 0;
-  height: 495px;
-  background: url('images/level2-mountains.png') repeat-x;
   background-position: center bottom;
+  background-repeat: repeat-x;
+}
+.level.level2 #background .mountain {
+  height: 495px;
+  background-image: url('images/level2-mountains.png');
+}
+.level.level3 #background .mountain {
+  height: 499px;
+  background-image: url('images/level3-sand.png');
+}
+.level.level3 #background .troposphere > .sun {
+  position: absolute;
+  left: 85px; top: 25%;
+  width: 278px; height: 174px;
+  background: url('images/level3-sun.png') no-repeat;
+  margin-top: -116px;
 }
 
 #awards .strip,
@@ -286,40 +328,52 @@ body { background: #008; }
      -moz-transform: translate(0,138px);
           transform: translate(0,138px);
 }
-.level.grass #awards .award.a1 {
+.level.level1 #awards .award.a1,
+.level.level3 #awards .award.a1 {
   background-image: url('images/award1.png');
 }
-.level.grass #awards .award.a2 {
+.level.level1 #awards .award.a2,
+.level.level3 #awards .award.a2 {
   background-image: url('images/award2.png');
 }
-.level.grass #awards .award.a3 {
+.level.level1 #awards .award.a3,
+.level.level3 #awards .award.a3 {
   background-image: url('images/award3.png');
 }
-.level.grass #awards .award.a4 {
+.level.level1 #awards .award.a4,
+.level.level3 #awards .award.a4 {
   background-image: url('images/award4.png');
 }
-.level.grass #awards .award.a5 {
+.level.level1 #awards .award.a5,
+.level.level3 #awards .award.a5 {
   background-image: url('images/award5.png');
 }
-.level.grass #awards .award.a6 {
+.level.level1 #awards .award.a6,
+.level.level3 #awards .award.a6 {
   background-image: url('images/award6.png');
 }
-.level.mountains #awards .award.a1 {
+.level.level2 #awards .award.a1,
+.level.level4 #awards .award.a1 {
   background-image: url('images/award7.png');
 }
-.level.mountains #awards .award.a2 {
+.level.level2 #awards .award.a2,
+.level.level4 #awards .award.a2 {
   background-image: url('images/award8.png');
 }
-.level.mountains #awards .award.a3 {
+.level.level2 #awards .award.a3,
+.level.level4 #awards .award.a3 {
   background-image: url('images/award9.png');
 }
-.level.mountains #awards .award.a4 {
+.level.level2 #awards .award.a4,
+.level.level4 #awards .award.a4 {
   background-image: url('images/award10.png');
 }
-.level.mountains #awards .award.a5 {
+.level.level2 #awards .award.a5,
+.level.level4 #awards .award.a5 {
   background-image: url('images/award11.png');
 }
-.level.mountains #awards .award.a6 {
+.level.level2 #awards .award.a6,
+.level.level4 #awards .award.a6 {
   background-image: url('images/award12.png');
 }
 #awards .award.show {
@@ -369,6 +423,9 @@ body { background: #008; }
   transition-duration: 1.5s;
   transition-timing-function: ease-in-out;
   transform-origin: 70px bottom;
+}
+.level.level3 #sprouts .award {
+  background-image: url('images/sprout1-lg-level3.png');
 }
 #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
@@ -651,17 +708,17 @@ body { background: #008; }
      -moz-animation-delay: -1s;
           animation-delay: -1s;
 }
-.level.grass #clouds > .bug {
+.level.level1 #clouds > .bug {
   position: absolute;
   bottom: -152px; height: 388px;
   left: 227px; width: 151px;
-  background: url('images/grass-hero.png') no-repeat;
+  background: url('images/level1-bug.png') no-repeat;
 }
-.level.grass #clouds > .grass {
+.level.level1 #clouds > .grass {
   height: 243px; bottom: -152px;
   background: url('images/level1-grass-front.png') repeat-x;
 }
-.level.mountains #clouds > .grass {
+.level.level2 #clouds > .grass {
   height: 224px; bottom: -152px;
   background: url('images/level2-grass-front.png') repeat-x;
 }
@@ -712,149 +769,243 @@ body { background: #008; }
 }
 
 /* payloads for "grass" level */
-.level.grass.ground #balloons .payload { display: none; }
-.level.grass.troposphere #balloons .black > .payload {
+.level.level1.ground #balloons .payload { display: none; }
+.level.level1.troposphere #balloons .black > .payload {
   background-image: url('images/tag-black-bat.png');
 }
-.level.grass.troposphere #balloons .lilac > .payload {
+.level.level1.troposphere #balloons .lilac > .payload {
   background-image: url('images/tag-lilac-mat.png');
 }
-.level.grass.troposphere #balloons .orange > .payload {
+.level.level1.troposphere #balloons .orange > .payload {
   background-image: url('images/tag-orange-orange.png');
 }
-.level.grass.troposphere #balloons .yellow > .payload {
+.level.level1.troposphere #balloons .yellow > .payload {
   background-image: url('images/tag-yellow-banana.png');
 }
 
-.level.grass.stratosphere #balloons .balloon {
+.level.level1.stratosphere #balloons .balloon {
   background-image: url('images/balloon-white.png');
 }
-.level.grass.stratosphere #balloons .black > .payload {
+.level.level1.stratosphere #balloons .black > .payload {
   background-image: url('images/tag-white-bat.png');
 }
-.level.grass.stratosphere #balloons .lilac > .payload {
+.level.level1.stratosphere #balloons .lilac > .payload {
   background-image: url('images/tag-white-mat.png');
 }
-.level.grass.stratosphere #balloons .orange > .payload {
+.level.level1.stratosphere #balloons .orange > .payload {
   background-image: url('images/tag-white-orange.png');
 }
-.level.grass.stratosphere #balloons .yellow > .payload {
+.level.level1.stratosphere #balloons .yellow > .payload {
   background-image: url('images/tag-white-banana.png');
 }
 
-.level.grass.mesosphere #balloons .balloon {
+.level.level1.mesosphere #balloons .balloon {
   background-image: url('images/balloon-white.png');
 }
-.level.grass.mesosphere #balloons .black > .payload {
+.level.level1.mesosphere #balloons .black > .payload {
   background-image: url('images/tag-white-bat-bw.png');
 }
-.level.grass.mesosphere #balloons .lilac > .payload {
+.level.level1.mesosphere #balloons .lilac > .payload {
   background-image: url('images/tag-white-mat-bw.png');
 }
-.level.grass.mesosphere #balloons .orange > .payload {
+.level.level1.mesosphere #balloons .orange > .payload {
   background-image: url('images/tag-white-orange-bw.png');
 }
-.level.grass.mesosphere #balloons .yellow > .payload {
+.level.level1.mesosphere #balloons .yellow > .payload {
   background-image: url('images/tag-white-banana-bw.png');
 }
 
 
 /* payloads for "mountains" level */
-.level.mountains #buttons > a.black {
+.level.level2 #buttons > a.black {
   background-color: #777;
 }
-.level.mountains.ground #balloons .black > .payload {
+.level.level2.ground #balloons .black > .payload {
   background-image: url('images/tag-black-b.png');
 }
-.level.mountains.ground #balloons .lilac > .payload {
+.level.level2.ground #balloons .lilac > .payload {
   background-image: url('images/tag-lilac-m.png');
 }
-.level.mountains.ground #balloons .orange > .payload {
+.level.level2.ground #balloons .orange > .payload {
   background-image: url('images/tag-orange-t.png');
 }
-.level.mountains.ground #balloons .yellow > .payload {
+.level.level2.ground #balloons .yellow > .payload {
   background-image: url('images/tag-yellow-c.png');
 }
 
-.level.mountains.troposphere #balloons .balloon {
+.level.level2.troposphere #balloons .balloon {
   background-image: url('images/balloon-white.png');
 }
-.level.mountains.troposphere #balloons .black > .payload {
+.level.level2.troposphere #balloons .black > .payload {
   background-image: url('images/tag-white-b.png');
 }
-.level.mountains.troposphere #balloons .lilac > .payload {
+.level.level2.troposphere #balloons .lilac > .payload {
   background-image: url('images/tag-white-m.png');
 }
-.level.mountains.troposphere #balloons .orange > .payload {
+.level.level2.troposphere #balloons .orange > .payload {
   background-image: url('images/tag-white-t.png');
 }
-.level.mountains.troposphere #balloons .yellow > .payload {
+.level.level2.troposphere #balloons .yellow > .payload {
   background-image: url('images/tag-white-c.png');
 }
 
-.level.mountains.ground #buttons > a.black,
-.level.mountains.troposphere #buttons > a.black {
+.level.level2.ground #buttons > a.black,
+.level.level2.troposphere #buttons > a.black {
   background-image: url('images/button-b.png');
 }
-.level.mountains.ground #buttons > a.lilac,
-.level.mountains.troposphere #buttons > a.lilac {
+.level.level2.ground #buttons > a.lilac,
+.level.level2.troposphere #buttons > a.lilac {
   background-image: url('images/button-m.png');
 }
-.level.mountains.ground #buttons > a.orange,
-.level.mountains.troposphere #buttons > a.orange {
+.level.level2.ground #buttons > a.orange,
+.level.level2.troposphere #buttons > a.orange {
   background-image: url('images/button-t.png');
 }
-.level.mountains.ground #buttons > a.yellow,
-.level.mountains.troposphere #buttons > a.yellow {
+.level.level2.ground #buttons > a.yellow,
+.level.level2.troposphere #buttons > a.yellow {
   background-image: url('images/button-c.png');
 }
 
-.level.mountains.stratosphere #balloons .black > .payload {
+.level.level2.stratosphere #balloons .black > .payload {
   background-image: url('images/tag-black-word-bat.png');
 }
-.level.mountains.stratosphere #balloons .lilac > .payload {
+.level.level2.stratosphere #balloons .lilac > .payload {
   background-image: url('images/tag-lilac-word-mat.png');
 }
-.level.mountains.stratosphere #balloons .orange > .payload {
+.level.level2.stratosphere #balloons .orange > .payload {
   background-image: url('images/tag-orange-word-cat.png');
 }
-.level.mountains.stratosphere #balloons .yellow > .payload {
+.level.level2.stratosphere #balloons .yellow > .payload {
   background-image: url('images/tag-yellow-word-cab.png');
 }
 
-.level.mountains.mesosphere #balloons .balloon {
+.level.level2.mesosphere #balloons .balloon {
   background-image: url('images/balloon-white.png');
 }
-.level.mountains.mesosphere #balloons .black > .payload {
+.level.level2.mesosphere #balloons .black > .payload {
   background-image: url('images/tag-white-word-bat.png');
 }
-.level.mountains.mesosphere #balloons .lilac > .payload {
+.level.level2.mesosphere #balloons .lilac > .payload {
   background-image: url('images/tag-white-word-mat.png');
 }
-.level.mountains.mesosphere #balloons .orange > .payload {
+.level.level2.mesosphere #balloons .orange > .payload {
   background-image: url('images/tag-white-word-cat.png');
 }
-.level.mountains.mesosphere #balloons .yellow > .payload {
+.level.level2.mesosphere #balloons .yellow > .payload {
   background-image: url('images/tag-white-word-cab.png');
 }
 
-.level.mountains.stratosphere #buttons > a.black,
-.level.mountains.mesosphere #buttons > a.black {
+.level.level2.stratosphere #buttons > a.black,
+.level.level2.mesosphere #buttons > a.black {
   background-image: url('images/button-word-bat.png');
 }
-.level.mountains.stratosphere #buttons > a.lilac,
-.level.mountains.mesosphere #buttons > a.lilac {
+.level.level2.stratosphere #buttons > a.lilac,
+.level.level2.mesosphere #buttons > a.lilac {
   background-image: url('images/button-word-mat.png');
 }
-.level.mountains.stratosphere #buttons > a.orange,
-.level.mountains.mesosphere #buttons > a.orange {
+.level.level2.stratosphere #buttons > a.orange,
+.level.level2.mesosphere #buttons > a.orange {
   background-image: url('images/button-word-cat.png');
 }
-.level.mountains.stratosphere #buttons > a.yellow,
-.level.mountains.mesosphere #buttons > a.yellow {
+.level.level2.stratosphere #buttons > a.yellow,
+.level.level2.mesosphere #buttons > a.yellow {
   background-image: url('images/button-word-cab.png');
 }
 
+/* payloads for "sand" level */
+.level.level3 #buttons > a.black {
+  background-color: #777;
+}
+.level.level3.ground #buttons > a.black,
+.level.level3.troposphere #buttons > a.black {
+  background-image: url('images/button-word-bat.png');
+}
+.level.level3.ground #buttons > a.lilac,
+.level.level3.troposphere #buttons > a.lilac {
+  background-image: url('images/button-word-mat.png');
+}
+.level.level3.ground #buttons > a.orange,
+.level.level3.troposphere #buttons > a.orange {
+  background-image: url('images/button-word-cat.png');
+}
+.level.level3.ground #buttons > a.yellow,
+.level.level3.troposphere #buttons > a.yellow {
+  background-image: url('images/button-word-cab.png');
+}
+.level.level3.stratosphere #buttons > a.black,
+.level.level3.mesosphere #buttons > a.black {
+  background-image: url('images/button-bat.png');
+}
+.level.level3.stratosphere #buttons > a.lilac,
+.level.level3.mesosphere #buttons > a.lilac {
+  background-image: url('images/button-mat.png');
+}
+.level.level3.stratosphere #buttons > a.orange,
+.level.level3.mesosphere #buttons > a.orange {
+  background-image: url('images/button-cat.png');
+}
+.level.level3.stratosphere #buttons > a.yellow,
+.level.level3.mesosphere #buttons > a.yellow {
+  background-image: url('images/button-cab.png');
+}
+
+.level.level3.ground #balloons .black > .payload {
+  background-image: url('images/tag-black-bat.png');
+}
+.level.level3.ground #balloons .lilac > .payload {
+  background-image: url('images/tag-lilac-mat.png');
+}
+.level.level3.ground #balloons .orange > .payload {
+  background-image: url('images/tag-orange-cat.png');
+}
+.level.level3.ground #balloons .yellow > .payload {
+  background-image: url('images/tag-yellow-cab.png');
+}
+
+.level.level3.troposphere #balloons .balloon {
+  background-image: url('images/balloon-white.png');
+}
+.level.level3.troposphere #balloons .black > .payload {
+  background-image: url('images/tag-white-bat-bw.png');
+}
+.level.level3.troposphere #balloons .lilac > .payload {
+  background-image: url('images/tag-white-mat-bw.png');
+}
+.level.level3.troposphere #balloons .orange > .payload {
+  background-image: url('images/tag-white-cat-bw.png');
+}
+.level.level3.troposphere #balloons .yellow > .payload {
+  background-image: url('images/tag-white-cab-bw.png');
+}
+
+.level.level3.stratosphere #balloons .black > .payload {
+  background-image: url('images/tag-black-word-bat.png');
+}
+.level.level3.stratosphere #balloons .lilac > .payload {
+  background-image: url('images/tag-lilac-word-mat.png');
+}
+.level.level3.stratosphere #balloons .orange > .payload {
+  background-image: url('images/tag-orange-word-cat.png');
+}
+.level.level3.stratosphere #balloons .yellow > .payload {
+  background-image: url('images/tag-yellow-word-cab.png');
+}
+
+.level.level3.mesosphere #balloons .balloon {
+  background-image: url('images/balloon-white.png');
+}
+.level.level3.mesosphere #balloons .black > .payload {
+  background-image: url('images/tag-white-word-bat.png');
+}
+.level.level3.mesosphere #balloons .lilac > .payload {
+  background-image: url('images/tag-white-word-mat.png');
+}
+.level.level3.mesosphere #balloons .orange > .payload {
+  background-image: url('images/tag-white-word-cat.png');
+}
+.level.level3.mesosphere #balloons .yellow > .payload {
+  background-image: url('images/tag-white-word-cab.png');
+}
 
 /* ------------------ balloon animations ------------------- */
 @-webkit-keyframes balloon-squirt {
@@ -1317,12 +1468,12 @@ body { background: #008; }
       transform: rotate(1deg);
     }
 }
-.level.grass #clouds > .bug {
+.level.level1 #clouds > .bug {
     -webkit-animation: none;
        -moz-animation: none;
             animation: none;
 }
-.anim .level.grass #clouds > .bug {
+.anim .level.level1 #clouds > .bug {
     -webkit-animation: bug-shake 5000ms infinite both ease-in-out;
        -moz-animation: bug-shake 5000ms infinite both ease-in-out;
             animation: bug-shake 5000ms infinite both ease-in-out;
@@ -1362,6 +1513,37 @@ body { background: #008; }
   -webkit-animation: background-drift 200s infinite normal none linear;
      -moz-animation: background-drift 200s infinite normal none linear;
           animation: background-drift 200s infinite normal none linear;
+}
+
+@-webkit-keyframes meteor-background-drift {
+  0% {
+    -webkit-transform: translate3d(800px,0,0);
+  }
+  100% {
+    -webkit-transform: translate3d(-800px,0,0);
+  }
+}
+@-moz-keyframes meteor-background-drift {
+  0% {
+    -moz-transform: translate(800px,0);
+  }
+  100% {
+    -moz-transform: translate(-800px,0);
+  }
+}
+@keyframes meteor-background-drift {
+  0% {
+    transform: translate(800px,0);
+  }
+  100% {
+    transform: translate(-800px,0);
+  }
+}
+.anim .level.level2 #background .cloud.c1,
+.anim .level.level3 #background .satellite2 {
+  -webkit-animation: meteor-background-drift 200s infinite normal none linear;
+     -moz-animation: meteor-background-drift 200s infinite normal none linear;
+          animation: meteor-background-drift 200s infinite normal none linear;
 }
 
 /* ------------------ menu layout ---------------------- */
@@ -1405,41 +1587,73 @@ body { background: #008; }
   background-repeat: repeat-x;
   background-position: bottom;
   background-size: 100% 100%;
-}
-#menu .level.grass > .background {
   background-color: #000;
+}
+#menu .level.level1 > .background {
   background-image: url('images/level1-back.png');
 }
-#menu .level.mountains > .background {
-  background-color: #000;
+#menu .level.level2 > .background {
   background-image: url('images/level2-menu-back.png');
 }
-.anim #menu .level.grass > .background {
+#menu .level.level3 > .background {
+  background-image: url('images/level3-back.png');
+}
+.anim #menu .level.level1 > .background {
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:         linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
-.anim #menu .level.mountains > .background {
+.anim #menu .level.level2 > .background {
   background-image: -webkit-linear-gradient(bottom, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
   background-image:         linear-gradient(to top, #fcffa5, #0ff 43%, #00f 71%, #000 100%);
 }
-#menu .level.grass > .background .stars,
-#menu .level.mountains > .background .stars {
+.anim #menu .level.level3 > .background {
+  background-image: -webkit-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
+  background-image:    -moz-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
+  background-image:         linear-gradient(to bottom, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
+}
+
+#menu .level.level1 > .background .stars,
+#menu .level.level2 > .background .stars,
+#menu .level.level3 > .background .stars {
   position: absolute; left: 0; top: 0; height: 100%; width: 100%;
   background: url('images/star-tile.png') repeat;
 }
-#menu .level.mountains > .background .mountains {
-  position: absolute; left: -25%; right: -25%; bottom: 0; height: 495px;
-  background: url('images/level2-mountains.png') repeat-x;
+#menu .level > .background .mountains {
+  position: absolute; left: -25%; right: -25%; bottom: 0;
   background-position: bottom center;
-  /* scale the whole thing from 2400px to 1600px (66%) */
-  -webkit-transform: scale3d(.667,.667,1);
-     -moz-transform: scale(.667,.667);
-          transform: scale(.667,.667);
+  background-repeat: repeat-x;
   -webkit-transform-origin: bottom center;
      -moz-transform-origin: bottom center;
           transform-origin: bottom center;
+  /* scale down level art to about 66% for menu screen */
+  -webkit-transform: scale3d(.667,.667,1);
+     -moz-transform: scale(.667,.667);
+          transform: scale(.667,.667);
+}
+#menu .level.level2 > .background .mountains {
+  height: 495px;
+  background-image: url('images/level2-mountains.png');
+  /* scale the whole thing from 2400px to 1600px (66%) */
+}
+#menu .level.level3 > .background .mountains {
+  height: 499px;
+  background-image: url('images/level3-sand.png');
+  /* scale the whole thing down from 2200px (let's say 66%) */
+}
+#menu .level.level3 > .background .sun {
+  position: absolute;
+  width: 278px; height: 174px;
+  background: url('images/level3-sun.png') no-repeat;
+  top: -50px; left: 140px;
+  /* scale the whole thing down (let's say 66%) */
+  -webkit-transform: scale3d(.667,.667,1);
+     -moz-transform: scale(.667,.667);
+          transform: scale(.667,.667);
+  -webkit-transform-origin: top left;
+     -moz-transform-origin: top left;
+          transform-origin: top left;
 }
 #menu .nells .ground .nell {
   position: absolute;
@@ -1487,6 +1701,9 @@ body { background: #008; }
   width: 326px; height: 1207px;
   bottom: 30px; left: 13px;
 }
+#menu .level.level3 .sprout {
+  background-image: url('images/sprout1-lgr-level3.png');
+}
 #menu .clouds .grass {
   position: absolute; bottom: 0; left: 0;
   width: 100%;
@@ -1495,7 +1712,7 @@ body { background: #008; }
      -moz-transform-origin: bottom left;
           transform-origin: bottom left;
 }
-#menu .level.grass .clouds .grass {
+#menu .level.level1 .clouds .grass {
   width: 200%;
   height: 243px;
   background-image: url('images/level1-grass-front.png');
@@ -1503,7 +1720,7 @@ body { background: #008; }
      -moz-transform: scale(0.5,0.5);
           transform: scale(0.5,0.5);
 }
-#menu .level.mountains .clouds .grass {
+#menu .level.level2 .clouds .grass {
   width: 150%;
   height: 224px;
   background-image: url('images/level2-grass-front.png');
@@ -1598,30 +1815,43 @@ body { background: #008; }
   background-color: rgba(255,255,255,0.8);
 }
 /* tags from grass level */
-#menu .level.grass .awards .ground .tag {
+#menu .level.level1 .awards .ground .tag {
   background-image: url('images/tag-orange-solid.png');
 }
-#menu .level.grass .awards .troposphere .tag {
+#menu .level.level1 .awards .troposphere .tag {
   background-image: url('images/tag-orange-orange.png');
 }
-#menu .level.grass .awards .stratosphere .tag {
+#menu .level.level1 .awards .stratosphere .tag {
   background-image: url('images/tag-white-orange.png');
 }
-#menu .level.grass .awards .mesosphere .tag {
+#menu .level.level1 .awards .mesosphere .tag {
   background-image: url('images/tag-white-orange-bw.png');
 }
 /* tags from mountains level */
-#menu .level.mountains .awards .ground .tag {
+#menu .level.level2 .awards .ground .tag {
   background-image: url('images/tag-orange-t.png');
 }
-#menu .level.mountains .awards .troposphere .tag {
+#menu .level.level2 .awards .troposphere .tag {
   background-image: url('images/tag-white-t.png');
 }
-#menu .level.mountains .awards .stratosphere .tag {
+#menu .level.level2 .awards .stratosphere .tag {
   background-image: url('images/tag-orange-word-cat.png');
 }
-#menu .level.mountains .awards .mesosphere .tag {
+#menu .level.level2 .awards .mesosphere .tag {
   background-image: url('images/tag-white-word-cat.png');
+}
+/* tags from desert level */
+#menu .level.level3 .awards .ground .tag {
+  background-image: url('images/tag-yellow-cab.png');
+}
+#menu .level.level3 .awards .troposphere .tag {
+  background-image: url('images/tag-white-cab-bw.png');
+}
+#menu .level.level3 .awards .stratosphere .tag {
+  background-image: url('images/tag-yellow-word-cab.png');
+}
+#menu .level.level3 .awards .mesosphere .tag {
+  background-image: url('images/tag-white-word-cab.png');
 }
 /* pulse the tags to make it clear they are touchable */
 @-webkit-keyframes menu-tag-throb {

@@ -231,6 +231,14 @@ body { background: #008; }
   background-image:    -moz-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
   background-image:         linear-gradient(to bottom, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
 }
+.level.level4 #background {
+  background-image: url('images/level4-back.png');
+}
+.anim .level.level4 #background {
+  background-image: -webkit-linear-gradient(top, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
+  background-image:    -moz-linear-gradient(top, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
+  background-image:         linear-gradient(to bottom, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
+}
 
 
 #background .satellite1,
@@ -257,6 +265,14 @@ body { background: #008; }
   background-image: url('images/shuttle.png');
   background-repeat: no-repeat;
   margin-top: -121px;
+}
+.level.level4 #background .satellite2 {
+  width: 292px; min-width: 292px; height: 288px;
+  background: url('images/moon.png') no-repeat;
+  left: 100px; margin-top: -50px;
+  -webkit-animation-name: none;
+     -moz-animation-name: none;
+          animation-name: none;
 }
 
 #background .cloud {
@@ -296,12 +312,35 @@ body { background: #008; }
   height: 499px;
   background-image: url('images/level3-sand.png');
 }
+.level.level4 #background .mountain {
+  height: 338px;
+  background-image: url('images/level4-snow.png');
+}
 .level.level3 #background .troposphere > .sun {
   position: absolute;
   left: 85px; top: 25%;
   width: 278px; height: 174px;
   background: url('images/level3-sun.png') no-repeat;
   margin-top: -116px;
+}
+.level.level4 #background .ground > .tree {
+  position: absolute;
+  right: -39px; width: 100%; max-width: 681px;
+  bottom: 0; height: 100%;
+  background-image: url('images/level4-tree.png');
+  background-size: 100% 100%;
+}
+.level.level4 #background > .snowflakes {
+  bottom: 0; height: 75%;
+  background: url('images/level4-snowflakes.png') repeat;
+  background-position: bottom center;
+}
+.level.level4 #nell .stratosphere > .ufo {
+  position: absolute;
+  width: 752px; height: 579px;
+  background: url('images/ufo.png') no-repeat;
+  bottom: 0; right: -60px;
+  pointer-events: none;
 }
 
 #awards .strip,
@@ -426,6 +465,9 @@ body { background: #008; }
 }
 .level.level3 #sprouts .award {
   background-image: url('images/sprout1-lg-level3.png');
+}
+.level.level4 #sprouts .award {
+  background-image: url('images/sprout1-lg-level4.png');
 }
 #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
@@ -1007,6 +1049,208 @@ body { background: #008; }
   background-image: url('images/tag-white-word-cab.png');
 }
 
+/* payloads for "snow" level */
+.level.level4 #buttons > a.black {
+  background-color: #777;
+}
+.level.level4.ground #buttons > a.black {
+  background-image: url('images/button-word-bat.png');
+}
+.level.level4.ground #buttons > a.lilac {
+  background-image: url('images/button-word-mat.png');
+}
+.level.level4.ground #buttons > a.orange {
+  background-image: url('images/button-word-cat.png');
+}
+.level.level4.ground #buttons > a.yellow {
+  background-image: url('images/button-word-cab.png');
+}
+.level.level4.troposphere #buttons > a.black {
+  background-image: url('images/button-bat.png');
+}
+.level.level4.troposphere #buttons > a.lilac {
+  background-image: url('images/button-mat.png');
+}
+.level.level4.troposphere #buttons > a.orange {
+  background-image: url('images/button-cat.png');
+}
+.level.level4.troposphere #buttons > a.yellow {
+  background-image: url('images/button-cab.png');
+}
+.level.level4.stratosphere #buttons > a.black {
+  background-image: url('images/button-bat.png');
+}
+.level.level4.stratosphere #buttons > a.lilac {
+  background-image: url('images/button-bats.png');
+  background-color: #777;
+}
+.level.level4.stratosphere #buttons > a.orange {
+  background-image: url('images/button-cat.png');
+}
+.level.level4.stratosphere #buttons > a.yellow {
+  background-image: url('images/button-cats.png');
+  background-color: #ef7c11; /* orange */
+}
+.level.level4.mesosphere #buttons > a {
+  background-color: #cacaca; /* white button background */
+}
+.level.level4.mesosphere #buttons > a.black {
+  background-image: url('images/button-mat.png');
+}
+.level.level4.mesosphere #buttons > a.lilac {
+  background-image: url('images/button-mats.png');
+}
+.level.level4.mesosphere #buttons > a.orange {
+  background-image: url('images/button-cab.png');
+}
+.level.level4.mesosphere #buttons > a.yellow {
+  background-image: url('images/button-cabs.png');
+}
+
+.level.level4.ground #balloons .black > .payload,
+.level.level4.ground #balloons .black.var1 > .payload {
+  background-image: url('images/tag-black-word-bat.png');
+}
+.level.level4.ground #balloons .black.var2 > .payload {
+  background-image: url('images/tag-black-word-a-bat.png');
+}
+.level.level4.ground #balloons .black.var3 > .payload {
+  background-image: url('images/tag-black-word-the-bat.png');
+}
+.level.level4.ground #balloons .black.var4 > .payload {
+  background-image: url('images/tag-black-word-bats.png');
+}
+.level.level4.ground #balloons .lilac > .payload,
+.level.level4.ground #balloons .lilac.var1 > .payload {
+  background-image: url('images/tag-lilac-word-mat.png');
+}
+.level.level4.ground #balloons .lilac.var2 > .payload {
+  background-image: url('images/tag-lilac-word-a-mat.png');
+}
+.level.level4.ground #balloons .lilac.var3 > .payload {
+  background-image: url('images/tag-lilac-word-the-mat.png');
+}
+.level.level4.ground #balloons .lilac.var4 > .payload {
+  background-image: url('images/tag-lilac-word-mats.png');
+}
+.level.level4.ground #balloons .orange > .payload,
+.level.level4.ground #balloons .orange.var1 > .payload {
+  background-image: url('images/tag-orange-word-cat.png');
+}
+.level.level4.ground #balloons .orange.var2 > .payload {
+  background-image: url('images/tag-orange-word-a-cat.png');
+}
+.level.level4.ground #balloons .orange.var3 > .payload {
+  background-image: url('images/tag-orange-word-the-cat.png');
+}
+.level.level4.ground #balloons .orange.var4 > .payload {
+  background-image: url('images/tag-orange-word-cats.png');
+}
+.level.level4.ground #balloons .yellow > .payload,
+.level.level4.ground #balloons .yellow.var1 > .payload {
+  background-image: url('images/tag-yellow-word-cab.png');
+}
+.level.level4.ground #balloons .yellow.var2 > .payload {
+  background-image: url('images/tag-yellow-word-a-cab.png');
+}
+.level.level4.ground #balloons .yellow.var3 > .payload {
+  background-image: url('images/tag-yellow-word-the-cab.png');
+}
+.level.level4.ground #balloons .yellow.var4 > .payload {
+  background-image: url('images/tag-yellow-word-cabs.png');
+}
+
+.level.level4.troposphere #balloons .balloon {
+  background-image: url('images/balloon-white.png');
+}
+.level.level4.troposphere #balloons .black > .payload,
+.level.level4.troposphere #balloons .black.var1 > .payload {
+  background-image: url('images/tag-white-word-bat.png');
+}
+.level.level4.troposphere #balloons .black.var2 > .payload {
+  background-image: url('images/tag-white-word-a-bat.png');
+}
+.level.level4.troposphere #balloons .black.var3 > .payload {
+  background-image: url('images/tag-white-word-the-bat.png');
+}
+.level.level4.troposphere #balloons .black.var4 > .payload {
+  background-image: url('images/tag-white-word-bats.png');
+}
+.level.level4.troposphere #balloons .lilac > .payload,
+.level.level4.troposphere #balloons .lilac.var1 > .payload {
+  background-image: url('images/tag-white-word-mat.png');
+}
+.level.level4.troposphere #balloons .lilac.var2 > .payload {
+  background-image: url('images/tag-white-word-a-mat.png');
+}
+.level.level4.troposphere #balloons .lilac.var3 > .payload {
+  background-image: url('images/tag-white-word-the-mat.png');
+}
+.level.level4.troposphere #balloons .lilac.var4 > .payload {
+  background-image: url('images/tag-white-word-mats.png');
+}
+.level.level4.troposphere #balloons .orange > .payload,
+.level.level4.troposphere #balloons .orange.var1 > .payload {
+  background-image: url('images/tag-white-word-cat.png');
+}
+.level.level4.troposphere #balloons .orange.var2 > .payload {
+  background-image: url('images/tag-white-word-a-cat.png');
+}
+.level.level4.troposphere #balloons .orange.var3 > .payload {
+  background-image: url('images/tag-white-word-the-cat.png');
+}
+.level.level4.troposphere #balloons .orange.var4 > .payload {
+  background-image: url('images/tag-white-word-cats.png');
+}
+.level.level4.troposphere #balloons .yellow > .payload,
+.level.level4.troposphere #balloons .yellow.var1 > .payload {
+  background-image: url('images/tag-white-word-cab.png');
+}
+.level.level4.troposphere #balloons .yellow.var2 > .payload {
+  background-image: url('images/tag-white-word-a-cab.png');
+}
+.level.level4.troposphere #balloons .yellow.var3 > .payload {
+  background-image: url('images/tag-white-word-the-cab.png');
+}
+.level.level4.troposphere #balloons .yellow.var4 > .payload {
+  background-image: url('images/tag-white-word-cabs.png');
+}
+
+.level.level4.stratosphere #balloons .black > .payload {
+  background-image: url('images/tag-black-word-bat.png');
+}
+.level.level4.stratosphere #balloons .lilac > .payload {
+  background-image: url('images/tag-black-word-bats.png');
+}
+.level.level4.stratosphere #balloons > .lilac > .balloon {
+  background-image: url('images/balloon-black.png');
+}
+.level.level4.stratosphere #balloons .orange > .payload {
+  background-image: url('images/tag-orange-word-cat.png');
+}
+.level.level4.stratosphere #balloons .yellow > .payload {
+  background-image: url('images/tag-orange-word-cats.png');
+}
+.level.level4.stratosphere #balloons > .yellow > .balloon {
+  background-image: url('images/balloon-orange.png');
+}
+
+.level.level4.mesosphere #balloons .balloon {
+  background-image: url('images/balloon-white.png');
+}
+.level.level4.mesosphere #balloons .black > .payload {
+  background-image: url('images/tag-white-word-mat.png');
+}
+.level.level4.mesosphere #balloons .lilac > .payload {
+  background-image: url('images/tag-white-word-mats.png');
+}
+.level.level4.mesosphere #balloons .orange > .payload {
+  background-image: url('images/tag-white-word-cab.png');
+}
+.level.level4.mesosphere #balloons .yellow > .payload {
+  background-image: url('images/tag-white-word-cabs.png');
+}
+
 /* ------------------ balloon animations ------------------- */
 @-webkit-keyframes balloon-squirt {
    0% {
@@ -1546,6 +1790,75 @@ body { background: #008; }
           animation: meteor-background-drift 200s infinite normal none linear;
 }
 
+@-webkit-keyframes snowflake-fall {
+  0% {
+    background-position:  50% 0px;
+  }
+  100% {
+    background-position:  50% 750px;
+  }
+}
+@-moz-keyframes snowflake-fall {
+  0% {
+    background-position:  50% 0px;
+  }
+  100% {
+    background-position:  50% 750px;
+  }
+}
+@keyframes snowflake-fall {
+  0% {
+    background-position:  50% 0px;
+  }
+  100% {
+    background-position:  50% 750px;
+  }
+}
+.level.level4 #background > .snowflakes {
+  -webkit-animation: snowflake-fall 40s infinite normal none linear;
+     -moz-animation: snowflake-fall 40s infinite normal none linear;
+          animation: snowflake-fall 40s infinite normal none linear;
+}
+
+@-webkit-keyframes ufo-hover {
+  0% {
+    -webkit-transform: translate3d(-800px,0,0);
+  }
+  50% {
+    -webkit-transform: translate3d(0,0,0);
+  }
+  100% {
+    -webkit-transform: translate3d(800px,0,0);
+  }
+}
+@-moz-keyframes ufo-hover {
+  0% {
+    -moz-transform: translate(-800px,0);
+  }
+  50% {
+    -moz-transform: translate(0,0);
+  }
+  100% {
+    -moz-transform: translate(800px,0);
+  }
+}
+@keyframes ufo-hover {
+  0% {
+    transform: translate(-800px,0);
+  }
+  50% {
+    transform: translate(0,0);
+  }
+  100% {
+    transform: translate(800px,0);
+  }
+}
+.level.level4 #nell .stratosphere > .ufo {
+  -webkit-animation: ufo-hover 15s infinite alternate none ease-in-out;
+     -moz-animation: ufo-hover 15s infinite alternate none ease-in-out;
+          animation: ufo-hover 15s infinite alternate none ease-in-out;
+}
+
 /* ------------------ menu layout ---------------------- */
 #menu .nells,
 #menu .clouds,
@@ -1598,6 +1911,9 @@ body { background: #008; }
 #menu .level.level3 > .background {
   background-image: url('images/level3-back.png');
 }
+#menu .level.level4 > .background {
+  background-image: url('images/level4-back.png');
+}
 .anim #menu .level.level1 > .background {
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
   background-image:    -moz-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
@@ -1613,10 +1929,16 @@ body { background: #008; }
   background-image:    -moz-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
   background-image:         linear-gradient(to bottom, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
 }
+.anim #menu .level.level4 > .background {
+  background-image: -webkit-linear-gradient(top, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
+  background-image:    -moz-linear-gradient(top, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
+  background-image:         linear-gradient(to bottom, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
+}
 
 #menu .level.level1 > .background .stars,
 #menu .level.level2 > .background .stars,
-#menu .level.level3 > .background .stars {
+#menu .level.level3 > .background .stars,
+#menu .level.level4 > .background .stars {
   position: absolute; left: 0; top: 0; height: 100%; width: 100%;
   background: url('images/star-tile.png') repeat;
 }
@@ -1642,6 +1964,11 @@ body { background: #008; }
   background-image: url('images/level3-sand.png');
   /* scale the whole thing down from 2200px (let's say 66%) */
 }
+#menu .level.level4 > .background .mountains {
+  height: 338px;
+  background-image: url('images/level4-snow.png');
+  /* scale the whole thing down from 1200px (let's say 66%) */
+}
 #menu .level.level3 > .background .sun {
   position: absolute;
   width: 278px; height: 174px;
@@ -1651,6 +1978,19 @@ body { background: #008; }
   -webkit-transform: scale3d(.667,.667,1);
      -moz-transform: scale(.667,.667);
           transform: scale(.667,.667);
+  -webkit-transform-origin: top left;
+     -moz-transform-origin: top left;
+          transform-origin: top left;
+}
+#menu .level.level4 > .background .sun {
+  position: absolute;
+  width: 292px; height: 288px;
+  background: url('images/moon.png') no-repeat;
+  top: -80px; left: 160px;
+  /* scale the whole thing down (let's say 60%) */
+  -webkit-transform: scale3d(.6,.6,1);
+     -moz-transform: scale(.6,.6);
+          transform: scale(.6,.6);
   -webkit-transform-origin: top left;
      -moz-transform-origin: top left;
           transform-origin: top left;
@@ -1703,6 +2043,10 @@ body { background: #008; }
 }
 #menu .level.level3 .sprout {
   background-image: url('images/sprout1-lgr-level3.png');
+}
+#menu .level.level4 .sprout {
+  background-image: url('images/sprout1-lgr-level4.png');
+  bottom: 0px;
 }
 #menu .clouds .grass {
   position: absolute; bottom: 0; left: 0;
@@ -1852,6 +2196,19 @@ body { background: #008; }
 }
 #menu .level.level3 .awards .mesosphere .tag {
   background-image: url('images/tag-white-word-cab.png');
+}
+/* tags from snow level */
+#menu .level.level4 .awards .ground .tag {
+  background-image: url('images/tag-lilac-word-a-mat.png');
+}
+#menu .level.level4 .awards .troposphere .tag {
+  background-image: url('images/tag-white-word-the-mat.png');
+}
+#menu .level.level4 .awards .stratosphere .tag {
+  background-image: url('images/tag-black-word-bats.png');
+}
+#menu .level.level4 .awards .mesosphere .tag {
+  background-image: url('images/tag-white-word-mats.png');
 }
 /* pulse the tags to make it clear they are touchable */
 @-webkit-keyframes menu-tag-throb {

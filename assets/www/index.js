@@ -900,6 +900,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             this.videoElement.poster = level.videoFor(altitude, 'jpg');
             this.videoElement.addEventListener('canplay',
                                                this.canPlay.bind(this), false);
+            this.videoElement.addEventListener('loadstart',/* for firefox =( */
+                                               this.canPlay.bind(this), false);
+            this.videoElement.addEventListener('ended',
+                                               this.playEnded.bind(this),false);
             // XXX something's wrong with mp4 rendering on webkit.
             // ... also on firefox:
             //    https://bugzilla.mozilla.org/show_bug.cgi?id=790950
@@ -915,8 +919,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     })(GameMode.Video.enter);
     GameMode.Video.canPlay = function() {
         // ready to play, let's do it!
-        this.videoElement.addEventListener('ended',
-                                           this.playEnded.bind(this), false);
         this.videoElement.play();
         document.querySelector('#video').classList.add('playing');
     };

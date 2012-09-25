@@ -881,10 +881,15 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 // https://bugzilla.mozilla.org/show_bug.cgi?id=741351
                 this.videoElement.autobuffer = true;
                 this.videoElement.preload = 'auto';
+            } else {
+                // needed on desktop firefox (!)
+                this.videoElement.preload = 'none';
             }
             this.videoElement.volume = 1;
             this.videoElement.muted = false; // xxx?
             this.videoElement.poster = level.videoFor(altitude, 'jpg');
+            this.videoElement.addEventListener('canplay',
+                                               this.canPlay.bind(this), false);
             // XXX something's wrong with mp4 rendering on webkit.
             // ... also on firefox:
             //    https://bugzilla.mozilla.org/show_bug.cgi?id=790950
@@ -895,7 +900,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 this.videoElement.appendChild(source);
             }.bind(this));
             inner.insertBefore(this.videoElement, inner.firstChild);
-            this.canPlay();
+            this.videoElement.load();
         };
     })(GameMode.Video.enter);
     GameMode.Video.canPlay = function() {

@@ -17,7 +17,7 @@
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="tags.svg"
-   inkscape:export-filename="/home/cananian/Projects/OLPC/Narrative/nell-balloons/assets/www/images/tag-white-cab.png"
+   inkscape:export-filename="/home/cananian/Projects/OLPC/Narrative/nell-balloons/assets/www/images/tag-yellow-a-cab-word.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <sodipodi:namedview
@@ -28,10 +28,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.7653436"
-     inkscape:cx="86.28715"
-     inkscape:cy="81.877153"
+     inkscape:cx="105.27645"
+     inkscape:cy="32.358961"
      inkscape:document-units="px"
-     inkscape:current-layer="g43047"
+     inkscape:current-layer="g5234"
      showgrid="false"
      borderlayer="true"
      inkscape:window-width="1440"
@@ -8373,10 +8373,11 @@
        inkscape:export-ydpi="90" />
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Tag Bottom, White"
      id="g165231"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     sodipodi:insensitive="true">
     <path
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -8388,7 +8389,7 @@
        transform="translate(0,-1160)" />
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Tag Top, White"
      id="g165227"
      inkscape:groupmode="layer"
@@ -8412,7 +8413,7 @@
      id="layer7"
      inkscape:label="Tag Bottom, Yellow"
      sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline">
     <path
        transform="translate(0,-1160)"
        inkscape:connector-curvature="0"
@@ -8427,7 +8428,7 @@
      inkscape:groupmode="layer"
      id="layer8"
      inkscape:label="Tag Top, Yellow"
-     style="display:none"
+     style="display:inline"
      sodipodi:insensitive="true">
     <rect
        transform="translate(0,-1160)"
@@ -9676,8 +9677,8 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Mat Word"
-     sodipodi:insensitive="true"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <flowRoot
        xml:space="preserve"
        id="flowRoot3913"
@@ -9691,6 +9692,72 @@
            y="26.938774"
            style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
          id="flowPara3931">mat</flowPara></flowRoot>  </g>
+  <g
+     style="display:none"
+     inkscape:groupmode="layer"
+     id="g5270"
+     inkscape:label="Mats Word"
+     sodipodi:insensitive="true">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5272"
+       style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       transform="translate(-18.080586,21.82918)"><flowRegion
+         id="flowRegion5274"><rect
+           id="rect5276"
+           width="149.63548"
+           height="99.571098"
+           x="17.327795"
+           y="25.079716"
+           style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
+         style="font-size:65px;letter-spacing:-2px"
+         id="flowPara5278">mats</flowPara></flowRoot>  </g>
+  <g
+     inkscape:label="A Mat Word"
+     id="g5256"
+     inkscape:groupmode="layer"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <flowRoot
+       transform="translate(-16.296055,8.0919984)"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       id="flowRoot5258"
+       xml:space="preserve"><flowRegion
+         id="flowRegion5260"><rect
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
+           y="1.7086729"
+           x="22.108234"
+           height="138.6113"
+           width="138.48112"
+           id="rect5262" /></flowRegion><flowPara
+         id="flowPara5264"
+         style="font-size:55px">a</flowPara><flowPara
+         id="flowPara5266"
+         style="font-size:55px">mat</flowPara><flowPara
+         id="flowPara5268"
+         style="font-size:55px" /></flowRoot>  </g>
+  <g
+     style="display:none"
+     inkscape:groupmode="layer"
+     id="g5244"
+     inkscape:label="The Mat Word"
+     sodipodi:insensitive="true">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5246"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       transform="translate(-16.296055,8.0919984)"><flowRegion
+         id="flowRegion5248"><rect
+           id="rect5250"
+           width="138.48112"
+           height="138.6113"
+           x="22.108234"
+           y="1.7086729"
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
+         style="font-size:55px"
+         id="flowPara5252">the mat</flowPara><flowPara
+         style="font-size:55px"
+         id="flowPara5254" /></flowRoot>  </g>
   <g
      inkscape:label="Bat Word"
      id="g3921"
@@ -9712,6 +9779,72 @@
          style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
          id="flowPara3929">bat</flowPara></flowRoot>  </g>
   <g
+     inkscape:label="Bats Word"
+     id="g5234"
+     inkscape:groupmode="layer"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <flowRoot
+       transform="translate(-16.693711,21.65418)"
+       style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       id="flowRoot5236"
+       xml:space="preserve"><flowRegion
+         id="flowRegion5238"><rect
+           style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
+           y="25.345295"
+           x="22.108234"
+           height="98.508781"
+           width="138.74672"
+           id="rect5240" /></flowRegion><flowPara
+         id="flowPara5242"
+         style="font-size:65px">bats</flowPara></flowRoot>  </g>
+  <g
+     style="display:none"
+     inkscape:groupmode="layer"
+     id="g5220"
+     inkscape:label="A Bat Word"
+     sodipodi:insensitive="true">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5222"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       transform="translate(-16.296055,8.0919984)"><flowRegion
+         id="flowRegion5224"><rect
+           id="rect5226"
+           width="138.48112"
+           height="138.6113"
+           x="22.108234"
+           y="1.7086729"
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
+         style="font-size:55px"
+         id="flowPara5228">a</flowPara><flowPara
+         style="font-size:55px"
+         id="flowPara5230">bat</flowPara><flowPara
+         style="font-size:55px"
+         id="flowPara5232" /></flowRoot>  </g>
+  <g
+     inkscape:label="The Bat Word"
+     id="g5208"
+     inkscape:groupmode="layer"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <flowRoot
+       transform="translate(-16.296055,8.0919984)"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       id="flowRoot5210"
+       xml:space="preserve"><flowRegion
+         id="flowRegion5212"><rect
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
+           y="1.7086729"
+           x="22.108234"
+           height="138.6113"
+           width="138.48112"
+           id="rect5214" /></flowRegion><flowPara
+         id="flowPara5216"
+         style="font-size:55px">the bat</flowPara><flowPara
+         id="flowPara5218"
+         style="font-size:55px" /></flowRoot>  </g>
+  <g
      inkscape:groupmode="layer"
      id="g3933"
      inkscape:label="Cat Word"
@@ -9730,6 +9863,72 @@
            y="26.938774"
            style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
          id="flowPara3943">cat</flowPara></flowRoot>  </g>
+  <g
+     style="display:none"
+     inkscape:groupmode="layer"
+     id="g5172"
+     inkscape:label="The Cat Word"
+     sodipodi:insensitive="true">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5174"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       transform="translate(-16.296055,8.0919984)"><flowRegion
+         id="flowRegion5176"><rect
+           id="rect5178"
+           width="138.48112"
+           height="138.6113"
+           x="22.108234"
+           y="1.7086729"
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
+         style="font-size:55px"
+         id="flowPara5180">the cat</flowPara><flowPara
+         style="font-size:55px"
+         id="flowPara5182" /></flowRoot>  </g>
+  <g
+     inkscape:label="A Cat Word"
+     id="g5184"
+     inkscape:groupmode="layer"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <flowRoot
+       transform="translate(-16.296055,8.0919984)"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       id="flowRoot5186"
+       xml:space="preserve"><flowRegion
+         id="flowRegion5188"><rect
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
+           y="1.7086729"
+           x="22.108234"
+           height="138.6113"
+           width="138.48112"
+           id="rect5190" /></flowRegion><flowPara
+         id="flowPara5192"
+         style="font-size:55px">a</flowPara><flowPara
+         id="flowPara5194"
+         style="font-size:55px">cat</flowPara><flowPara
+         id="flowPara5196"
+         style="font-size:55px" /></flowRoot>  </g>
+  <g
+     style="display:none"
+     inkscape:groupmode="layer"
+     id="g5198"
+     inkscape:label="Cats Word"
+     sodipodi:insensitive="true">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5200"
+       style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       transform="translate(-16.693711,21.65418)"><flowRegion
+         id="flowRegion5202"><rect
+           id="rect5204"
+           width="138.74672"
+           height="98.508781"
+           x="22.108234"
+           y="25.345295"
+           style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
+         style="font-size:65px"
+         id="flowPara5206">cats</flowPara></flowRoot>  </g>
   <g
      inkscape:label="Can Word"
      id="g3945"
@@ -9759,7 +9958,7 @@
        xml:space="preserve"
        id="flowRoot4939"
        style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
-       transform="translate(-16.513125,8.059952)"><flowRegion
+       transform="translate(-16.00875,8.059952)"><flowRegion
          id="flowRegion4941"><rect
            id="rect4943"
            width="168.22606"
@@ -9768,6 +9967,72 @@
            y="26.938774"
            style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
          id="flowPara4945">cab</flowPara></flowRoot>  </g>
+  <g
+     inkscape:label="Cabs Word"
+     id="g5162"
+     inkscape:groupmode="layer"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <flowRoot
+       transform="translate(-16.693711,21.65418)"
+       style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       id="flowRoot5164"
+       xml:space="preserve"><flowRegion
+         id="flowRegion5166"><rect
+           style="font-size:80px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
+           y="25.345295"
+           x="22.108234"
+           height="98.508781"
+           width="138.74672"
+           id="rect5168" /></flowRegion><flowPara
+         id="flowPara5170"
+         style="font-size:65px">cabs</flowPara></flowRoot>  </g>
+  <g
+     inkscape:label="The Cab Word"
+     id="g5132"
+     inkscape:groupmode="layer"
+     style="display:none"
+     sodipodi:insensitive="true">
+    <flowRoot
+       transform="translate(-16.296055,8.0919984)"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       id="flowRoot5134"
+       xml:space="preserve"><flowRegion
+         id="flowRegion5136"><rect
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius"
+           y="1.7086729"
+           x="22.108234"
+           height="138.6113"
+           width="138.48112"
+           id="rect5138" /></flowRegion><flowPara
+         id="flowPara5144"
+         style="font-size:55px">the cab</flowPara><flowPara
+         id="flowPara5146"
+         style="font-size:55px" /></flowRoot>  </g>
+  <g
+     style="display:inline"
+     inkscape:groupmode="layer"
+     id="g5148"
+     inkscape:label="A Cab Word"
+     sodipodi:insensitive="true">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5150"
+       style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Delius;-inkscape-font-specification:Delius"
+       transform="translate(-16.296055,8.0919984)"><flowRegion
+         id="flowRegion5152"><rect
+           id="rect5154"
+           width="138.48112"
+           height="138.6113"
+           x="22.108234"
+           y="1.7086729"
+           style="font-size:60px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;writing-mode:lr-tb;text-anchor:middle;font-family:Delius;-inkscape-font-specification:Delius" /></flowRegion><flowPara
+         style="font-size:55px"
+         id="flowPara5156">a</flowPara><flowPara
+         style="font-size:55px"
+         id="flowPara5160">cab</flowPara><flowPara
+         style="font-size:55px"
+         id="flowPara5158" /></flowRoot>  </g>
   <g
      style="display:none"
      inkscape:groupmode="layer"
@@ -12147,7 +12412,7 @@
      id="layer27"
      inkscape:label="Cab2"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <g
        id="g7296">
       <path

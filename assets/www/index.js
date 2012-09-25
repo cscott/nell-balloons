@@ -1075,6 +1075,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         case 0: base += 'barrios_gavota'; break;
         case 1: base += 'letting-go'; break;
         case 2: base += 'red-wing'; break;
+        case 3: base += 'arkansas-traveller'; break;
         }
         return base;
     };
@@ -1095,7 +1096,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         new GameLevel('level3'), // "sand"
         new GameLevel('level4')  // "snow"
     ];
-    LEVELS.length=3; // only first three levels are done.
     LEVELS.forEach(function(l, i) {
         l.num = i;
         l.prevLevel = LEVELS[i-1] || null;

@@ -1179,50 +1179,35 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         return this.sounds[altitude][color][variant];
     };
 
-    var B_M_C_T = {
-        black: ['angela_name_b', 'richard_name_b',
-                'angela_sound_b', 'richard_sound_b'],
-        lilac: ['angela_name_m', 'richard_name_m',
-                'angela_sound_m', 'richard_sound_m'],
-        orange:['angela_name_t', 'richard_name_t',
-                'angela_sound_t', 'richard_sound_t'],
-        yellow:['angela_name_c', 'richard_name_c',
-                'angela_sound_c', 'richard_sound_c']
-    };
     var BAT_MAT_CAT_CAB = {
-        black: ['angela_bat', 'richard_bat', 'scott_bat'],
-        lilac: ['angela_mat', 'richard_mat', 'scott_mat'],
-        orange:['angela_cat', 'richard_cat', 'scott_cat'],
-        yellow:['angela_cab', 'richard_cab', 'scott_cab']
+        black: ['angela_bat', 'richard_bat', 'scott_bat', 'scott_b_a_t'],
+        lilac: ['angela_mat', 'richard_mat', 'scott_mat', 'scott_m_a_t'],
+        orange:['angela_cat', 'richard_cat', 'scott_cat', 'scott_c_a_t'],
+        yellow:['angela_cab', 'richard_cab', 'scott_cab', 'scott_c_a_b']
     };
     var LEVELS = [
         // "grass" level
         new GameLevel('level1', 'barrios-gavota', {
-            ground:
-            { black:  'scott_black',
-              lilac:  'scott_purple',
-              orange: 'scott_orange',
-              yellow: 'scott_yellow' },
-            troposphere:
-            { black: ['scott_bat', 'angela_bat', 'richard_bat'],
-              lilac: ['scott_mat', 'angela_mat', 'richard_mat'],
-              orange: 'scott_orange',
-              yellow: 'scott_banana' },
-            stratosphere:
-            { black:  'scott_bat',
-              lilac:  'scott_mat',
-              orange: 'scott_orange',
-              yellow: 'scott_banana' },
-            mesosphere:
-            { black:  'scott_bat',
-              lilac:  'scott_mat',
-              orange: 'scott_orange',
-              yellow: 'scott_banana' }
+            // no sounds for first level
+            ground: {},
+            troposphere: {},
+            stratosphere: {},
+            mesosphere: {}
         }),
         // "mountains" level
         new GameLevel('level2', 'letting-go', {
-            ground:       B_M_C_T,
-            troposphere:  B_M_C_T,
+            ground:
+            { black: ['angela_name_b', 'richard_name_b' ],
+              lilac: ['angela_name_m', 'richard_name_m' ],
+              orange:['angela_name_t', 'richard_name_t' ],
+              yellow:['angela_name_c', 'richard_name_c' ]
+            },
+            troposphere:
+            { black: ['angela_sound_b', 'richard_sound_b'],
+              lilac: ['angela_sound_m', 'richard_sound_m'],
+              orange:['angela_sound_t', 'richard_sound_t'],
+              yellow:['angela_sound_c', 'richard_sound_c']
+            },
             stratosphere: BAT_MAT_CAT_CAB,
             mesosphere:   BAT_MAT_CAT_CAB
         }),

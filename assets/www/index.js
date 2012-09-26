@@ -1267,8 +1267,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // try to adjust speed such that:
         // (a) correctFraction is about 80%
         // (b) the balloon travels 90% up the screen in 'correctTime' ms.
+        // only use (b) if we have a valid correctTime estimate.
         var aspeed = Math.max(correctFraction/0.8, 0.8) * initialBalloonSpeedY;
-        var bspeed = (balloonsElement.offsetHeight * 0.9) / correctTime;
+        var bspeed = (correctTime===null) ? aspeed :
+            (balloonsElement.offsetHeight * 0.9) / correctTime;
         var avg = (aspeed + bspeed) / 2;
         // only allow it to speed up/slow down by factor of 1.2 each time
         var ADJ_FACTOR = 1.2;
@@ -1347,17 +1349,12 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         funf.record('incorrect', { type: how, time: balloonTime });
 
         // maintain weighted averages
-        // since this answer is incorrect, use the time only if it
-        // is greater than the current correctTime estimate.
-        var correctTimeCopy = correctTime;
-        if (balloonTime > correctTime) {
-            correctTimeCopy = CORRECT_SMOOTHING * correctTime +
-                (1 - CORRECT_SMOOTHING) * balloonTime;
-        }
+        // since this answer is incorrect, we don't actually have a
+        // new correct time estimate (so don't try to use it)
         correctFraction = CORRECT_SMOOTHING * correctFraction;
 
         // adjust speeds based on new fractions
-        adjustSpeeds(correctTimeCopy, correctFraction);
+        adjustSpeeds(null/*don't use correctTime*/, correctFraction);
         Ruler.adjust(false, 1);
     };
 

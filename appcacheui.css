@@ -2,7 +2,7 @@
 
 #appcache_info {
   position: absolute;
-  position: fixed;
+  /*position: fixed;*/
   top: -2em;
   left: 1em;
   right: 1em;

@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# dcac7bf5a8f4321e82d53b4b26a0e0a8  -
+# 4855b9577f18b8e1497ef51914018935  -
 
 CACHE:
 ./images/icon-48.png
@@ -51,7 +51,6 @@ CACHE:
 ./images/cloud-tile-bottom.png
 ./images/cloud-tile.png
 ./images/clouds.png
-./images/dot-group.png
 ./images/dot-off.png
 ./images/dot-on.png
 ./images/download-icon.png
@@ -165,9 +164,21 @@ CACHE:
 ./images/xoom-rotate-bg.png
 ./images/xoom-rotate-fg.png
 ./index.js
+./sounds/angela_bat.webm
+./sounds/angela_cab.webm
+./sounds/angela_cat.webm
+./sounds/angela_mat.webm
+./sounds/angela_name_b.webm
+./sounds/angela_name_c.webm
+./sounds/angela_name_m.webm
+./sounds/angela_name_t.webm
+./sounds/angela_sound_b.webm
+./sounds/angela_sound_c.webm
+./sounds/angela_sound_m.webm
+./sounds/angela_sound_t.webm
 ./sounds/arkansas-traveller.webm
 ./sounds/award.webm
-./sounds/barrios_gavota.webm
+./sounds/barrios-gavota.webm
 ./sounds/burst1.webm
 ./sounds/burst2.webm
 ./sounds/burst3.webm
@@ -182,6 +193,38 @@ CACHE:
 ./sounds/levellose.webm
 ./sounds/levelwin.webm
 ./sounds/red-wing.webm
+./sounds/richard_bat.webm
+./sounds/richard_cab.webm
+./sounds/richard_cat.webm
+./sounds/richard_mat.webm
+./sounds/richard_name_b.webm
+./sounds/richard_name_c.webm
+./sounds/richard_name_m.webm
+./sounds/richard_name_t.webm
+./sounds/richard_sound_b.webm
+./sounds/richard_sound_c.webm
+./sounds/richard_sound_m.webm
+./sounds/richard_sound_t.webm
+./sounds/scott_a_bat.webm
+./sounds/scott_a_cab.webm
+./sounds/scott_a_cat.webm
+./sounds/scott_a_mat.webm
+./sounds/scott_b_a_t.webm
+./sounds/scott_bat.webm
+./sounds/scott_bats.webm
+./sounds/scott_c_a_b.webm
+./sounds/scott_c_a_t.webm
+./sounds/scott_cab.webm
+./sounds/scott_cabs.webm
+./sounds/scott_cat.webm
+./sounds/scott_cats.webm
+./sounds/scott_m_a_t.webm
+./sounds/scott_mat.webm
+./sounds/scott_mats.webm
+./sounds/scott_the_bat.webm
+./sounds/scott_the_cab.webm
+./sounds/scott_the_cat.webm
+./sounds/scott_the_mat.webm
 ./sounds/wrong1.webm
 ./sounds/wrong2.webm
 ./video/SpaceBalloon1-1.jpg

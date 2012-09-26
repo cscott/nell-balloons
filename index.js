@@ -1,16 +1,3374 @@
+
 /**
  * @license RequireJS domReady 2.0.1 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/requirejs/domReady for details
  */
+/*jslint */
+/*global require: false, define: false, requirejs: false,
+  window: false, clearInterval: false, document: false,
+  self: false, setInterval: false */
+
+
+define('domReady',[],function () {
+    
+
+    var isTop, testDiv, scrollIntervalId,
+        isBrowser = typeof window !== "undefined" && window.document,
+        isPageLoaded = !isBrowser,
+        doc = isBrowser ? document : null,
+        readyCalls = [];
+
+    function runCallbacks(callbacks) {
+        var i;
+        for (i = 0; i < callbacks.length; i += 1) {
+            callbacks[i](doc);
+        }
+    }
+
+    function callReady() {
+        var callbacks = readyCalls;
+
+        if (isPageLoaded) {
+            //Call the DOM ready callbacks
+            if (callbacks.length) {
+                readyCalls = [];
+                runCallbacks(callbacks);
+            }
+        }
+    }
+
+    /**
+     * Sets the page as loaded.
+     */
+    function pageLoaded() {
+        if (!isPageLoaded) {
+            isPageLoaded = true;
+            if (scrollIntervalId) {
+                clearInterval(scrollIntervalId);
+            }
+
+            callReady();
+        }
+    }
+
+    if (isBrowser) {
+        if (document.addEventListener) {
+            //Standards. Hooray! Assumption here that if standards based,
+            //it knows about DOMContentLoaded.
+            document.addEventListener("DOMContentLoaded", pageLoaded, false);
+            window.addEventListener("load", pageLoaded, false);
+        } else if (window.attachEvent) {
+            window.attachEvent("onload", pageLoaded);
+
+            testDiv = document.createElement('div');
+            try {
+                isTop = window.frameElement === null;
+            } catch (e) {}
+
+            //DOMContentLoaded approximation that uses a doScroll, as found by
+            //Diego Perini: http://javascript.nwbox.com/IEContentLoaded/,
+            //but modified by other contributors, including jdalton
+            if (testDiv.doScroll && isTop && window.external) {
+                scrollIntervalId = setInterval(function () {
+                    try {
+                        testDiv.doScroll();
+                        pageLoaded();
+                    } catch (e) {}
+                }, 30);
+            }
+        }
+
+        //Check if document already complete, and if so, just trigger page load
+        //listeners. Latest webkit browsers also use "interactive", and
+        //will fire the onDOMContentLoaded before "interactive" but not after
+        //entering "interactive" or "complete". More details:
+        //http://dev.w3.org/html5/spec/the-end.html#the-end
+        //http://stackoverflow.com/questions/3665561/document-readystate-of-interactive-vs-ondomcontentloaded
+        //Hmm, this is more complicated on further use, see "firing too early"
+        //bug: https://github.com/requirejs/domReady/issues/1
+        //so removing the || document.readyState === "interactive" test.
+        //There is still a window.onload binding that should get fired if
+        //DOMContentLoaded is missed.
+        if (document.readyState === "complete") {
+            pageLoaded();
+        }
+    }
+
+    /** START OF PUBLIC API **/
+
+    /**
+     * Registers a callback for DOM ready. If DOM is already ready, the
+     * callback is called immediately.
+     * @param {Function} callback
+     */
+    function domReady(callback) {
+        if (isPageLoaded) {
+            callback(doc);
+        } else {
+            readyCalls.push(callback);
+        }
+        return domReady;
+    }
+
+    domReady.version = '2.0.1';
+
+    /**
+     * Loader Plugin API method
+     */
+    domReady.load = function (name, req, onLoad, config) {
+        if (config.isBuild) {
+            onLoad(null);
+        } else {
+            domReady(onLoad);
+        }
+    };
+
+    /** END OF PUBLIC API **/
+
+    return domReady;
+});
+
+// From http://baagoe.com/en/RandomMusings/javascript/
+define('alea',[], function() {
+
+// Johannes Baagøe <baagoe@baagoe.com>, 2010
+function Mash() {
+  var n = 0xefc8249d;
+
+  var mash = function(data) {
+    data = data.toString();
+    for (var i = 0; i < data.length; i++) {
+      n += data.charCodeAt(i);
+      var h = 0.02519603282416938 * n;
+      n = h >>> 0;
+      h -= n;
+      h *= n;
+      n = h >>> 0;
+      h -= n;
+      n += h * 0x100000000; // 2^32
+    }
+    return (n >>> 0) * 2.3283064365386963e-10; // 2^-32
+  };
+
+  mash.version = 'Mash 0.9';
+  return mash;
+}
+
+function Alea() {
+  return (function(args) {
+    // Johannes Baagøe <baagoe@baagoe.com>, 2010
+    var s0 = 0;
+    var s1 = 0;
+    var s2 = 0;
+    var c = 1;
+
+    if (args.length == 0) {
+      args = [+new Date];
+    }
+    var mash = Mash();
+    s0 = mash(' ');
+    s1 = mash(' ');
+    s2 = mash(' ');
+
+    for (var i = 0; i < args.length; i++) {
+      s0 -= mash(args[i]);
+      if (s0 < 0) {
+        s0 += 1;
+      }
+      s1 -= mash(args[i]);
+      if (s1 < 0) {
+        s1 += 1;
+      }
+      s2 -= mash(args[i]);
+      if (s2 < 0) {
+        s2 += 1;
+      }
+    }
+    mash = null;
+
+    var random = function() {
+      var t = 2091639 * s0 + c * 2.3283064365386963e-10; // 2^-32
+      s0 = s1;
+      s1 = s2;
+      return s2 = t - (c = t | 0);
+    };
+    random.uint32 = function() {
+      return random() * 0x100000000; // 2^32
+    };
+    random.fract53 = function() {
+      return random() + 
+        (random() * 0x200000 | 0) * 1.1102230246251565e-16; // 2^-53
+    };
+    random.choice = function(list) {
+        var i = Math.floor(random() * list.length);
+        return list[i];
+    };
+    var _randomsign = function() { return random() - 0.5; };
+    random.shuffle = function(list) {
+        list.sort(_randomsign);
+    };
+    random.version = 'Alea 0.9';
+    random.args = args;
+    return random;
+
+  } (Array.prototype.slice.call(arguments)));
+};
+
+    return { Random: Alea };
+});
+
+/*jshint
+  eqeqeq:true, curly:true, latedef:true, newcap:true, undef:true,
+  trailing:true, es5:true, globalstrict:true
+ */
+/*global
+  define:true, console:false, require:false, module:false, window:false,
+  Float64Array:false, Uint16Array:false
+ */
+
+// Compatibility thunks.  Hackity hackity.
+define('compat',[], function() {
+    // Because Safari 5.1 doesn't have Function.bind (sigh)
+    if (!Function.prototype.bind) {
+        Function.prototype.bind = function (oThis) {
+            var aArgs = Array.prototype.slice.call(arguments, 1),
+            fToBind = this,
+            fNOP = function () {},
+            fBound = function () {
+                return fToBind.apply(this instanceof fNOP ? this :
+                                     (oThis || window),
+                                     aArgs.concat(Array.prototype.slice.call(arguments)));
+            };
+            fNOP.prototype = this.prototype;
+            fBound.prototype = new fNOP();
+            return fBound;
+        };
+    }
+    // Android's embedded webkit doesn't have Object.freeze
+    if (!Object.freeze) {
+        Object.freeze = function(o) { return o; };
+    }
+    // Android non-Chrome doesn't have Web Workers
+    var FakeWorker = function() {
+        console.warn("Faking Web Worker creation.");
+    };
+    FakeWorker.prototype = {
+        postMessage: function(msg) { },
+        addEventListener: function(msg, func) { }
+    };
+
+    var Compat = {
+        // Android non-Chrome browser doesn't have Web Workers
+        Worker: typeof(Worker)==='undefined' ? FakeWorker : Worker,
+        // Android Honeycomb doesn't have Uint8Array
+        Uint8Array: typeof(Uint8Array)==='undefined' ? Array : Uint8Array,
+        // iOS 5 doesn't have Float64Array
+        Float64Array: typeof(Float64Array)==='undefined' ? Array : Float64Array
+    };
+
+    // robust poly fill for window.requestAnimationFrame
+    if (typeof window !== 'undefined') {
+        (function() {
+            var lastTime = 0;
+            var vendors = ['ms', 'moz', 'webkit', 'o'];
+            var x;
+            for(x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+                window.cancelAnimationFrame =
+                    window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+            }
+
+            if (!window.requestAnimationFrame) {
+                console.log("Using requestAnimationFrame fallback.");
+                window.requestAnimationFrame = function(callback, element) {
+                    var currTime = new Date().getTime();
+                    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                    var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+                                               timeToCall);
+                    lastTime = currTime + timeToCall;
+                    return id;
+                };
+            }
+
+            if (!window.cancelAnimationFrame) {
+                window.cancelAnimationFrame = function(id) {
+                    clearTimeout(id);
+                };
+            }
+
+            Compat.requestAnimationFrame =
+                window.requestAnimationFrame.bind(window);
+            Compat.cancelAnimationFrame =
+                window.cancelAnimationFrame.bind(window);
+        })();
+    }
+
+    return Compat;
+});
 
 /**
  * Phonegap Web Intent plugin
  * Copyright (c) Boris Smus 2010
  *
  */
+define('webintent',[], function() {
+var Cordova = window.Cordova || { addConstructor: function() {} };
+var WebIntent = function() { 
+
+};
+
+WebIntent.ACTION_SEND = "android.intent.action.SEND";
+WebIntent.ACTION_VIEW= "android.intent.action.VIEW";
+WebIntent.EXTRA_TEXT = "android.intent.extra.TEXT";
+WebIntent.EXTRA_SUBJECT = "android.intent.extra.SUBJECT";
+WebIntent.EXTRA_STREAM = "android.intent.extra.STREAM";
+WebIntent.EXTRA_EMAIL = "android.intent.extra.EMAIL";
+
+WebIntent.prototype.startActivity = function(params, success, fail) {
+	return Cordova.exec(function(args) {
+        success(args);
+    }, function(args) {
+        fail(args);
+    }, 'WebIntent', 'startActivity', [params]);
+};
+
+WebIntent.prototype.sendBroadcast = function(params, success, fail) {
+    return Cordova.exec(function(args) {
+        success(args);
+    }, function(args) {
+        fail(args);
+    }, 'WebIntent', 'sendBroadcast', [params]);
+};
+
+WebIntent.prototype.hasExtra = function(params, success, fail) {
+	return Cordova.exec(function(args) {
+        success(args);
+    }, function(args) {
+        fail(args);
+    }, 'WebIntent', 'hasExtra', [params]);
+};
+
+WebIntent.prototype.getUri = function(success, fail) {
+	return Cordova.exec(function(args) {
+        success(args);
+    }, function(args) {
+        fail(args);
+    }, 'WebIntent', 'getUri', []);
+};
+
+WebIntent.prototype.getExtra = function(params, success, fail) {
+	return Cordova.exec(function(args) {
+        success(args);
+    }, function(args) {
+        fail(args);
+    }, 'WebIntent', 'getExtra', [params]);
+};
+
+
+WebIntent.prototype.onNewIntent = function(callback) {
+	return Cordova.exec(function(args) {
+		callback(args);
+    }, function(args) {
+    }, 'WebIntent', 'onNewIntent', []);
+};
+
+Cordova.addConstructor(function() {
+	Cordova.addPlugin('webintent', new WebIntent());
+});
+
+return WebIntent;
+});
+
+// encapsulate Funf functionality
+define('funf',['./webintent'], function(WebIntent) {
+
+    var FUNF_ACTION_RECORD = 'edu.mit.media.funf.RECORD';
+    var FUNF_ACTION_ARCHIVE = 'edu.mit.media.funf.ARCHIVE';
+    var FUNF_DATABASE_NAME = 'mainPipeline';
+
+    var Funf = function(appName) {
+        console.assert(appName.indexOf('-') < 0,
+                       "funf doesn't like hyphens in the appName");
+        this.appName = appName;
+    };
+    Funf.prototype = {};
+    Funf.prototype.record = function(name, value) {
+        if (typeof value === 'object' /* includes arrays */) {
+            // protect complex values from funf flattening
+            value = JSON.stringify(value);
+        }
+        console.log('CSA FUNF '+name+' / '+value);
+        try {
+            // send custom event; there's a Firefox add-on which will
+            // turn this into an Android Intent:
+            //     https://github.com/cscott/intent-addon
+            var event = document.createEvent('CustomEvent');
+            var o = { name: name, value: value, millis: Date.now() };
+            var intent = {
+                action: FUNF_ACTION_RECORD,
+                method: 'sendBroadcast',
+                extras: {
+                    DATABASE_NAME: FUNF_DATABASE_NAME,
+                    TIMESTAMP: Math.floor(Date.now()/1000),
+                    NAME: this.appName,
+                    VALUE: JSON.stringify(o)
+                }
+	    };
+            event.initCustomEvent("intent-addon", true, true, intent);
+	    document.documentElement.dispatchEvent(event);
+        } catch(e) {
+            console.log("Sending custom event failed: "+e);
+        }
+    };
+    Funf.prototype.archive = function() {
+        try {
+            var event = document.createEvent('CustomEvent');
+            var intent = {
+                action: FUNF_ACTION_ARCHIVE,
+                method: 'sendBroadcast',
+                extras: {
+                    DATABASE_NAME: FUNF_DATABASE_NAME
+                }
+	    };
+            event.initCustomEvent("intent-addon", true, true, intent);
+	    document.documentElement.dispatchEvent(event);
+        } catch(e) {
+            console.log("Sending custom event failed: "+e);
+        }
+    };
+    // redefine these methods if running on PhoneGap/Android
+    if (window &&
+        window.Cordova && window.Cordova.exec &&
+        window.device && window.device.platform==='Android') {
+        Funf.prototype.record = function(name, value) {
+            if (typeof value === 'object' /* includes arrays */) {
+                // protect complex values from funf flattening
+                value = JSON.stringify(value);
+            }
+            var wi = new WebIntent();
+            var o = { name:name, value:value, millis: Date.now() };
+            wi.sendBroadcast({
+                action: FUNF_ACTION_RECORD,
+                extras: {
+                    DATABASE_NAME: FUNF_DATABASE_NAME,
+                    TIMESTAMP: Math.floor(Date.now()/1000),
+                    NAME: this.appName,
+                    VALUE: JSON.stringify(o)
+                }
+            }, function(args) { /* success */ }, function(args) {
+                console.error('Funf logging failed.');
+            });
+        };
+        Funf.prototype.archive = function() {
+            new WebIntent().sendBroadcast({
+                action: FUNF_ACTION_ARCHIVE,
+                extras: {
+                    DATABASE_NAME: FUNF_DATABASE_NAME
+                }
+            }, function(){}, function(){});
+        };
+    }
+    return Funf;
+});
+
+/**
+ * Lawnchair!
+ * --- 
+ * clientside json store 
+ *
+ */
+define('lawnchair/core',[], function() {
+var Lawnchair = function (options, callback) {
+    // ensure Lawnchair was called as a constructor
+    if (!(this instanceof Lawnchair)) return new Lawnchair(options, callback);
+
+    // lawnchair requires json 
+    if (!JSON) throw 'JSON unavailable! Include http://www.json.org/json2.js to fix.'
+    // options are optional; callback is not
+    if (arguments.length <= 2 && arguments.length > 0) {
+        callback = (typeof arguments[0] === 'function') ? arguments[0] : arguments[1];
+        options  = (typeof arguments[0] === 'function') ? {} : arguments[0];
+    } else {
+        throw 'Incorrect # of ctor args!'
+    }
+    // TODO perhaps allow for pub/sub instead?
+    if (typeof callback !== 'function') throw 'No callback was provided';
+    
+    // default configuration 
+    this.record = options.record || 'record'  // default for records
+    this.name   = options.name   || 'records' // default name for underlying store
+    
+    // mixin first valid  adapter
+    var adapter
+    // if the adapter is passed in we try to load that only
+    if (options.adapter) {
+        for (var i = 0, l = Lawnchair.adapters.length; i < l; i++) {
+            if (Lawnchair.adapters[i].adapter === options.adapter) {
+              adapter = Lawnchair.adapters[i].valid() ? Lawnchair.adapters[i] : undefined;
+              break;
+            }
+        }
+    // otherwise find the first valid adapter for this env
+    } 
+    else {
+        for (var i = 0, l = Lawnchair.adapters.length; i < l; i++) {
+            adapter = Lawnchair.adapters[i].valid() ? Lawnchair.adapters[i] : undefined
+            if (adapter) break 
+        }
+    } 
+    
+    // we have failed 
+    if (!adapter) throw 'No valid adapter.' 
+    
+    // yay! mixin the adapter 
+    for (var j in adapter)  
+        this[j] = adapter[j]
+    
+    // call init for each mixed in plugin
+    for (var i = 0, l = Lawnchair.plugins.length; i < l; i++) 
+        Lawnchair.plugins[i].call(this)
+
+    // init the adapter 
+    this.init(options, callback)
+}
+
+Lawnchair.adapters = [] 
+
+/** 
+ * queues an adapter for mixin
+ * ===
+ * - ensures an adapter conforms to a specific interface
+ *
+ */
+Lawnchair.adapter = function (id, obj) {
+    // add the adapter id to the adapter obj
+    // ugly here for a  cleaner dsl for implementing adapters
+    obj['adapter'] = id
+    // methods required to implement a lawnchair adapter 
+    var implementing = 'adapter valid init keys save batch get exists all remove nuke'.split(' ')
+    ,   indexOf = this.prototype.indexOf
+    // mix in the adapter   
+    for (var i in obj) {
+        if (indexOf(implementing, i) === -1) throw 'Invalid adapter! Nonstandard method: ' + i
+    }
+    // if we made it this far the adapter interface is valid 
+	// insert the new adapter as the preferred adapter
+	Lawnchair.adapters.splice(0,0,obj)
+}
+
+Lawnchair.plugins = []
+
+/**
+ * generic shallow extension for plugins
+ * ===
+ * - if an init method is found it registers it to be called when the lawnchair is inited 
+ * - yes we could use hasOwnProp but nobody here is an asshole
+ */ 
+Lawnchair.plugin = function (obj) {
+    for (var i in obj) 
+        i === 'init' ? Lawnchair.plugins.push(obj[i]) : this.prototype[i] = obj[i]
+}
+
+/**
+ * helpers
+ *
+ */
+Lawnchair.prototype = {
+
+    isArray: Array.isArray || function(o) { return Object.prototype.toString.call(o) === '[object Array]' },
+    
+    /**
+     * this code exists for ie8... for more background see:
+     * http://www.flickr.com/photos/westcoastlogic/5955365742/in/photostream
+     */
+    indexOf: function(ary, item, i, l) {
+        if (ary.indexOf) return ary.indexOf(item)
+        for (i = 0, l = ary.length; i < l; i++) if (ary[i] === item) return i
+        return -1
+    },
+
+    // awesome shorthand callbacks as strings. this is shameless theft from dojo.
+    lambda: function (callback) {
+        return this.fn(this.record, callback)
+    },
+
+    // first stab at named parameters for terse callbacks; dojo: first != best // ;D
+    fn: function (name, callback) {
+        return typeof callback == 'string' ? new Function(name, callback) : callback
+    },
+
+    // returns a unique identifier (by way of Backbone.localStorage.js)
+    // TODO investigate smaller UUIDs to cut on storage cost
+    uuid: function () {
+        var S4 = function () {
+            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        }
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    },
+
+    // a classic iterator
+    each: function (callback) {
+        var cb = this.lambda(callback)
+        // iterate from chain
+        if (this.__results) {
+            for (var i = 0, l = this.__results.length; i < l; i++) cb.call(this, this.__results[i], i) 
+        }  
+        // otherwise iterate the entire collection 
+        else {
+            this.all(function(r) {
+                for (var i = 0, l = r.length; i < l; i++) cb.call(this, r[i], i)
+            })
+        }
+        return this
+    }
+// --
+};
+    return Lawnchair;
+});
+
+/**
+ * indexed db adapter
+ * === 
+ * - originally authored by Vivian Li
+ *
+ */
+define('lawnchair/adapters/indexed-db.js',[], function() { return function(Lawnchair) {
+
+Lawnchair.adapter('indexed-db', (function(){
+
+  function fail(e, i) { console.error('error in indexed-db adapter!', e, i); }
+
+  var STORE_NAME = 'lawnchair';
+
+  // update the STORE_VERSION when the schema used by this adapter changes
+  // (for example, if you change the STORE_NAME above)
+  var STORE_VERSION = 2;
+
+  var getIDB = function() {
+    // XXX firefox is timing out trying to open the db after you clear local
+    // storage, without firing onblocked or anything. =(
+    return window.indexedDB || window.webkitIndexedDB ||
+          /*window.mozIndexedDB || */ window.oIndexedDB ||
+          window.msIndexedDB;
+  };
+  var getIDBTransaction = function() {
+      return window.IDBTransaction || window.webkitIDBTransaction ||
+          window.mozIDBTransaction || window.oIDBTransaction ||
+          window.msIDBTransaction;
+  };
+  var getIDBKeyRange = function() {
+      return window.IDBKeyRange || window.webkitIDBKeyRange ||
+          window.mozIDBKeyRange || window.oIDBKeyRange ||
+          window.msIDBKeyRange;
+  };
+  var getIDBDatabaseException = function() {
+      return window.IDBDatabaseException || window.webkitIDBDatabaseException ||
+          window.mozIDBDatabaseException || window.oIDBDatabaseException ||
+          window.msIDBDatabaseException;
+  };
+
+  // see https://groups.google.com/a/chromium.org/forum/?fromgroups#!topic/chromium-html5/OhsoAQLj7kc
+  var READ_WRITE = (getIDBTransaction() &&
+                    'READ_WRITE' in getIDBTransaction()) ?
+    getIDBTransaction().READ_WRITE : 'readwrite';
+
+  return {
+    
+    valid: function() { return !!getIDB(); },
+    
+    init:function(options, callback) {
+        this.idb = getIDB();
+        this.waiting = [];
+        var request = this.idb.open(this.name, STORE_VERSION);
+        var self = this;
+        var cb = self.fn(self.name, callback);
+        var win = function() {
+            // manually clean up event handlers on request; this helps on chrome
+            request.onupgradeneeded = request.onsuccess = request.error = null;
+            return cb.call(self, self);
+        };
+        
+        var upgrade = function(from, to) {
+            // don't try to migrate dbs, just recreate
+            try {
+                self.db.deleteObjectStore('teststore'); // old adapter
+            } catch (e1) { /* ignore */ }
+            try {
+                self.db.deleteObjectStore(STORE_NAME);
+            } catch (e2) { /* ignore */ }
+
+            // ok, create object store.
+            self.db.createObjectStore(STORE_NAME/*, { autoIncrement: true}*/);
+            self.store = true;
+        };
+        request.onupgradeneeded = function(event) {
+            self.db = request.result;
+            self.transaction = request.transaction;
+            upgrade(event.oldVersion, event.newVersion);
+            // will end up in onsuccess callback
+        };
+        request.onsuccess = function(event) {
+           self.db = request.result; 
+            
+            if (self.db.version != (''+STORE_VERSION)) {
+              // DEPRECATED API: modern implementations will fire the
+              // upgradeneeded event instead.
+              var oldVersion = self.db.version;
+              var setVrequest = self.db.setVersion(''+STORE_VERSION);
+              // onsuccess is the only place we can create Object Stores
+              setVrequest.onsuccess = function(event) {
+                  var transaction = setVrequest.result;
+                  setVrequest.onsuccess = setVrequest.onerror = null;
+                  // can't upgrade w/o versionchange transaction.
+                  upgrade(oldVersion, STORE_VERSION);
+                  transaction.oncomplete = function() {
+                      for (var i = 0; i < self.waiting.length; i++) {
+                          self.waiting[i].call(self);
+                      }
+                      self.waiting = [];
+                      win();
+                  };
+              };
+              setVrequest.onerror = function(e) {
+                  setVrequest.onsuccess = setVrequest.onerror = null;
+                  console.log("Failed to create objectstore " + e);
+                  fail(e);
+              };
+            } else {
+                self.store = true;
+                for (var i = 0; i < self.waiting.length; i++) {
+                      self.waiting[i].call(self);
+                }
+                self.waiting = [];
+                win();
+            }
+        }
+        request.onblocked = function(ev) {
+            console.log('onblocked!'); // XXX
+        };
+        request.onerror = function(ev) {
+            if (request.errorCode === getIDBDatabaseException().VERSION_ERR) {
+                // xxx blow it away
+                self.idb.deleteDatabase(self.name);
+                // try it again.
+                return self.init(options, callback);
+            }
+            console.error('Failed to open database');
+        };
+    },
+
+    save:function(obj, callback) {
+        if(!this.store) {
+            this.waiting.push(function() {
+                this.save(obj, callback);
+            });
+            return;
+         }
+         
+         var self = this, request;
+         var win  = function (e) {
+             // manually clean up event handlers; helps free memory on chrome.
+             request.onsuccess = request.onerror = null;
+             if (callback) { obj.key = e.target.result; self.lambda(callback).call(self, obj) }
+         };
+
+         var trans = this.db.transaction(STORE_NAME, READ_WRITE);
+         var store = trans.objectStore(STORE_NAME);
+         request = obj.key ? store.put(obj, obj.key) : store.put(obj);
+         
+         request.onsuccess = win;
+         request.onerror = fail;
+         
+         return this;
+    },
+    
+    // FIXME this should be a batch insert / just getting the test to pass...
+    batch: function (objs, cb) {
+        
+        var results = []
+        ,   done = false
+        ,   self = this
+
+        var updateProgress = function(obj) {
+            results.push(obj)
+            done = results.length === objs.length
+        }
+
+        var checkProgress = setInterval(function() {
+            if (done) {
+                if (cb) self.lambda(cb).call(self, results)
+                clearInterval(checkProgress)
+            }
+        }, 200)
+
+        for (var i = 0, l = objs.length; i < l; i++) 
+            this.save(objs[i], updateProgress)
+        
+        return this
+    },
+    
+
+    get:function(key, callback) {
+        if(!this.store) {
+            this.waiting.push(function() {
+                this.get(key, callback);
+            });
+            return;
+        }
+        
+        
+        var self = this;
+        var win  = function (e) { if (callback) { self.lambda(callback).call(self, e.target.result) }};
+        
+        if (!this.isArray(key)){
+            var req = this.db.transaction(STORE_NAME).objectStore(STORE_NAME).get(key);
+
+            req.onsuccess = function(event) {
+                req.onsuccess = req.onerror = null;
+                win(event);
+            };
+            req.onerror = function(event) {
+                console.log("Failed to find " + key);
+                req.onsuccess = req.onerror = null;
+                fail(event);
+            };
+        
+        // FIXME: again the setInterval solution to async callbacks..    
+        } else {
+
+            // note: these are hosted.
+            var results = []
+            ,   done = false
+            ,   keys = key
+
+            var updateProgress = function(obj) {
+                results.push(obj)
+                done = results.length === keys.length
+                if (done) {
+                    self.lambda(callback).call(self, results);
+                }
+            }
+
+            for (var i = 0, l = keys.length; i < l; i++) 
+                this.get(keys[i], updateProgress)
+            
+        }
+
+        return this;
+    },
+
+    exists:function(key, callback) {
+        if(!this.store) {
+            this.waiting.push(function() {
+                this.exists(key, callback);
+            });
+            return;
+        }
+
+        var self = this;
+
+        var req = this.db.transaction(STORE_NAME).objectStore(STORE_NAME).openCursor(getIDBKeyRange().only(key));
+
+        req.onsuccess = function(event) {
+            req.onsuccess = req.onerror = null;
+            // exists iff req.result is not null
+            // XXX but firefox returns undefined instead, sigh XXX
+            var undef;
+            self.lambda(callback).call(self, event.target.result !== null &&
+                                             event.target.result !== undef);
+        };
+        req.onerror = function(event) {
+            req.onsuccess = req.onerror = null;
+            console.log("Failed to test for " + key);
+            fail(event);
+        };
+
+        return this;
+    },
+
+    all:function(callback) {
+        if(!this.store) {
+            this.waiting.push(function() {
+                this.all(callback);
+            });
+            return;
+        }
+        var cb = this.fn(this.name, callback) || undefined;
+        var self = this;
+        var objectStore = this.db.transaction(STORE_NAME).objectStore(STORE_NAME);
+        var toReturn = [];
+        objectStore.openCursor().onsuccess = function(event) {
+          var cursor = event.target.result;
+          if (cursor) {
+               toReturn.push(cursor.value);
+               cursor['continue']();
+          }
+          else {
+              if (cb) cb.call(self, toReturn);
+          }
+        };
+        return this;
+    },
+
+    remove:function(keyOrObj, callback) {
+        if(!this.store) {
+            this.waiting.push(function() {
+                this.remove(keyOrObj, callback);
+            });
+            return;
+        }
+        if (typeof keyOrObj == "object") {
+            keyOrObj = keyOrObj.key;
+        }
+        var self = this, request;
+        var win  = function () {
+            request.onsuccess = request.onerror = null;
+            if (callback) self.lambda(callback).call(self)
+        };
+        
+        request = this.db.transaction(STORE_NAME, READ_WRITE).objectStore(STORE_NAME)['delete'](keyOrObj);
+        request.onsuccess = win;
+        request.onerror = fail;
+        return this;
+    },
+
+    nuke:function(callback, optDeleteOutright) {
+        if(!this.store) {
+            this.waiting.push(function() {
+                this.nuke(callback, optDeleteOutright);
+            });
+            return;
+        }
+        
+        var self = this
+        ,   win  = callback ? function() { self.lambda(callback).call(self) } : function(){};
+        
+        if (optDeleteOutright) {
+            // can't use this lawnchair for anything after this completes
+            if (this.waiting.length) fail();
+            this.idb.deleteDatabase(this.name);
+            delete this.store;
+            delete this.waiting;
+            win();
+            return;
+        }
+
+        try {
+            this.db
+                .transaction(STORE_NAME, READ_WRITE)
+                .objectStore(STORE_NAME).clear().onsuccess = win;
+            
+        } catch(e) {
+            fail();
+        }
+        return this;
+    }
+    
+  };
+  
+})());
+
+};
+});
+
+/**
+ * dom storage adapter 
+ * === 
+ * - originally authored by Joseph Pecoraro
+ *
+ */ 
+//
+// TODO does it make sense to be chainable all over the place?
+// chainable: nuke, remove, all, get, save, all    
+// not chainable: valid, keys
+//
+define('lawnchair/adapters/dom.js',[], function() { return function(Lawnchair) {
+
+Lawnchair.adapter('dom', (function() {
+    var storage = window.localStorage
+    // the indexer is an encapsulation of the helpers needed to keep an ordered index of the keys
+    var indexer = function(name) {
+        return {
+            // the key
+            key: name + '._index_',
+            // returns the index
+            all: function() {
+				var a  = storage.getItem(this.key)
+				if (a) {
+					a = JSON.parse(a)
+				}
+                if (a === null) storage.setItem(this.key, JSON.stringify([])) // lazy init
+                return JSON.parse(storage.getItem(this.key))
+            },
+            // adds a key to the index
+            add: function (key) {
+                var a = this.all()
+                a.push(key)
+                storage.setItem(this.key, JSON.stringify(a))
+            },
+            // deletes a key from the index
+            del: function (key) {
+                var a = this.all(), r = []
+                // FIXME this is crazy inefficient but I'm in a strata meeting and half concentrating
+                for (var i = 0, l = a.length; i < l; i++) {
+                    if (a[i] != key) r.push(a[i])
+                }
+                storage.setItem(this.key, JSON.stringify(r))
+            },
+            // returns index for a key
+            find: function (key) {
+                var a = this.all()
+                for (var i = 0, l = a.length; i < l; i++) {
+                    if (key === a[i]) return i 
+                }
+                return false
+            }
+        }
+    }
+    
+    // adapter api 
+    return {
+    
+        // ensure we are in an env with localStorage 
+        valid: function () {
+            return !!storage 
+        },
+
+        init: function (options, callback) {
+            this.indexer = indexer(this.name)
+            if (callback) this.fn(this.name, callback).call(this, this)  
+        },
+        
+        save: function (obj, callback) {
+            var key = obj.key ? this.name + '.' + obj.key : this.name + '.' + this.uuid()
+            // if the key is not in the index push it on
+            if (this.indexer.find(key) === false) this.indexer.add(key)
+            // now we kil the key and use it in the store colleciton    
+            delete obj.key;
+            storage.setItem(key, JSON.stringify(obj))
+            obj.key = key.slice(this.name.length + 1)
+            if (callback) {
+                this.lambda(callback).call(this, obj)
+            }
+            return this
+        },
+
+        batch: function (ary, callback) {
+            var saved = []
+            // not particularily efficient but this is more for sqlite situations
+            for (var i = 0, l = ary.length; i < l; i++) {
+                this.save(ary[i], function(r){
+                    saved.push(r)
+                })
+            }
+            if (callback) this.lambda(callback).call(this, saved)
+            return this
+        },
+       
+        // accepts [options], callback
+        keys: function(callback) {
+            if (callback) { 
+                var name = this.name
+                ,   keys = this.indexer.all().map(function(r){ return r.replace(name + '.', '') })
+                this.fn('keys', callback).call(this, keys)
+            }
+            return this // TODO options for limit/offset, return promise
+        },
+        
+        get: function (key, callback) {
+            if (this.isArray(key)) {
+                var r = []
+                for (var i = 0, l = key.length; i < l; i++) {
+                    var k = this.name + '.' + key[i]
+                    var obj = storage.getItem(k)
+                    if (obj) {
+						obj = JSON.parse(obj)
+                        obj.key = key[i]
+                        r.push(obj)
+                    } 
+                }
+                if (callback) this.lambda(callback).call(this, r)
+            } else {
+                var k = this.name + '.' + key
+                var  obj = storage.getItem(k)
+                if (obj) {
+					obj = JSON.parse(obj)
+					obj.key = key
+				}
+                if (callback) this.lambda(callback).call(this, obj)
+            }
+            return this
+        },
+
+        exists: function (key, cb) {
+            var exists = this.indexer.find(this.name+'.'+key) === false ? false : true ;
+            this.lambda(cb).call(this, exists);
+            return this;
+        },
+        // NOTE adapters cannot set this.__results but plugins do
+        // this probably should be reviewed
+        all: function (callback) {
+            var idx = this.indexer.all()
+            ,   r   = []
+            ,   o
+            ,   k
+            for (var i = 0, l = idx.length; i < l; i++) {
+                k     = idx[i] //v
+                o     = JSON.parse(storage.getItem(k))
+                o.key = k.replace(this.name + '.', '')
+                r.push(o)
+            }
+            if (callback) this.fn(this.name, callback).call(this, r)
+            return this
+        },
+        
+        remove: function (keyOrObj, callback) {
+            var key = this.name + '.' + ((keyOrObj.key) ? keyOrObj.key : keyOrObj)
+            this.indexer.del(key)
+            storage.removeItem(key)
+            if (callback) this.lambda(callback).call(this)
+            return this
+        },
+        
+        nuke: function (callback) {
+            this.all(function(r) {
+                for (var i = 0, l = r.length; i < l; i++) {
+                    this.remove(r[i]);
+                }
+                if (callback) this.lambda(callback).call(this)
+            })
+            return this 
+        }
+}})());
+
+};
+});
+
+// window.name code courtesy Remy Sharp: http://24ways.org/2009/breaking-out-the-edges-of-the-browser
+define('lawnchair/adapters/window-name.js',[], function() { return function(Lawnchair) {
+
+Lawnchair.adapter('window-name', (function(index, store) {
+    if (typeof window==='undefined') {
+        window = { top: { } }; // node/optimizer compatibility
+    }
+
+    var data = window.top.name ? JSON.parse(window.top.name) : {}
+
+    return {
+
+        valid: function () {
+            return typeof window.top.name != 'undefined' 
+        },
+
+        init: function (options, callback) {
+            data[this.name] = data[this.name] || {index:[],store:{}}
+            index = data[this.name].index
+            store = data[this.name].store
+            this.fn(this.name, callback).call(this, this)
+        },
+
+        keys: function (callback) {
+            this.fn('keys', callback).call(this, index)
+            return this
+        },
+
+        save: function (obj, cb) {
+            // data[key] = value + ''; // force to string
+            // window.top.name = JSON.stringify(data);
+            var key = obj.key || this.uuid()
+            this.exists(key, function(exists) {
+                if (!exists) {
+                    if (obj.key) delete obj.key
+                    index.push(key)
+                }
+                store[key] = obj
+                window.top.name = JSON.stringify(data) // TODO wow, this is the only diff from the memory adapter
+                if (cb) {
+                    obj.key = key
+                    this.lambda(cb).call(this, obj)
+                }
+            })
+            return this
+        },
+
+        batch: function (objs, cb) {
+            var r = []
+            for (var i = 0, l = objs.length; i < l; i++) {
+                this.save(objs[i], function(record) {
+                    r.push(record)
+                })
+            }
+            if (cb) this.lambda(cb).call(this, r)
+            return this
+        },
+        
+        get: function (keyOrArray, cb) {
+            var r;
+            if (this.isArray(keyOrArray)) {
+                r = []
+                for (var i = 0, l = keyOrArray.length; i < l; i++) {
+                    r.push(store[keyOrArray[i]]) 
+                }
+            } else {
+                r = store[keyOrArray]
+                if (r) r.key = keyOrArray
+            }
+            if (cb) this.lambda(cb).call(this, r)
+            return this 
+        },
+        
+        exists: function (key, cb) {
+            this.lambda(cb).call(this, !!(store[key]))
+            return this
+        },
+
+        all: function (cb) {
+            var r = []
+            for (var i = 0, l = index.length; i < l; i++) {
+                var obj = store[index[i]]
+                obj.key = index[i]
+                r.push(obj)
+            }
+            this.fn(this.name, cb).call(this, r)
+            return this
+        },
+        
+        remove: function (keyOrArray, cb) {
+            var del = this.isArray(keyOrArray) ? keyOrArray : [keyOrArray]
+            for (var i = 0, l = del.length; i < l; i++) {
+                delete store[del[i]]
+                index.splice(this.indexOf(index, del[i]), 1)
+            }
+            window.top.name = JSON.stringify(data)
+            if (cb) this.lambda(cb).call(this)
+            return this
+        },
+
+        nuke: function (cb) {
+            store = {}
+            index = []
+            window.top.name = JSON.stringify(data)
+            if (cb) this.lambda(cb).call(this)
+            return this 
+        }
+    }
+/////
+})())
+
+};
+});
+
+// Load lawnchair core and appropriate adapters.
+define('lawnchair/lawnchair',['./core',
+        // use these adapters, in this order (prefer the first)
+        './adapters/indexed-db.js',
+        './adapters/dom.js',
+        './adapters/window-name.js'], function(Lawnchair) {
+
+            // go through arguments from last to first
+            for (var i=arguments.length-1; i>0; i--) {
+                arguments[i](Lawnchair);
+            }
+
+            // return the Lawnchair interface
+            return Lawnchair;
+        });
+
+// use the requirejs plugin interface so that we can delay startup until the
+// lawnchair has loaded.
+define('nell',['./alea', './lawnchair/lawnchair'], function(Alea, Lawnchair) {
+    var NELL_COLORS = [ 'n0', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8',
+                        'n9', 'n10' ];
+    var random = Alea.Random();
+
+    var getDefault = function(lawnchair, key, defaultValue, callback) {
+        lawnchair.exists(key, function(exists) {
+            if (exists) {
+                lawnchair.get(key, callback);
+            } else {
+                callback(defaultValue);
+            }
+        });
+    };
+
+    var Nell = function(lawnchair, color) {
+        this.lawnchair = lawnchair;
+        if (color) {
+            this.setColor(color);
+        } else {
+            this.setColor(random.choice(NELL_COLORS));
+            this.saveColor();
+        }
+    };
+    Nell.prototype = {};
+    Nell.prototype.setColor = function(color) {
+        document.body.classList.remove(this.color||'n0');
+        this.color = color;
+        document.body.classList.add(this.color);
+    };
+    Nell.prototype.saveColor = function() {
+        this.lawnchair.save({ key:'color', value: this.color,
+                              timestamp: Date.now() }, function(){});
+    };
+    Nell.prototype.switchColor = function() {
+        var otherColors = NELL_COLORS.filter(function(c) {
+            return c !== this.color;
+        }.bind(this));
+        this.setColor(random.choice(otherColors));
+        this.saveColor();
+        if (this.funf) {
+            this.funf.record('colorchange', this.color);
+        }
+    };
+
+    var makeNellAsync = function(callback) {
+        var withLawnchair = function(lawnchair) {
+            getDefault(lawnchair, 'color', null, function(color) {
+                callback(new Nell(lawnchair, color && color.value));
+            });
+        };
+        Lawnchair({name:'nell'}, function() { withLawnchair(this); });
+    };
+
+    return {
+        load: function(name, req, onLoad, config) {
+            if (config.isBuild || typeof document==='undefined') {
+                // indicate that this plugin can't be inlined
+                onLoad(null);
+            } else {
+                makeNellAsync(onLoad);
+            }
+        }
+    };
+});
+
+// use the requirejs plugin interface so that we can delay startup until the
+// lawnchair has loaded.
+define('score',['./lawnchair/lawnchair'], function(Lawnchair) {
+
+    var getDefault = function(lawnchair, key, defaultValue, callback) {
+        lawnchair.exists(key, function(exists) {
+            if (exists) {
+                lawnchair.get(key, callback);
+            } else {
+                callback(defaultValue);
+            }
+        });
+    };
+
+    var Score = function(lawnchair, unlocked) {
+        this.lawnchair = lawnchair;
+        this.unlocked = unlocked || {};
+    };
+    Score.prototype = {};
+    Score.prototype._get = function(level, altitude, create) {
+        if (!this.unlocked[level]) {
+            if (!create) { return {}; }
+            this.unlocked[level] = {};
+        }
+        if (!this.unlocked[level][altitude]) {
+            if (!create) { return {}; }
+            this.unlocked[level][altitude] = {};
+        }
+        return this.unlocked[level][altitude];
+    };
+    Score.prototype.isCompleted = function(level, altitude) {
+        return !!(this._get(level, altitude).firstCompleted);
+    };
+    Score.prototype.numStars = function(level, altitude) {
+        return this._get(level, altitude).numStars || 0;
+    };
+    Score.prototype.setCompleted = function(level, altitude, numStars) {
+        var info = this._get(level, altitude, true/*create*/);
+        var prevStars = (info.numStars || 0);
+        var isNew = (!info.firstCompleted) || (numStars > prevStars);
+        if (!isNew) { return; }
+        // new high score / not previously unlocked
+        if (!info.firstCompleted) { info.firstCompleted = Date.now(); }
+        info.lastCompleted = Date.now();
+        info.numStars = numStars;
+        if (this.funf) {
+            this.funf.record('unlocked', {
+                level:level,
+                altitude:altitude,
+                numStars: numStars,
+                firstCompleted: info.firstCompleted
+            });
+        }
+        this.save();
+    };
+    Score.prototype.save = function() {
+        this.lawnchair.save({key: 'unlocked', value: this.unlocked});
+    };
+
+    var makeScoreAsync = function(callback) {
+        var withLawnchair = function(lawnchair) {
+            getDefault(lawnchair, 'unlocked', {}, function(unlocked) {
+                callback(new Score(lawnchair, unlocked.value));
+            });
+        };
+        Lawnchair({name:'score'}, function() { withLawnchair(this); });
+    };
+
+    return {
+        load: function(name, req, onLoad, config) {
+            if (config.isBuild || typeof document==='undefined') {
+                // indicate that this plugin can't be inlined
+                onLoad(null);
+            } else {
+                makeScoreAsync(onLoad);
+            }
+        }
+    };
+});
+
+/*jshint white: false, onevar: false, strict: false, plusplus: false,
+  nomen: false */
+/*global define: false, window: false, document: false */
 
 // Cross-platform sound pool.  Heavily hacked from the MIT licensed code in
 // https://github.com/gladiusjs/gladius-core/blob/develop/src/sound/default.js
+define('sound',[], function() {
 
-define("domReady",[],function(){function u(e){var t;for(t=0;t<e.length;t+=1)e[t](s)}function a(){var e=o;i&&e.length&&(o=[],u(e))}function f(){i||(i=!0,n&&clearInterval(n),a())}function c(e){return i?e(s):o.push(e),c}var e,t,n,r=typeof window!="undefined"&&window.document,i=!r,s=r?document:null,o=[];if(r){if(document.addEventListener)document.addEventListener("DOMContentLoaded",f,!1),window.addEventListener("load",f,!1);else if(window.attachEvent){window.attachEvent("onload",f),t=document.createElement("div");try{e=window.frameElement===null}catch(l){}t.doScroll&&e&&window.external&&(n=setInterval(function(){try{t.doScroll(),f()}catch(e){}},30))}document.readyState==="complete"&&f()}return c.version="2.0.1",c.load=function(e,t,n,r){r.isBuild?n(null):c(n)},c}),define("alea",[],function(){function e(){var e=4022871197,t=function(t){t=t.toString();for(var r=0;r<t.length;r++){e+=t.charCodeAt(r);var i=.02519603282416938*e;e=i>>>0,i-=e,i*=e,e=i>>>0,i-=e,e+=i*4294967296}return(e>>>0)*2.3283064365386963e-10};return t.version="Mash 0.9",t}function t(){return function(t){var n=0,r=0,i=0,s=1;t.length==0&&(t=[+(new Date)]);var o=e();n=o(" "),r=o(" "),i=o(" ");for(var u=0;u<t.length;u++)n-=o(t[u]),n<0&&(n+=1),r-=o(t[u]),r<0&&(r+=1),i-=o(t[u]),i<0&&(i+=1);o=null;var a=function(){var e=2091639*n+s*2.3283064365386963e-10;return n=r,r=i,i=e-(s=e|0)};a.uint32=function(){return a()*4294967296},a.fract53=function(){return a()+(a()*2097152|0)*1.1102230246251565e-16},a.choice=function(e){var t=Math.floor(a()*e.length);return e[t]};var f=function(){return a()-.5};return a.shuffle=function(e){e.sort(f)},a.version="Alea 0.9",a.args=t,a}(Array.prototype.slice.call(arguments))}return{Random:t}}),define("compat",[],function(){Function.prototype.bind||(Function.prototype.bind=function(e){var t=Array.prototype.slice.call(arguments,1),n=this,r=function(){},i=function(){return n.apply(this instanceof r?this:e||window,t.concat(Array.prototype.slice.call(arguments)))};return r.prototype=this.prototype,i.prototype=new r,i}),Object.freeze||(Object.freeze=function(e){return e});var e=function(){console.warn("Faking Web Worker creation.")};e.prototype={postMessage:function(e){},addEventListener:function(e,t){}};var t={Worker:typeof Worker=="undefined"?e:Worker,Uint8Array:typeof Uint8Array=="undefined"?Array:Uint8Array,Float64Array:typeof Float64Array=="undefined"?Array:Float64Array};return typeof window!="undefined"&&function(){var e=0,n=["ms","moz","webkit","o"],r;for(r=0;r<n.length&&!window.requestAnimationFrame;++r)window.requestAnimationFrame=window[n[r]+"RequestAnimationFrame"],window.cancelAnimationFrame=window[n[r]+"CancelAnimationFrame"]||window[n[r]+"CancelRequestAnimationFrame"];window.requestAnimationFrame||(console.log("Using requestAnimationFrame fallback."),window.requestAnimationFrame=function(t,n){var r=(new Date).getTime(),i=Math.max(0,16-(r-e)),s=window.setTimeout(function(){t(r+i)},i);return e=r+i,s}),window.cancelAnimationFrame||(window.cancelAnimationFrame=function(e){clearTimeout(e)}),t.requestAnimationFrame=window.requestAnimationFrame.bind(window),t.cancelAnimationFrame=window.cancelAnimationFrame.bind(window)}(),t}),define("webintent",[],function(){var e=window.Cordova||{addConstructor:function(){}},t=function(){};return t.ACTION_SEND="android.intent.action.SEND",t.ACTION_VIEW="android.intent.action.VIEW",t.EXTRA_TEXT="android.intent.extra.TEXT",t.EXTRA_SUBJECT="android.intent.extra.SUBJECT",t.EXTRA_STREAM="android.intent.extra.STREAM",t.EXTRA_EMAIL="android.intent.extra.EMAIL",t.prototype.startActivity=function(t,n,r){return e.exec(function(e){n(e)},function(e){r(e)},"WebIntent","startActivity",[t])},t.prototype.sendBroadcast=function(t,n,r){return e.exec(function(e){n(e)},function(e){r(e)},"WebIntent","sendBroadcast",[t])},t.prototype.hasExtra=function(t,n,r){return e.exec(function(e){n(e)},function(e){r(e)},"WebIntent","hasExtra",[t])},t.prototype.getUri=function(t,n){return e.exec(function(e){t(e)},function(e){n(e)},"WebIntent","getUri",[])},t.prototype.getExtra=function(t,n,r){return e.exec(function(e){n(e)},function(e){r(e)},"WebIntent","getExtra",[t])},t.prototype.onNewIntent=function(t){return e.exec(function(e){t(e)},function(e){},"WebIntent","onNewIntent",[])},e.addConstructor(function(){e.addPlugin("webintent",new t)}),t}),define("funf",["./webintent"],function(e){var t="edu.mit.media.funf.RECORD",n="edu.mit.media.funf.ARCHIVE",r="mainPipeline",i=function(e){console.assert(e.indexOf("-")<0,"funf doesn't like hyphens in the appName"),this.appName=e};return i.prototype={},i.prototype.record=function(e,n){typeof n=="object"&&(n=JSON.stringify(n)),console.log("CSA FUNF "+e+" / "+n);try{var i=document.createEvent("CustomEvent"),s={name:e,value:n,millis:Date.now()},o={action:t,method:"sendBroadcast",extras:{DATABASE_NAME:r,TIMESTAMP:Math.floor(Date.now()/1e3),NAME:this.appName,VALUE:JSON.stringify(s)}};i.initCustomEvent("intent-addon",!0,!0,o),document.documentElement.dispatchEvent(i)}catch(u){console.log("Sending custom event failed: "+u)}},i.prototype.archive=function(){try{var e=document.createEvent("CustomEvent"),t={action:n,method:"sendBroadcast",extras:{DATABASE_NAME:r}};e.initCustomEvent("intent-addon",!0,!0,t),document.documentElement.dispatchEvent(e)}catch(i){console.log("Sending custom event failed: "+i)}},window&&window.Cordova&&window.Cordova.exec&&window.device&&window.device.platform==="Android"&&(i.prototype.record=function(n,i){typeof i=="object"&&(i=JSON.stringify(i));var s=new e,o={name:n,value:i,millis:Date.now()};s.sendBroadcast({action:t,extras:{DATABASE_NAME:r,TIMESTAMP:Math.floor(Date.now()/1e3),NAME:this.appName,VALUE:JSON.stringify(o)}},function(e){},function(e){console.error("Funf logging failed.")})},i.prototype.archive=function(){(new e).sendBroadcast({action:n,extras:{DATABASE_NAME:r}},function(){},function(){})}),i}),define("lawnchair/core",[],function(){var e=function(t,n){if(!(this instanceof e))return new e(t,n);if(!JSON)throw"JSON unavailable! Include http://www.json.org/json2.js to fix.";if(!(arguments.length<=2&&arguments.length>0))throw"Incorrect # of ctor args!";n=typeof arguments[0]=="function"?arguments[0]:arguments[1],t=typeof arguments[0]=="function"?{}:arguments[0];if(typeof n!="function")throw"No callback was provided";this.record=t.record||"record",this.name=t.name||"records";var r;if(t.adapter){for(var i=0,s=e.adapters.length;i<s;i++)if(e.adapters[i].adapter===t.adapter){r=e.adapters[i].valid()?e.adapters[i]:undefined;break}}else for(var i=0,s=e.adapters.length;i<s;i++){r=e.adapters[i].valid()?e.adapters[i]:undefined;if(r)break}if(!r)throw"No valid adapter.";for(var o in r)this[o]=r[o];for(var i=0,s=e.plugins.length;i<s;i++)e.plugins[i].call(this);this.init(t,n)};return e.adapters=[],e.adapter=function(t,n){n.adapter=t;var r="adapter valid init keys save batch get exists all remove nuke".split(" "),i=this.prototype.indexOf;for(var s in n)if(i(r,s)===-1)throw"Invalid adapter! Nonstandard method: "+s;e.adapters.splice(0,0,n)},e.plugins=[],e.plugin=function(t){for(var n in t)n==="init"?e.plugins.push(t[n]):this.prototype[n]=t[n]},e.prototype={isArray:Array.isArray||function(e){return Object.prototype.toString.call(e)==="[object Array]"},indexOf:function(e,t,n,r){if(e.indexOf)return e.indexOf(t);for(n=0,r=e.length;n<r;n++)if(e[n]===t)return n;return-1},lambda:function(e){return this.fn(this.record,e)},fn:function(e,t){return typeof t=="string"?new Function(e,t):t},uuid:function(){var e=function(){return((1+Math.random())*65536|0).toString(16).substring(1)};return e()+e()+"-"+e()+"-"+e()+"-"+e()+"-"+e()+e()+e()},each:function(e){var t=this.lambda(e);if(this.__results)for(var n=0,r=this.__results.length;n<r;n++)t.call(this,this.__results[n],n);else this.all(function(e){for(var n=0,r=e.length;n<r;n++)t.call(this,e[n],n)});return this}},e}),define("lawnchair/adapters/indexed-db.js",[],function(){return function(e){e.adapter("indexed-db",function(){function e(e,t){console.error("error in indexed-db adapter!",e,t)}var t="lawnchair",n=2,r=function(){return window.indexedDB||window.webkitIndexedDB||window.oIndexedDB||window.msIndexedDB},i=function(){return window.IDBTransaction||window.webkitIDBTransaction||window.mozIDBTransaction||window.oIDBTransaction||window.msIDBTransaction},s=function(){return window.IDBKeyRange||window.webkitIDBKeyRange||window.mozIDBKeyRange||window.oIDBKeyRange||window.msIDBKeyRange},o=function(){return window.IDBDatabaseException||window.webkitIDBDatabaseException||window.mozIDBDatabaseException||window.oIDBDatabaseException||window.msIDBDatabaseException},u=i()&&"READ_WRITE"in i()?i().READ_WRITE:"readwrite";return{valid:function(){return!!r()},init:function(i,s){this.idb=r(),this.waiting=[];var u=this.idb.open(this.name,n),a=this,f=a.fn(a.name,s),l=function(){return u.onupgradeneeded=u.onsuccess=u.error=null,f.call(a,a)},c=function(e,n){try{a.db.deleteObjectStore("teststore")}catch(r){}try{a.db.deleteObjectStore(t)}catch(i){}a.db.createObjectStore(t),a.store=!0};u.onupgradeneeded=function(e){a.db=u.result,a.transaction=u.transaction,c(e.oldVersion,e.newVersion)},u.onsuccess=function(t){a.db=u.result;if(a.db.version!=""+n){var r=a.db.version,i=a.db.setVersion(""+n);i.onsuccess=function(e){var t=i.result;i.onsuccess=i.onerror=null,c(r,n),t.oncomplete=function(){for(var e=0;e<a.waiting.length;e++)a.waiting[e].call(a);a.waiting=[],l()}},i.onerror=function(t){i.onsuccess=i.onerror=null,console.log("Failed to create objectstore "+t),e(t)}}else{a.store=!0;for(var s=0;s<a.waiting.length;s++)a.waiting[s].call(a);a.waiting=[],l()}},u.onblocked=function(e){console.log("onblocked!")},u.onerror=function(e){if(u.errorCode===o().VERSION_ERR)return a.idb.deleteDatabase(a.name),a.init(i,s);console.error("Failed to open database")}},save:function(n,r){if(!this.store){this.waiting.push(function(){this.save(n,r)});return}var i=this,s,o=function(e){s.onsuccess=s.onerror=null,r&&(n.key=e.target.result,i.lambda(r).call(i,n))},a=this.db.transaction(t,u),f=a.objectStore(t);return s=n.key?f.put(n,n.key):f.put(n),s.onsuccess=o,s.onerror=e,this},batch:function(e,t){var n=[],r=!1,i=this,s=function(t){n.push(t),r=n.length===e.length},o=setInterval(function(){r&&(t&&i.lambda(t).call(i,n),clearInterval(o))},200);for(var u=0,a=e.length;u<a;u++)this.save(e[u],s);return this},get:function(n,r){if(!this.store){this.waiting.push(function(){this.get(n,r)});return}var i=this,s=function(e){r&&i.lambda(r).call(i,e.target.result)};if(!this.isArray(n)){var o=this.db.transaction(t).objectStore(t).get(n);o.onsuccess=function(e){o.onsuccess=o.onerror=null,s(e)},o.onerror=function(t){console.log("Failed to find "+n),o.onsuccess=o.onerror=null,e(t)}}else{var u=[],a=!1,f=n,l=function(e){u.push(e),a=u.length===f.length,a&&i.lambda(r).call(i,u)};for(var c=0,h=f.length;c<h;c++)this.get(f[c],l)}return this},exists:function(n,r){if(!this.store){this.waiting.push(function(){this.exists(n,r)});return}var i=this,o=this.db.transaction(t).objectStore(t).openCursor(s().only(n));return o.onsuccess=function(e){o.onsuccess=o.onerror=null;var t;i.lambda(r).call(i,e.target.result!==null&&e.target.result!==t)},o.onerror=function(t){o.onsuccess=o.onerror=null,console.log("Failed to test for "+n),e(t)},this},all:function(e){if(!this.store){this.waiting.push(function(){this.all(e)});return}var n=this.fn(this.name,e)||undefined,r=this,i=this.db.transaction(t).objectStore(t),s=[];return i.openCursor().onsuccess=function(e){var t=e.target.result;t?(s.push(t.value),t["continue"]()):n&&n.call(r,s)},this},remove:function(n,r){if(!this.store){this.waiting.push(function(){this.remove(n,r)});return}typeof n=="object"&&(n=n.key);var i=this,s,o=function(){s.onsuccess=s.onerror=null,r&&i.lambda(r).call(i)};return s=this.db.transaction(t,u).objectStore(t)["delete"](n),s.onsuccess=o,s.onerror=e,this},nuke:function(n,r){if(!this.store){this.waiting.push(function(){this.nuke(n,r)});return}var i=this,s=n?function(){i.lambda(n).call(i)}:function(){};if(r){this.waiting.length&&e(),this.idb.deleteDatabase(this.name),delete this.store,delete this.waiting,s();return}try{this.db.transaction(t,u).objectStore(t).clear().onsuccess=s}catch(o){e()}return this}}}())}}),define("lawnchair/adapters/dom.js",[],function(){return function(e){e.adapter("dom",function(){var e=window.localStorage,t=function(t){return{key:t+"._index_",all:function(){var t=e.getItem(this.key);return t&&(t=JSON.parse(t)),t===null&&e.setItem(this.key,JSON.stringify([])),JSON.parse(e.getItem(this.key))},add:function(t){var n=this.all();n.push(t),e.setItem(this.key,JSON.stringify(n))},del:function(t){var n=this.all(),r=[];for(var i=0,s=n.length;i<s;i++)n[i]!=t&&r.push(n[i]);e.setItem(this.key,JSON.stringify(r))},find:function(e){var t=this.all();for(var n=0,r=t.length;n<r;n++)if(e===t[n])return n;return!1}}};return{valid:function(){return!!e},init:function(e,n){this.indexer=t(this.name),n&&this.fn(this.name,n).call(this,this)},save:function(t,n){var r=t.key?this.name+"."+t.key:this.name+"."+this.uuid();return this.indexer.find(r)===!1&&this.indexer.add(r),delete t.key,e.setItem(r,JSON.stringify(t)),t.key=r.slice(this.name.length+1),n&&this.lambda(n).call(this,t),this},batch:function(e,t){var n=[];for(var r=0,i=e.length;r<i;r++)this.save(e[r],function(e){n.push(e)});return t&&this.lambda(t).call(this,n),this},keys:function(e){if(e){var t=this.name,n=this.indexer.all().map(function(e){return e.replace(t+".","")});this.fn("keys",e).call(this,n)}return this},get:function(t,n){if(this.isArray(t)){var r=[];for(var i=0,s=t.length;i<s;i++){var o=this.name+"."+t[i],u=e.getItem(o);u&&(u=JSON.parse(u),u.key=t[i],r.push(u))}n&&this.lambda(n).call(this,r)}else{var o=this.name+"."+t,u=e.getItem(o);u&&(u=JSON.parse(u),u.key=t),n&&this.lambda(n).call(this,u)}return this},exists:function(e,t){var n=this.indexer.find(this.name+"."+e)===!1?!1:!0;return this.lambda(t).call(this,n),this},all:function(t){var n=this.indexer.all(),r=[],i,s;for(var o=0,u=n.length;o<u;o++)s=n[o],i=JSON.parse(e.getItem(s)),i.key=s.replace(this.name+".",""),r.push(i);return t&&this.fn(this.name,t).call(this,r),this},remove:function(t,n){var r=this.name+"."+(t.key?t.key:t);return this.indexer.del(r),e.removeItem(r),n&&this.lambda(n).call(this),this},nuke:function(e){return this.all(function(t){for(var n=0,r=t.length;n<r;n++)this.remove(t[n]);e&&this.lambda(e).call(this)}),this}}}())}}),define("lawnchair/adapters/window-name.js",[],function(){return function(e){e.adapter("window-name",function(e,t){typeof window=="undefined"&&(window={top:{}});var n=window.top.name?JSON.parse(window.top.name):{};return{valid:function(){return typeof window.top.name!="undefined"},init:function(r,i){n[this.name]=n[this.name]||{index:[],store:{}},e=n[this.name].index,t=n[this.name].store,this.fn(this.name,i).call(this,this)},keys:function(t){return this.fn("keys",t).call(this,e),this},save:function(r,i){var s=r.key||this.uuid();return this.exists(s,function(o){o||(r.key&&delete r.key,e.push(s)),t[s]=r,window.top.name=JSON.stringify(n),i&&(r.key=s,this.lambda(i).call(this,r))}),this},batch:function(e,t){var n=[];for(var r=0,i=e.length;r<i;r++)this.save(e[r],function(e){n.push(e)});return t&&this.lambda(t).call(this,n),this},get:function(e,n){var r;if(this.isArray(e)){r=[];for(var i=0,s=e.length;i<s;i++)r.push(t[e[i]])}else r=t[e],r&&(r.key=e);return n&&this.lambda(n).call(this,r),this},exists:function(e,n){return this.lambda(n).call(this,!!t[e]),this},all:function(n){var r=[];for(var i=0,s=e.length;i<s;i++){var o=t[e[i]];o.key=e[i],r.push(o)}return this.fn(this.name,n).call(this,r),this},remove:function(r,i){var s=this.isArray(r)?r:[r];for(var o=0,u=s.length;o<u;o++)delete t[s[o]],e.splice(this.indexOf(e,s[o]),1);return window.top.name=JSON.stringify(n),i&&this.lambda(i).call(this),this},nuke:function(r){return t={},e=[],window.top.name=JSON.stringify(n),r&&this.lambda(r).call(this),this}}}())}}),define("lawnchair/lawnchair",["./core","./adapters/indexed-db.js","./adapters/dom.js","./adapters/window-name.js"],function(e){for(var t=arguments.length-1;t>0;t--)arguments[t](e);return e}),define("nell",["./alea","./lawnchair/lawnchair"],function(e,t){var n=["n0","n1","n2","n3","n4","n5","n6","n7","n8","n9","n10"],r=e.Random(),i=function(e,t,n,r){e.exists(t,function(i){i?e.get(t,r):r(n)})},s=function(e,t){this.lawnchair=e,t?this.setColor(t):(this.setColor(r.choice(n)),this.saveColor())};s.prototype={},s.prototype.setColor=function(e){document.body.classList.remove(this.color||"n0"),this.color=e,document.body.classList.add(this.color)},s.prototype.saveColor=function(){this.lawnchair.save({key:"color",value:this.color,timestamp:Date.now()},function(){})},s.prototype.switchColor=function(){var e=n.filter(function(e){return e!==this.color}.bind(this));this.setColor(r.choice(e)),this.saveColor(),this.funf&&this.funf.record("colorchange",this.color)};var o=function(e){var n=function(t){i(t,"color",null,function(n){e(new s(t,n&&n.value))})};t({name:"nell"},function(){n(this)})};return{load:function(e,t,n,r){r.isBuild||typeof document=="undefined"?n(null):o(n)}}}),define("score",["./lawnchair/lawnchair"],function(e){var t=function(e,t,n,r){e.exists(t,function(i){i?e.get(t,r):r(n)})},n=function(e,t){this.lawnchair=e,this.unlocked=t||{}};n.prototype={},n.prototype._get=function(e,t,n){if(!this.unlocked[e]){if(!n)return{};this.unlocked[e]={}}if(!this.unlocked[e][t]){if(!n)return{};this.unlocked[e][t]={}}return this.unlocked[e][t]},n.prototype.isCompleted=function(e,t){return!!this._get(e,t).firstCompleted},n.prototype.numStars=function(e,t){return this._get(e,t).numStars||0},n.prototype.setCompleted=function(e,t,n){var r=this._get(e,t,!0),i=r.numStars||0,s=!r.firstCompleted||n>i;if(!s)return;r.firstCompleted||(r.firstCompleted=Date.now()),r.lastCompleted=Date.now(),r.numStars=n,this.funf&&this.funf.record("unlocked",{level:e,altitude:t,numStars:n,firstCompleted:r.firstCompleted}),this.save()},n.prototype.save=function(){this.lawnchair.save({key:"unlocked",value:this.unlocked})};var r=function(r){var i=function(e){t(e,"unlocked",{},function(t){r(new n(e,t.value))})};e({name:"score"},function(){i(this)})};return{load:function(e,t,n,i){i.isBuild||typeof document=="undefined"?n(null):r(n)}}}),define("sound",[],function(){function r(){}function s(e,t){var n=new e({url:t.url,instances:t.instances,callback:t.callback,errback:t.errback})}function o(t){var n=t.url;if(!n)throw"you must pass a URL to Effect.";var s=new i(n,t.formats||[],t.instances||e,t.callback?function(e,t){return function(){t(e)}}(this,t.callback):r,t.errback||r);this.__defineGetter__("audio",function(){return s.getInstance()}),this.__defineGetter__("url",function(){return n}),this.play=function(){var e=this.audio;return e?(e.play(),e):null},this.loop=function(){s.loop()},this.unloop=function(){s.unloop()}}function u(e){e.instances=1,o.call(this,e)}var e=4,t={mp3:"audio/mpeg",ogg:"audio/ogg",wav:"audio/wav",aac:"audio/aac",webm:"audio/webm",m4a:"audio/x-m4a"},n=function(){return"Audio"in window?window.Audio:function(){return document.createElement("audio")}}(),i=function(e,r,i,s,o){var u=new n,a=!1,f=[];u.autobuffer=!0,u.preload="auto",u.addEventListener("error",function(){o(u.error)},!1),u.addEventListener("canplaythrough",function(){if(a)return;while(i--)f.push(u.cloneNode(!0));a=!0,s()},!1);var l=function(e){return e.split(".").pop()},c=function(e){var n=document.createElement("source");n.src=e,t[l(e)]&&(n.type=t[l(e)]),u.appendChild(n)};r&&r.length>0?r.forEach(function(t){c(e+"."+t)}):c(e),this.getInstance=function(){var e,t,n;for(n=0,t=f.length;n<t;n++){e=f[n];if(e.paused||e.ended)return e.ended&&(e.currentTime=0),e}return f.length===0?null:(e=f[0],e.pause(),e.currentTime=0,e)};var h=function(){u.currentTime=0,u.play()};this.loop=function(){u.loop=!0,u.addEventListener("ended",h,!1),u.play()},this.unloop=function(){if(!u.loop)return;u.pause(),u.removeAttribute("loop"),u.removeEventListener("ended",h,!1);try{u.currentTime=0}catch(e){console.log("AUDIO PROBLEM: "+e)}}};return window.cordovaDetect&&(i=function(e,t,n,r,i){var s=[],o=[];e="/android_asset/www/"+e,t&&t.length>0&&(e+="."+t[0]),this.getInstance=function(){var t,r,i;for(i=0,r=s.length;i<r;i++){t=s[i];if(o[i])return t.seekTo(0),o[i]=!1,t}return r<n?(s[r]=t=new Media(e,function(){o[r]=!0}),o[r]=!1,t):s.length===0?null:(t=s[0],t.seekTo(0),t)};var u=null;this.loop=function(){var t;u&&this.unloop();var n=function(){if(u===null||u.id!==t.id)return;t.seekTo(0),t.play()};u=t=new Media(e,n),u.play()},this.unloop=function(){var e=u;u=null,e&&(e.stop(),e.release())},r()}),o.load=function(e){s(o,e)},u.load=function(e){s(u,e)},{Effect:o,Track:u}}),define("version",[],function(){return"7"}),define("index",["domReady!","./alea","./compat","./funf","nell!","score!","sound","./version"],function(e,t,n,r,s,o,u,a){function Ht(){C.record("startColor",s.color),C.record("startVersion",a);var t=function(){var t=e.body,n=t.parentElement.offsetWidth;if(n>=800)t.style.width=t.style.height=t.style.WebkitTransform=t.style.MozTransform=t.style.transform="";else{var r=n/800;t.style.width="800px",t.style.height=100/r+"%";var i="scale("+r+")";t.style.WebkitTransform="translate3d(0,0,0) "+i,t.style.MozTransform=t.style.transform=i}};window.addEventListener("resize",t,!1),t(),window.GameMode=pt,pt.Menu.switchLevel(vt[0]),pt.switchTo(pt.Menu),E&&(history.replaceState(pt.currentMode.toJSON(),f+" | Menu","#menu"),window.addEventListener("popstate",_t,!1));if(window&&window.navigator&&window.navigator.mozApps&&window.navigator.mozApps.getSelf&&window.navigator.mozApps.install){var n=window.navigator.mozApps.getSelf();n.onsuccess=function(){n.result?C.record("installed","yes"):(C.record("installed","no"),pt.Install.doInstall=function(e){var t=window.navigator.mozApps.install("http://nell-balloons.github.cscott.net/manifest.webapp");t.onsuccess=function(){C.record("installed","success"),e(!0)},t.onerror=function(){C.record("installerror",this.error.name),e(!1)}},pt.Install.push())},n.onerror=function(){C.record("installerror",this.error.name),console.log("Error checking installation status: "+this.error.name)}}var r=!1;if(window.cordovaDetect)r=!0;else if(window.navigator){var i=window.navigator.platform.toLowerCase(),o=window.navigator.userAgent.toLowerCase();if(i.indexOf("android")>=0||o.indexOf("android;")>=0||o.indexOf(" android ")>=0||o.indexOf("tablet;")>=0||o.indexOf("fennec")>=0)r=!0}if(r)if(window.matchMedia){var u=window.matchMedia("screen and (orientation: landscape)"),l=function(e){var t=!e.matches;Dt(t)};u.addListener(l),l(u)}else"orientation"in window&&(window.addEventListener("orientationchange",Pt,!1),Pt());e.addEventListener("backbutton",function(){E?history.back():pt.currentMode===pt.Playing&&pt.switchTo(pt.Menu)},!1),e.addEventListener("pause",Ct,!1),e.addEventListener("resume",kt,!1),Ot();var c=window.cordovaDetect&&window.device&&window.device.platform==="Android"&&window.device.name==="tervigon";c||e.body.classList.add("anim")}var f=e.title="Nell's Balloons",l="sounds/barrios_gavota",c=["black","lilac","orange","yellow"],h=.05,p=.8,d=.25,v=1e3,m=h,g=2,y=!1,w=!1,E=history.pushState&&history.replaceState,S=t.Random(),x=e.getElementById("game"),T=e.getElementById("buttons"),N=e.getElementById("balloons"),C=s.funf=o.funf=new r("NellBalloons"+a),k,L,A,O,M=["ground","troposphere","stratosphere","mesosphere"];M.forEach(function(e,t){M[e]=t}),M.toNum=function(e){return M[e]};var _=[["a1",1],["a2",.5],["a3",1/8+1/6],["a4",.1875],["a5",.13125],["a6",1/64+1/12]],D=function(e,t){var n;for(n=0;n<e.length;n++)t(e[n],n)},P=0,H=function(){P=(P+1)%6;var e,t;for(e=0,sum=0;e<_.length;e++){if(!P){t=O[_[e][0]];if(t.size>=0)continue}sum+=_[e][1]}var n=S()*sum;for(e=0,sum=0;e<_.length;e++){if(!P){t=O[_[e][0]];if(t.size>=0)continue}sum+=_[e][1];if(n<sum)return _[e][0]}return _[_.length-1][0]},B=function(){var t;for(t=0;t<_.length;t++){var n=O[_[t][0]];if(n.size>=0){n.shrink();if(n.size<0){var r=e.querySelector("#awards .award."+_[t][0]);r.classList.remove("show")}return}}},j=function(){for(i=0;i<_.length;i++){var e=O[_[i][0]];if(e.size<0)return}if(pt.currentMode!==pt.Playing)return;var t=_.map(function(e){return O[e[0]].size});C.record("mode",{name:"playing",type:"levelcomplete",stars:wt.stars,streak:wt.streak,smoothedHeight:wt.smoothedHeight,sprouts:t,level:pt.Playing.currentLevel.num,altitude:M.toNum(pt.Playing.currentAltitude)}),o.setCompleted(pt.Playing.currentLevel.levelClass,pt.Playing.currentAltitude,wt.stars),it(),ct[0].play(),pt.StarThrob.push()},F=function(e,t){this.domElement=e,this.domElement.classList.add(t),this.color=t};F.prototype={},F.prototype.reset=function(e){this.domElement.classList.remove(this.color),this.domElement.classList.add(e),this.color=e},F.prototype.attach=function(e){e.appendChild(this.domElement)},F.prototype.detach=function(){this.domElement.parentElement.removeChild(this.domElement)};var I=function(t){F.call(this,e.createElement("a"),t),this.domElement.href="#";var n=!!window.cordovaDetect;["mousedown","touchstart"].forEach(function(e){if(n&&e[0]==="m")return;this.domElement.addEventListener(e,this.highlight.bind(this),!1)}.bind(this)),["mouseup","mouseout","touchcancel","touchend"].forEach(function(e){if(n&&e[0]==="m")return;this.domElement.addEventListener(e,this.unhighlight.bind(this),!1)}.bind(this)),this.domElement.addEventListener("click",function(e){e.preventDefault()},!1),this.ignoreMouse=!1};I.prototype=Object.create(F.prototype),I.prototype.highlight=function(e){switch(e.type){case"touchstart":this.ignoreMouse=!0;break;case"mousedown":if(this.ignoreMouse)return}this.domElement.classList.add("hover"),e.preventDefault(),this.fast&&this.ignoreMouse&&this.handleClick()},I.prototype.unhighlight=function(e){switch(e.type){case"mouseup":case"mouseout":if(this.ignoreMouse)return}this.domElement.classList.remove("hover"),e.preventDefault(),e.type!=="touchcancel"&&e.type!=="mouseout"&&(!this.fast||!this.ignoreMouse)&&this.handleClick(),this.ignoreMouse=!1};var q=function(t){I.call(this,t),this.domElement.appendChild(e.createElement("span")),this.attach(T),this.fast=!0};q.prototype=Object.create(I.prototype),q.prototype.handleClick=function(){if(pt.currentMode!==pt.Playing)return;L(this.color)};var R=function(e){I.call(this,"tag"),this.altitude=e};R.prototype=Object.create(I.prototype),R.prototype.handleClick=function(){this.altitudeClicked(this.altitude)};var U=["var1","var2","var3","var4"],z=function(t){t=t||S.choice(k).color,F.call(this,e.createElement("div"),t),this.balloon=e.createElement("div"),this.balloon.classList.add("balloon"),this.payload=e.createElement("div"),this.payload.classList.add("payload"),this.domElement.appendChild(this.payload),this.domElement.appendChild(this.balloon),this.attach(N),this.reset(this.color),this.refresh()};z.prototype=Object.create(F.prototype),z.prototype.doBirth=function(){this.born=!0,this.bornTime=Date.now(),this.pauseTime=0,this.height=this.domElement.offsetHeight,this.maxx=N.offsetWidth-this.domElement.offsetWidth,this.x=Math.floor(S()*this.maxx),this.y=N.offsetHeight,this.fastY=this.y-this.height,this.speedy=(.9+.2*S())*m,this.speedx=(2*S()-1)*this.speedy*d,C.record("born",this.color)},z.prototype.reset=function(e){e=e||S.choice(k).color,e!==this.color&&F.prototype.reset.call(this,e),U.forEach(function(e){this.domElement.classList.remove(e)}.bind(this)),this.domElement.classList.add(S.choice(U)),this.born=!1,this.bornTime=this.pauseTime=0,this.bornTimeout=0,this.popped=this.popDone=!1,["popped","squirt","payload-dropped"].forEach(function(e){this.domElement.classList.remove(e)}.bind(this)),this.award=null,this.x=0,this.y=N.offsetHeight},z.prototype.refresh=function(){if(this.popped)return;var e=Math.round(this.x)+"px,"+Math.round(this.y)+"px";this.domElement.style.WebkitTransform="translate3d("+e+",0)",this.domElement.style.MozTransform=this.domElement.style.transform="translate("+e,0/0},z.prototype.update=function(t){if(!this.born){this.bornTimeout-=t,this.bornTimeout<0&&this.doBirth();return}if(this.popped){this.popTimeout-=t;if(this.popTimeout<0){this.popDone=!0,this.domElement.classList.contains("squirt")&&S.choice(ot).play();if(this.award){var n=e.querySelector("#awards .award."+this.award),r=O[this.award];r.size>=0&&n.classList.add("show"),n.style.WebkitTransform=n.style.MozTransform=n.style.transform="";var i=e.querySelector("#awards .award.flex");i.style.display="none",j()}}return}if(this.y>this.fastY){var s=(this.y-this.fastY)/p;s>t?this.y-=t*p:this.y=this.fastY-(t-s)*this.speedy}else this.y-=t*this.speedy;this.x+=t*this.speedx,this.x<0&&(this.x=0,this.speedx=0),this.x>this.maxx&&(this.x=this.maxx,this.speedx=0)},z.prototype.isGone=function(){return this.born?this.y<-this.height||this.popDone:!1},z.prototype.pop=function(){this.popped=!0;var t=S()<1/3.5;w&&(t=!0);var n=S()<1/15,r=t?lt:n?ut:ot;S.choice(r).play(),this.domElement.classList.add("payload-dropped");if(t){this.domElement.classList.add("popped"),this.popTimeout=250,this.award=H();var i=e.querySelector("#awards .award."+this.award),s=O[this.award];if(s.size>=0){var o=e.querySelector("#awards .award.flex");o.style.top=i.offsetTop+"px",o.style.left=i.offsetLeft+"px",o.style.display="block",o.className="award flex "+this.award,i=o,this.popTimeout=750}var u=i.offsetTop+i.offsetParent.offsetTop,a=i.offsetLeft+i.offsetParent.offsetLeft,f=Math.round(this.x-a+23),l=Math.round(this.y-u+20),c=f+"px,"+l+"px";i.style.WebkitTransform="translate3d("+c+",0)",i.style.MozTransform=i.style.transform="translate("+c+")",s.grow(),$()}else n?(this.domElement.classList.add("squirt"),this.popTimeout=2e3):(this.domElement.classList.add("popped"),this.popTimeout=250)};var W=function(){function n(t){var n;for(n=0;t*n<e.length;n++)e[n]=e[t*n];e.length=n}var e=[[.143,.078]],t=function(t,n){var r,i,s,o=e[e.length-1];for(r=1;r<=t;r++)i=(n[0]-o[0])*r/t,s=(n[1]-o[1])*r/t,e.push([o[0]+i,o[1]+s])};return t(1,[.215,.118]),t(1,[.287,.156]),t(5,[.857,.469]),t(16,[1,1]),n(2),Object.freeze(e),e}(),X=function(t){this.awardClass=t,this.domElement=e.querySelector("#sprouts .award."+t),this.setSize(-1)};X.prototype={},X.prototype.grow=function(){this.setSize(this.size+1)},X.prototype.shrink=function(){this.setSize(this.size-1)},X.prototype.setSize=function(e){var t,n,r;e=Math.max(-1,Math.min(e,W.length-1)),e=Math.round(e);if(this.size===e)return;this.size=e,e<0?(this.domElement.classList.remove("show"),t=n=""):(this.domElement.classList.add("show"),r=W[e],t="scale("+r[0]+","+r[1]+")",n="translate3d(0,0,0) "+t),this.domElement.style.WebkitTransform=n,this.domElement.style.MozTransform=this.domElement.style.transform=t,this.setTime()},X.prototype.setTime=function(e,t){this.domElement.style.webkitTransitionDuration=this.domElement.style.mozTransitionDuration=this.domElement.style.transitionDuration=e||"",this.domElement.style.webkitTransitionDelay=this.domElement.style.mozTransitionDelay=this.domElement.style.transitionDelay=t||""},O={},_.forEach(function(e){O[e[0]]=new X(e[0])}),Object.freeze(O);var V=function(){if(!(o.recent&&o.recent.length>=_.length))return;_.forEach(function(t,n){var r=O[t[0]];r.setSize(o.recent[n]);if(r.size>=0){var i=e.querySelector("#awards .award."+t[0]);i.classList.add("show")}})},$=function(){var e=_.map(function(e){return O[e[0]].size});o.save(e)};k=[];var J=function(){while(k.length>0)b=k.pop(),b.detach();var e=c.slice(0);S.shuffle(e),e.forEach(function(e){var t=new q(e);k.push(t)})};J();var K=function(e){var t=e.changedTouches,n,r;for(n=0;n<t.length;n++){var i=t[n];for(r=0;r<k.length;r++){var s=k[r];if(i.target===s.domElement||i.target===s.domElement.firstChild)e.type==="touchstart"?(s.domElement.classList.add("hover"),s.handleClick()):s.domElement.classList.remove("hover")}}return e.stopPropagation(),e.preventDefault(),!1};["touchstart","touchend","touchcancel"].forEach(function(t){e.getElementById("buttons").addEventListener(t,K,!0)}),altitudeStars=[];var Q=function(){M.forEach(function(t){var n=new R(t);n.attach(e.querySelector("#menu .awards > ."+t)),altitudeStars.push(n)})};Q();var G=[];while(G.length<g)G.push(new z);var Y=null,Z=function(){return null},et=function(){},tt=function(e){e.y<-4?G.forEach(function(e){e.speedx-=50}):e.y>4&&G.forEach(function(e){e.speedx+=50})};navigator.accelerometer&&(Z=function(){return navigator.accelerometer.watchAcceleration(tt,function(){},{frequency:80})},et=function(e){navigator.accelerometer.clearWatch(e)});var nt,rt=function(e){nt&&nt.origSrc!==e&&(it(),nt=null),nt||(nt=new u.Track({url:e,formats:["webm"]}),nt.origSrc=e),nt.loop()},it=function(){nt&&nt.unloop()},st=function(e){return e.map(function(e){return new u.Effect({url:e,instances:2,formats:["webm"]})})},ot=st(["sounds/burst1","sounds/burst2","sounds/burst3","sounds/burst4","sounds/burst5","sounds/burst6","sounds/burst7"]),ut=st(["sounds/deflate1","sounds/deflate2"]),at=st(["sounds/wrong1"]),ft=st(["sounds/wrong2"]),lt=st(["sounds/award"]),ct=st(["sounds/levelwin","sounds/levellose"]),ht=function(e,t,n,r){var i=r?t&&t[r]:t,s=r?n[r]:n;return i&&e.classList.remove(i),e.classList.add(s),n},pt=function(e){this.bodyClass=e,this.active=!1};pt.prototype={},pt.prototype.enter=function(){this.resume(),e.body.classList.add(this.bodyClass),this.active=!0},pt.prototype.leave=function(){this.pause(),e.body.classList.remove(this.bodyClass),this.active=!1},pt.prototype.pause=function(){e.body.classList.add("paused")},pt.prototype.resume=function(){e.body.classList.remove("paused")},pt.prototype.toJSON=function(){return{mode:this.bodyClass}},pt.currentMode=null,pt.switchTo=function(e){pt.currentMode&&pt.currentMode.leave(),pt.currentMode=e,pt.currentMode.enter()},pt.Menu=new pt("menu"),pt.Menu.toJSON=function(){return{mode:"Menu",level:this.currentLevel.num}},pt.Menu.enter=function(e){return function(){e.call(this),C.record("mode",{name:"menu"}),this.syncExposed()}}(pt.Menu.enter),pt.Menu.start=function(e){if(pt.Playing.currentLevel!==this.currentLevel||pt.Playing.currentAltitude!==e)pt.Playing.switchLevel(this.currentLevel),pt.Playing.switchAltitude(e),pt.Playing.reset();E&&history.replaceState(pt.currentMode.toJSON(),f+" | Menu","#menu"),pt.switchTo(pt.Playing),E&&history.pushState(pt.currentMode.toJSON(),f+" | Play!","#play"),C.record("mode",{name:"playing",type:"levelstart",level:pt.Playing.currentLevel.num,altitude:M.toNum(pt.Playing.currentAltitude)})},pt.Menu.switchLevel=function(t){var n=e.querySelector("#menu .level");this.currentLevel=ht(n,this.currentLevel,t,"levelClass");var r=e.querySelector("#menu .levelnav .dot.on");r&&r.classList.remove("on"),t.dot.classList.add("on");var i=e.querySelector("#menu .levelnav .prev");i.classList.remove("hidden"),t.prevLevel||i.classList.add("hidden");var s=e.querySelector("#menu .levelnav .next");s.classList.remove("hidden"),t.nextLevel||s.classList.add("hidden"),this.syncExposed()},pt.Menu.syncExposed=function(){this.setExposed("none",0);if(this.currentLevel.prevLevel&&!o.isCompleted(this.currentLevel.prevLevel.levelClass,M[M.length-1]))return;for(i=0;i<M.length;i++){var e=o.numStars(this.currentLevel.levelClass,M[i]);this.setExposed(M[i],e);if(!o.isCompleted(this.currentLevel.levelClass,M[i]))break}},pt.Menu.setExposed=function(t,n){var r=e.querySelector("#menu .level"),i=this.currentExposed&&"exposed-"+this.currentExposed;ht(r,i,"exposed-"+t),this.currentExposed=t;if(t==="none")return;var s=e.querySelector("#menu .awards > ."+t+" > .stars");["zero","one","two","three"].forEach(function(e,t){n===t?s.classList.add(e):s.classList.remove(e)})},pt.Menu.prevClicked=function(){if(!this.currentLevel.prevLevel)return;this.switchLevel(this.currentLevel.prevLevel)},pt.Menu.nextClicked=function(){if(!this.currentLevel.nextLevel)return;this.switchLevel(this.currentLevel.nextLevel)},["prev","next"].forEach(function(t){var n=new I(t);n.attach(e.querySelector("#menu .levelnav .inner")),n.handleClick=pt.Menu[t+"Clicked"].bind(pt.Menu),pt.Menu[t+"Arrow"]=n}),R.prototype.altitudeClicked=pt.Menu.start.bind(pt.Menu),pt.OverlayMode=function(e){pt.call(this,e),this.underMode=null},pt.OverlayMode.prototype=Object.create(pt.prototype),pt.OverlayMode.prototype.setUnderMode=function(t){this.underMode=this.active?ht(e.body,this.underMode,t,"bodyClass"):t},pt.OverlayMode.prototype.push=function(){this.lastMode=pt.currentMode,this.setUnderMode(pt.currentMode.underMode||pt.currentMode),pt.switchTo(this)},pt.OverlayMode.prototype.pop=function(){console.assert(pt.currentMode===this),pt.switchTo(this.lastMode)},pt.OverlayMode.prototype.enter=function(t){return function(){t.call(this),this.underMode&&e.body.classList.add(this.underMode.bodyClass)}}(pt.OverlayMode.prototype.enter),pt.OverlayMode.prototype.leave=function(t){return function(){t.call(this),this.underMode&&e.body.classList.remove(this.underMode.bodyClass)}}(pt.OverlayMode.prototype.leave),pt.TransitionOverlayMode=function(e,t){pt.OverlayMode.call(this,e),this.delayMs=t,this.switchId=null},pt.TransitionOverlayMode.prototype=Object.create(pt.OverlayMode.prototype),pt.TransitionOverlayMode.prototype.nextMode=function(){},pt.TransitionOverlayMode.prototype.enter=function(e){return function(){e.call(this);var t=window.device&&window.device.platform==="Android",n=this.delayMs;this.switchTime=Date.now()+n,this.switchId=setTimeout(this.switchMode.bind(this),t&&n?250:n)}}(pt.TransitionOverlayMode.prototype.enter),pt.TransitionOverlayMode.prototype.leave=function(e){return function(){e.call(this);if(this.switchId===null)return;clearTimeout(this.switchId),this.switchId=null}}(pt.TransitionOverlayMode.prototype.leave),pt.TransitionOverlayMode.prototype.switchMode=function(){if(Date.now()<this.switchTime){this.switchId=setTimeout(this.switchMode.bind(this),10);return}this.switchId=null,this.nextMode()||this.pop()},pt.StarThrob=new pt.TransitionOverlayMode("starthrob",5e3),pt.StarThrob.enter=function(e){return function(){this.delayMs=wt.stars===0?0:5e3,e.call(this)}}(pt.StarThrob.enter),pt.StarThrob.nextMode=function(){var e=!!window.cordovaDetect;return _.forEach(function(t){var n=O[t[0]];n.size>=0&&(e?n.setSize(-1):(n.setSize(W.length),n.setTime("3s")))}),e&&(pt.SproutsGrow.delayMs=0),pt.SproutsGrow.push(),!0},pt.SproutsGrow=new pt.TransitionOverlayMode("sproutsgrow",3e3),pt.SproutsGrow.nextMode=function(){return pt.Video.push(),!0},pt.Video=new pt.OverlayMode("video"),pt.Video.enter=function(t){return function(){t.call(this),this.maybeUnloadVideo();var n=pt.Playing.currentLevel,r=pt.Playing.currentAltitude,i=e.querySelector("#video > .inner");this.videoElement=e.createElement("video"),this.videoElement.preload="none",this.videoElement.volume=1,this.videoElement.muted=!1,this.videoElement.poster=n.videoFor(r,"jpg"),this.videoElement.addEventListener("canplay",this.canPlay.bind(this),!1),this.videoElement.addEventListener("loadstart",this.canPlay.bind(this),!1),this.videoElement.addEventListener("ended",this.playEnded.bind(this),!1),["webm"].forEach(function(t){var i=e.createElement("source");i.type="video/"+t,i.src=n.videoFor(r,t),this.videoElement.appendChild(i)}.bind(this)),i.insertBefore(this.videoElement,i.firstChild),["loadstart","durationchange","loadedmetadata","loadeddata","progress","canplay","canplaythrough"].forEach(function(e){this.videoElement.addEventListener(e,function(){console.log("GOT "+e+" EVENT!")},!1)}.bind(this)),this.videoElement.load()}}(pt.Video.enter),pt.Video.canPlay=function(){this.videoElement.play(),e.querySelector("#video").classList.add("playing")},pt.Video.playEnded=function(){e.querySelector("#video").classList.remove("playing")},pt.Video.maybeUnloadVideo=function(){this.videoElement&&(this.videoElement.parentElement.removeChild(this.videoElement),this.videoElement=null),e.querySelector("#video").classList.remove("playing")},pt.Video.leave=function(e){return function(){this.maybeUnloadVideo(),e.call(this)}}(pt.Video.leave),pt.Video.arrow=new I("arrow"),pt.Video.arrow.attach(e.querySelector("#video > .inner")),pt.Video.arrow.handleClick=function(){pt.LevelDone.push()},pt.LevelDone=new pt.TransitionOverlayMode("leveldone",0),pt.LevelDone.nextMode=function(){return pt.Playing.nextAltitude()?(pt.Playing.reset(),_.forEach(function(e){var t=O[e[0]];t.setTime("0s","1s")}),pt.switchTo(pt.Playing),!0):E?(this.currentLevel=pt.Playing.currentLevel,history.back(),!0):(pt.Menu.switchLevel(pt.Playing.currentLevel),pt.switchTo(pt.Menu),!0)},pt.Rotate=new pt.OverlayMode("rotate"),pt.Install=new pt.OverlayMode("install"),e.querySelector("#install .yes").addEventListener("click",function(){pt.Install.maybeInstall(!0)},!1),e.querySelector("#install .no").addEventListener("click",function(){pt.Install.maybeInstall(!1)},!1),pt.Install.maybeInstall=function(e){var t=function(){pt.Install.pop()};e?pt.Install.doInstall(t):t()},pt.Playing=new pt("game"),pt.Playing.toJSON=function(){return{mode:"Playing",level:this.currentLevel.num,altitude:this.currentAltitude}},pt.Playing.reset=function(){m=h,G.forEach(function(e,t){e.reset(),e.bornTimeout=1e3+t*v,e.x=N.offsetWidth||-1e3,e.y=N.offsetHeight||-1e3,e.refresh()}),_.forEach(function(e){var t=O[e[0]];t.setSize(-1),t.setTime("0s")}),D(e.querySelectorAll("#awards .award"),function(e){e.classList.remove("show"),e.style.WebkitTransform=e.style.MozTransform=e.style.transform=""});var t=e.querySelector("#awards .award.flex");t.style.display="none",wt.reset()},pt.Playing.switchLevel=function(t){var n=e.querySelector("#gamelevel.level");this.currentLevel=ht(n,this.currentLevel,t,"levelClass")},pt.Playing.switchAltitude=function(t){var n=e.querySelector("#gamelevel.level");this.currentAltitude=ht(n,this.currentAltitude,t)},pt.Playing.nextAltitude=function(){var e=(M.toNum(this.currentAltitude)+1)%M.length;if(e===0){var t=this.currentLevel.nextLevel;if(t===null)return!1;this.switchLevel(t)}return this.switchAltitude(M[e]),!0},pt.Playing.pause=function(e){return function(){e.call(this),this.pauseTime=Date.now(),C.record("status","pause"),it(),A.id!==null&&(n.cancelAnimationFrame(A.id),A.id=null),Y!==null&&(et(),Y=null),$(),C.archive()}}(pt.Playing.pause),pt.Playing.resume=function(e){return function(){e.call(this);var t=this.pauseTime-Date.now();C.record("status","resume"),rt(this.currentLevel.audioUrl()),A.lastFrame=Date.now(),A.id===null&&(A.id=n.requestAnimationFrame(A)),Y===null&&y&&(Y=Z()),G.forEach(function(e){e.pauseTime+=t})}}(pt.Playing.resume),pt.Playing.pauseTime=Date.now();var dt=function(e){this.levelClass=e};dt.prototype={},dt.prototype.audioUrl=function(){var e="sounds/";switch(this.num){default:case 0:e+="barrios_gavota";break;case 1:e+="letting-go";break;case 2:e+="red-wing";break;case 3:e+="arkansas-traveller"}return e},dt.prototype.videoFor=function(e,t){var n="video/SpaceBalloon"+(1+this.num)+"-"+(1+M.toNum(e));return t==="mp4"?n+"-baseline.mp4":t==="jpg"?n+".jpg":n+"-256k32k.webm"};var vt=[new dt("level1"),new dt("level2"),new dt("level3"),new dt("level4")];vt.forEach(function(t,n){t.num=n,t.prevLevel=vt[n-1]||null,t.nextLevel=vt[n+1]||null,t.dot=e.createElement("div"),t.dot.classList.add("dot"),e.querySelector("#menu .levelnav .inner").appendChild(t.dot)});var mt=.8,gt=0,yt=1e4,bt=function(e,t){var n=Math.max(t/.8,.8)*m,r=N.offsetHeight*.9/e,i=(n+r)/2,s=1.2,o=Math.max(m/s,h),u=Math.min(m*s,p);m=Math.max(o,Math.min(u,i))},wt={SMOOTHING:.85,domElement:e.querySelector("#ruler .foreground"),reset:function(){this.smoothedHeight=1,this.height=1,this.stars=0,this.streak=0,D(e.querySelectorAll("#ruler .stars"),function(e){e.classList.remove("highlight")}),this.domElement.style.height="100%"},adjust:function(t,n){var r=pt.Playing.currentAltitude,i;t?(n-=.1,this.streak++):(this.streak=0,n=1),this.smoothedHeight=Math.max(0,Math.min(1,wt.SMOOTHING*this.smoothedHeight+(1-wt.SMOOTHING)*n)),this.height=this.smoothedHeight*Math.max(.28,Math.pow(.98,this.streak));var s=25*(this.height+M.toNum(r));this.domElement.style.height=s+"%";var o=this.height<.28?3:this.height<.54?2:this.height<.79?1:0,u=function(t){return e.querySelector("#ruler ."+r+" .stars."+["zero","one","two","three"][t])};o!==this.stars&&(i=u(this.stars),i&&i.classList.remove("highlight"),this.stars=o,i=u(this.stars),i&&i.classList.add("highlight"))}};wt.reset();var Et=function(e,t,n){C.record("correct",{color:e,time:t}),yt=mt*yt+(1-mt)*t,gt=mt*gt+(1-mt),bt(yt,gt),wt.adjust(!0,n)},St=function(e,t){C.record("incorrect",{type:e,time:t});var n=yt;t>yt&&(n=mt*yt+(1-mt)*t),gt=mt*gt,bt(n,gt),wt.adjust(!1,1)},xt=null,Tt=null,Nt;L=function(e){var t,n,r=null;for(t=0;t<G.length;t++)n=G[t],n.color===e&&n.born&&!n.isGone()&&!n.popped&&(r===null||n.y<r.y)&&(r=n);if(r===null){if(Tt!==null&&e==Nt)return;if(xt!==null)return;S.choice(at).play(),St("click."+e,Math.round(N.offsetHeight/m)),B(),$(),xt=window.setTimeout(function(){xt=null},500)}else r.pop(),Et(e,Date.now()-r.bornTime-r.pauseTime,1-Math.max(0,r.y/N.offsetHeight)),Nt=e,Tt&&window.clearTimeout(Tt),Tt=window.setTimeout(function(){Tt=null},500)};var Ct=function(){pt.currentMode.pause()},kt=function(){pt.currentMode.resume()},Lt="hidden",At="visibilitychange";typeof e.hidden!="undefined"?(Lt="hidden",At="visibilitychange"):typeof e.mozHidden!="undefined"?(Lt="mozHidden",At="mozvisibilitychange"):typeof e.msHidden!="undefined"?(Lt="msHidden",At="msvisibilitychange"):typeof e.webkitHidden!="undefined"&&(Lt="webkitHidden",At="webkitvisibilitychange");var Ot=function(){var t=!0;return function(n){var r=e[Lt]||!1;if(t===r)return;t=r,r?Ct():kt()}}();e.addEventListener(At,Ot,!1),A=function(){A.id=null;var e=Date.now(),t=!1,r=!1,i,s,o=Math.max(0,Math.min(e-A.lastFrame,100));for(i=0;i<G.length;i++)s=G[i],s.update(o),s.isGone()&&(s.popped||(r=!0,St("escape."+s.color,e-s.bornTime-s.pauseTime)),t=!0,s.reset(),e-A.lastBorn<v?(s.bornTimeout=v-(e-A.lastBorn),A.lastBorn+=v):A.lastBorn=e),s.refresh();r&&S.choice(ft).play(),t,A.lastFrame=e,pt.currentMode===pt.Playing&&(A.id=n.requestAnimationFrame(A))},A.id=null,A.lastFrame=Date.now(),A.lastBorn=0;var Mt=function(e){e.type==="touchstart"&&e.target.removeEventListener("mousedown",Mt,!1),e.preventDefault(),s.switchColor()};["mousedown","touchstart"].forEach(function(t){var n=!!window.cordovaDetect;if(n&&t[0]==="m")return;D(e.querySelectorAll(".nells > div > div"),function(e){e.addEventListener(t,Mt,!1)})});var _t=function(e){var t=e.state;if(!t)return;if(!t.mode)return;switch(t.mode){case"Playing":pt.Playing.switchLevel(vt[t.level]),pt.Playing.switchAltitude(vt[t.altitude]),pt.switchTo(pt.Playing);break;case"Menu":pt.currentMode.currentLevel?pt.Menu.switchLevel(pt.currentMode.currentLevel):pt.Menu.switchLevel(vt[t.level]),pt.switchTo(pt.Menu)}},Dt=function(e){e?pt.currentMode===pt.Rotate&&(pt.Rotate.pop(),C.record("orientation","portrait")):pt.currentMode!==pt.Rotate&&(pt.Rotate.push(),C.record("orientation","landscape"))},Pt=function(e){var t=window.device&&window.device.platform==="Android"&&window.device.name==="tervigon";if(!t)return;var n=window.orientation!==0&&window.orientation!==180;e||(n=window.outerHeight>=window.outerWidth),Dt(n)};window.cordovaDetect?e.addEventListener("deviceready",Ht,!1):(console.log("not on phonegap"),Ht())})
+    // Default number of audio instances to clone
+    var DEFAULT_INSTANCES = 4;
+
+    var AUDIO_TYPES = {
+        'mp3': 'audio/mpeg',
+        'ogg': 'audio/ogg',
+        'wav': 'audio/wav',
+        'aac': 'audio/aac',
+        'webm': 'audio/webm',
+        'm4a': 'audio/x-m4a'
+    };
+
+    // Cross-browser Audio() constructor
+    var Audio = (function() {
+        return ('Audio' in window) ?
+            window.Audio :
+            function() {
+                return document.createElement('audio');
+            };
+    }());
+
+    function nop(){}
+
+    var AudioPool = function( url, formats, instances, callback, errback ) {
+        var audio = new Audio(),
+        cloningDone = false, // work around https://bugzilla.mozilla.org/show_bug.cgi?id=675986
+        clones = [];
+
+        // XXXhumph do we want to have this be configurable for late load?
+        audio.autobuffer = true;
+        audio.preload = 'auto';
+
+        // XXXhumph do we want to keep some kind of state to know if things worked?
+        audio.addEventListener('error', function() {
+            errback(audio.error);
+        }, false);
+        audio.addEventListener('canplaythrough', function() {
+            if (cloningDone) {
+                return;
+            }
+            while ( instances-- ) {
+                clones.push( audio.cloneNode( true ) );
+            }
+            cloningDone = true;
+            callback();
+        }, false);
+
+        var getExt = function(filename) {
+            return filename.split('.').pop();
+        };
+
+        var addSource = function(src) {
+            var source = document.createElement('source');
+            source.src = src;
+            if (AUDIO_TYPES[ getExt(src) ]) {
+                source.type = AUDIO_TYPES[ getExt(src) ];
+            }
+            audio.appendChild(source);
+        };
+
+        if (formats && formats.length > 0) {
+            formats.forEach(function(f) {
+                addSource(url + '.' + f);
+            });
+        } else {
+            addSource(url);
+        }
+
+        this.getInstance = function() {
+            var clone,
+            count,
+            i;
+
+            for ( i = 0, count = clones.length; i < count; i++) {
+                clone = clones[i];
+
+                if ( clone.paused || clone.ended ) {
+                    if ( clone.ended ) {
+                        clone.currentTime = 0;
+                    }
+                    return clone;
+                }
+            }
+
+            // Rewind first one if none are available
+            if (clones.length===0) {
+                return null;
+            }
+            clone = clones[0];
+            clone.pause();
+            clone.currentTime = 0;
+
+            return clone;
+        };
+        // hackity hackity; this is a leak in our API
+        var loopFunc = function() {
+            audio.currentTime = 0;
+            audio.play();
+        };
+        this.loop = function() {
+            audio.loop = true;
+            audio.addEventListener('ended', loopFunc, false);
+            audio.play();
+        };
+        this.unloop = function() {
+            if (!audio.loop) { return; /* only unloop once */ }
+            audio.pause();
+            audio.removeAttribute('loop');
+            audio.removeEventListener('ended', loopFunc, false);
+            try {
+                audio.currentTime = 0;
+            } catch (e) {
+                console.log("AUDIO PROBLEM: "+e);
+            }
+        };
+    };
+    if (window.cordovaDetect) {
+        // use PhoneGap Media class.
+        AudioPool = function( url, formats, instances, callback, errback ) {
+            var clones = [], ready = [];
+            url = '/android_asset/www/'+url;
+            if (formats && formats.length > 0) {
+                url += '.' + formats[0];
+            }
+            this.getInstance = function() {
+                var clone, count, i;
+
+                for ( i = 0, count = clones.length; i < count; i++) {
+                    clone = clones[i];
+                    if (ready[i]) {
+                        clone.seekTo(0);
+                        ready[i] = false;
+                        return clone;
+                    }
+                }
+                if (count < instances) {
+                    // make a new clone
+                    clones[count] = clone = new Media(url, function() {
+                        ready[count] = true;
+                    });
+                    ready[count] = false;
+                    return clone;
+                }
+                // Rewind first one if none are available
+                if (clones.length===0) {
+                    return null;
+                }
+                clone = clones[0];
+                clone.seekTo(0);
+
+                return clone;
+            };
+            var loop = null;
+            this.loop = function() {
+                var nloop; // local scoped var
+                if (loop) { this.unloop(); } // abnormal
+                var completeFunc = function() {
+                    if (loop===null || loop.id !== nloop.id) {
+                        return; /* stop */
+                    }
+                    nloop.seekTo(0);
+                    nloop.play();
+                };
+                loop = nloop = new Media(url, completeFunc);
+                loop.play();
+            };
+            this.unloop = function() {
+                var oloop = loop;
+                loop = null;
+                if (oloop) {
+                    oloop.stop();
+                    oloop.release();
+                }
+            };
+            callback();
+        };
+    }
+
+
+    function load( Type, options ) {
+        var snd = new Type({
+            url: options.url,
+            instances: options.instances,
+            callback: options.callback,
+            errback: options.errback
+        });
+    }
+
+    function Effect( options ) {
+        var url = options.url;
+        if ( !url ) {
+            throw "you must pass a URL to Effect.";
+        }
+
+        var pool = new AudioPool(
+            url,
+            options.formats || [],
+            options.instances || DEFAULT_INSTANCES,
+            options.callback ?
+                (function( track, callback ) {
+                    return function() {
+                        callback( track );
+                    };
+                }( this, options.callback )) : nop,
+            options.errback || nop
+        );
+
+        this.__defineGetter__( 'audio', function() {
+            return pool.getInstance();
+        });
+
+        this.__defineGetter__( 'url', function() {
+            return url;
+        });
+        this.play = function() {
+            var audio = this.audio;
+            // handle case where sound is not yet loaded.
+            if (!audio) { return null; }
+            audio.play();
+            return audio;
+        };
+        this.loop = function() { pool.loop(); };
+        this.unloop = function() { pool.unloop(); };
+    }
+    Effect.load = function( options ) {
+        load( Effect, options );
+    };
+
+    /**
+     * A special-case Effect with only one audio instance (no clones).
+     */
+    function Track( options ) {
+        // Force a single audio
+        options.instances = 1;
+        Effect.call( this, options );
+    }
+    Track.load = function( options ) {
+        load( Track, options );
+    };
+
+    return {
+        Effect: Effect,
+        Track: Track
+    };
+});
+
+define('version',[], function() {
+    // the version of the nell-balloons source code.
+    return "7";
+});
+
+define('index',['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound', './version'], function(document, Alea, Compat, Funf, nell, score, Sound, version) {
+    var DOCUMENT_TITLE = document.title = "Nell's Balloons";
+    var MUSIC_URL = 'sounds/barrios_gavota';
+    var COLORS = [ 'black', 'lilac', 'orange', 'yellow' ]; // also 'white'
+    var MIN_BALLOON_SPEED_Y =   50 / 1000; /* pixels per ms */
+    var MAX_BALLOON_SPEED_Y =  800 / 1000; /* pixels per ms */
+    var X_SPEED_FRACTION = 0.25; // fraction of y speed
+    var BALLOON_SEPARATION_MS = 1000;
+
+    var initialBalloonSpeedY = MIN_BALLOON_SPEED_Y; /* pixels per ms */
+
+    var NUM_BALLOONS = 2;
+    var ENABLE_ACCEL = false;
+    var DEBUG_AWARD_OFTEN = false;
+    var HTML5_HISTORY = history.pushState && history.replaceState;
+    var random = Alea.Random();
+    var gameElement = document.getElementById('game');
+    var buttonsElement = document.getElementById('buttons');
+    var balloonsElement = document.getElementById('balloons');
+    var funf = nell.funf = score.funf = new Funf('NellBalloons'+version);
+    var buttons, handleButtonPress;
+    var refresh;
+    var SPROUTS;
+
+    var ALTITUDES = ['ground', 'troposphere', 'stratosphere', 'mesosphere'];
+    // make reverse mapping as well.
+    ALTITUDES.forEach(function(a, i) { ALTITUDES[a] = i; });
+    ALTITUDES.toNum = function(a) { return ALTITUDES[a]; };
+
+    var AWARDS = [['a1', 1/2+1/2],
+                  ['a2', 1/4+1/4],
+                  ['a3', 1/8+1/6],
+                  ['a4', 1/16+1/8],
+                  ['a5', 1/32+1/10],
+                  ['a6', 1/64+1/12]];
+
+    var elForEach = function(elementList, func) {
+        var i;
+        for (i=0; i<elementList.length; i++) {
+            func(elementList[i], i);
+        }
+    };
+
+    var awardCounter = 0;
+    var pickAward = function() {
+        // every N awards, choose from only unwon awards
+        awardCounter = (awardCounter+1) % 6;
+        var i, sprout;
+        for (i=0, sum=0; i<AWARDS.length; i++) {
+            if (!awardCounter) {
+                sprout = SPROUTS[AWARDS[i][0]];
+                if (sprout.size >=0) { continue; }
+            }
+            sum += AWARDS[i][1];
+        }
+        var v = random() * sum;
+        for (i=0, sum=0; i<AWARDS.length; i++) {
+            if (!awardCounter) {
+                sprout = SPROUTS[AWARDS[i][0]];
+                if (sprout.size >=0) { continue; }
+            }
+            sum += AWARDS[i][1];
+            if (v < sum) { return AWARDS[i][0]; }
+        }
+        // should never get here
+        return AWARDS[AWARDS.length-1][0];
+    };
+    var loseAward = function() {
+        var i;
+        for (i=0; i<AWARDS.length; i++) {
+            var sprout = SPROUTS[AWARDS[i][0]];
+            if (sprout.size >= 0) {
+                sprout.shrink();
+                if (sprout.size < 0) {
+                    var elem = document.querySelector('#awards .award.'+AWARDS[i][0]);
+                    elem.classList.remove('show');
+                }
+                return;
+            }
+        }
+    };
+    var checkForFinishedLevel = function() {
+        for (i=0; i<AWARDS.length; i++) {
+            var sprout = SPROUTS[AWARDS[i][0]];
+            if (sprout.size < 0) {
+                return; // level not done yet!
+            }
+        }
+        // ok, level done!
+        if (GameMode.currentMode !== GameMode.Playing) {
+            return; /* we're already transitioning */
+        }
+        // record sprouts sizes
+        var sproutsizes = AWARDS.map(function(a) {
+            return SPROUTS[a[0]].size;
+        });
+        // tell funf about completion
+        funf.record('mode', {
+            name: 'playing',
+            type: 'levelcomplete',
+            stars: Ruler.stars,
+            streak: Ruler.streak,
+            smoothedHeight: Ruler.smoothedHeight,
+            sprouts: sproutsizes,
+            level: GameMode.Playing.currentLevel.num,
+            altitude: ALTITUDES.toNum(GameMode.Playing.currentAltitude)
+        });
+        // unlock next level
+        score.setCompleted(GameMode.Playing.currentLevel.levelClass,
+                           GameMode.Playing.currentAltitude,
+                           Ruler.stars);
+        // play congratulatory sound!
+        stopMusic();
+        LEVEL_SOUNDS[0].play();
+        //  award stars!
+        GameMode.StarThrob.push();
+    };
+
+    var ColoredElement = function(element, color) {
+        this.domElement = element;
+        this.domElement.classList.add(color);
+        this.color = color;
+    };
+    ColoredElement.prototype = {};
+    ColoredElement.prototype.reset = function(color) {
+        this.domElement.classList.remove(this.color);
+        this.domElement.classList.add(color);
+        this.color = color;
+    };
+    ColoredElement.prototype.attach = function(parent) {
+        parent.appendChild(this.domElement);
+    };
+    ColoredElement.prototype.detach = function() {
+        this.domElement.parentElement.removeChild(this.domElement);
+    };
+
+    var ClickableElement = function(color) {
+        ColoredElement.call(this, document.createElement('a'), color);
+        this.domElement.href='#';
+        // android sometimes delivers events like:
+        // touchstart, <dom mutation> touchcancel, mousedown mouseup
+        // that results in double taps, which is bad.  ignore all mouse*
+        // events on android as a hacky workaround.
+        var isAndroid = !!window.cordovaDetect;
+        ['mousedown', 'touchstart'].forEach(function(evname) {
+            if (isAndroid && evname[0]==='m') { return; }
+            this.domElement.addEventListener(evname,this.highlight.bind(this), false);
+        }.bind(this));
+        ['mouseup','mouseout','touchcancel','touchend'].forEach(function(evname){
+            if (isAndroid && evname[0]==='m') { return; }
+            this.domElement.addEventListener(evname, this.unhighlight.bind(this), false);
+        }.bind(this));
+        this.domElement.addEventListener('click', function(event) {
+            // suppress 'click' event, which would change the history.
+            event.preventDefault();
+        }, false);
+        this.ignoreMouse = false;
+    };
+    ClickableElement.prototype = Object.create(ColoredElement.prototype);
+    ClickableElement.prototype.highlight = function(event) {
+        switch (event.type) {
+        case 'touchstart': this.ignoreMouse = true; break;
+        case 'mousedown': if (this.ignoreMouse) { return; } break;
+        }
+        this.domElement.classList.add('hover');
+        event.preventDefault();
+        if (this.fast && this.ignoreMouse) { this.handleClick(); }
+    };
+    ClickableElement.prototype.unhighlight = function(event) {
+        switch (event.type) {
+        case 'mouseup':
+        case 'mouseout':
+            if (this.ignoreMouse) { return; } break;
+        }
+        this.domElement.classList.remove('hover');
+        event.preventDefault();
+        if (event.type !== 'touchcancel' &&
+            event.type !== 'mouseout' &&
+            !(this.fast && this.ignoreMouse)) {
+            this.handleClick();
+        }
+        this.ignoreMouse = false;
+    };
+
+    var Button = function(color) {
+        ClickableElement.call(this, color);
+        this.domElement.appendChild(document.createElement('span'));
+        this.attach(buttonsElement);
+        this.fast = true; // fast button response
+    };
+    Button.prototype = Object.create(ClickableElement.prototype);
+    Button.prototype.handleClick = function() {
+        if (GameMode.currentMode !== GameMode.Playing) { return; }
+        handleButtonPress(this.color);
+    };
+
+    var MenuTag = function(altitude) {
+        ClickableElement.call(this, 'tag');
+        this.altitude = altitude;
+    };
+    MenuTag.prototype = Object.create(ClickableElement.prototype);
+    MenuTag.prototype.handleClick = function() {
+        this.altitudeClicked(this.altitude);
+    };
+
+    var BALLOON_VARIANTS = ['var1','var2','var3','var4'];
+    var Balloon = function(color) {
+        color = color || random.choice(buttons).color;
+        ColoredElement.call(this, document.createElement('div'), color);
+        this.balloon = document.createElement('div');
+        this.balloon.classList.add('balloon');
+        this.payload = document.createElement('div');
+        this.payload.classList.add('payload');
+        this.domElement.appendChild(this.payload); /* payload in back */
+        this.domElement.appendChild(this.balloon); /* balloon in front */
+        this.attach(balloonsElement);
+        // starting x, y, and speed
+        // pick a random x position
+        this.reset(this.color); // set random bits.
+        this.refresh();
+    };
+    Balloon.prototype = Object.create(ColoredElement.prototype);
+    Balloon.prototype.doBirth = function() {
+        this.born = true;
+        this.bornTime = Date.now();
+        this.pauseTime = 0;
+
+        // just in case element sizes change
+        this.height = this.domElement.offsetHeight;
+        this.maxx = balloonsElement.offsetWidth - this.domElement.offsetWidth;
+        // now reset properties
+        this.x = Math.floor(random() * this.maxx);
+        this.y = balloonsElement.offsetHeight;
+        this.fastY = this.y - this.height;
+        // speeds are in pixels / second.
+        this.speedy = (0.9+0.2*random()) * initialBalloonSpeedY;
+        this.speedx = (2*random()-1) * this.speedy * X_SPEED_FRACTION;
+
+        funf.record('born', this.color);
+    };
+    Balloon.prototype.reset = function(color) {
+        // change color
+        color = color || random.choice(buttons).color;
+        if (color !== this.color) {
+            ColoredElement.prototype.reset.call(this, color);
+        }
+        // swap variant
+        BALLOON_VARIANTS.forEach(function(v) {
+            this.domElement.classList.remove(v);
+        }.bind(this));
+        this.variant = random.choice(BALLOON_VARIANTS);
+        this.domElement.classList.add(this.variant);
+        // reset other properties.
+        this.born = false; this.bornTime = this.pauseTime = 0;
+        this.bornTimeout = 0; // born immediately by default
+        this.popped = this.popDone = false;
+        ['popped','squirt','payload-dropped'].forEach(function(c) {
+            this.domElement.classList.remove(c);
+        }.bind(this));
+        this.award = null;
+        // ensure that unborn balloon is invisible
+        this.x = 0;
+        this.y = balloonsElement.offsetHeight;
+    };
+    Balloon.prototype.refresh = function() {
+        if (this.popped) { return; }
+        var transform = Math.round(this.x)+'px,'+Math.round(this.y)+'px';
+        // the '3d' is actually very important here: it enables
+        // GPU acceleration of this transform on webkit
+        this.domElement.style.WebkitTransform =
+            'translate3d('+transform+',0)';
+        this.domElement.style.MozTransform =
+            this.domElement.style.transform =
+            'translate('+transform;+')';
+    };
+    Balloon.prototype.update = function(dt /* milliseconds */) {
+        if (!this.born) {
+            // don't move until it's born
+            this.bornTimeout -= dt;
+            if (this.bornTimeout < 0) {
+                this.doBirth();
+            }
+            return;
+        }
+        if (this.popped) {
+            // don't move after it's popped.
+            this.popTimeout -= dt;
+            if (this.popTimeout < 0) {
+                this.popDone = true;
+                if (this.domElement.classList.contains('squirt')) {
+                    random.choice(BURST_SOUNDS).play();
+                }
+                if (this.award) {
+                    var elem = document.querySelector(
+                        '#awards .award.'+this.award);
+                    var sprout = SPROUTS[this.award];
+                    if (sprout.size >= 0) {
+                        // deal w/ race -- maybe we lost this one already!
+                        elem.classList.add('show');
+                    }
+                    elem.style.WebkitTransform =
+                        elem.style.MozTransform =
+                        elem.style.transform = '';
+                    var flex = document.querySelector('#awards .award.flex');
+                    flex.style.display = 'none';
+
+                    checkForFinishedLevel();
+                }
+            }
+            return;
+        }
+        // faster until we get past the grass at the bottom.
+        if (this.y > this.fastY) {
+            // amount of time taken to get above fastY pixels at
+            // MAX_BALLOON_SPEED_Y;
+            var fastT = (this.y - this.fastY) / MAX_BALLOON_SPEED_Y;
+            if (fastT > dt) {
+                this.y -= dt * MAX_BALLOON_SPEED_Y;
+            } else {
+                this.y = this.fastY - (dt-fastT) * this.speedy;
+            }
+        } else {
+            this.y -= dt * this.speedy;
+        }
+        this.x += dt * this.speedx;
+        if (this.x < 0) {
+            this.x = 0; this.speedx = 0;
+        }
+        if (this.x > this.maxx) {
+            this.x = this.maxx; this.speedx = 0;
+        }
+        // XXX drift x left and right?
+    };
+    Balloon.prototype.isGone = function() {
+        if (!this.born) { return false; }
+        // returns true if balloon has floated past top of screen
+        return (this.y < -this.height) || this.popDone;
+    };
+    Balloon.prototype.pop = function() {
+        this.popped = true;
+        // chance of award
+        var isAward = (random() < (1/3.5)); // 1-in-4 chance of an award
+        // XXX: switch to "every 4th balloon is an award?"
+        if (DEBUG_AWARD_OFTEN) { isAward = true; } // award always, for testing
+        // run popping animation & sound effect
+        var isSquirt = (random() < (1/15)); // 1-in-15 chance of a squirt
+        // play balloon burst sound
+        var sounds = isAward ? AWARD_SOUNDS : isSquirt ? SQUIRT_SOUNDS :
+            BURST_SOUNDS;
+        random.choice(sounds).play();
+        this.domElement.classList.add('payload-dropped');
+        // play the appropriate learning reinforcement sound
+        var level = GameMode.Playing.currentLevel;
+        var altitude = GameMode.Playing.currentAltitude;
+        var reinforcement = level.soundFor(altitude, this.color, this.variant);
+        if (reinforcement.length) {
+            random.choice(reinforcement).play();
+        }
+
+        if (isAward) {
+            this.domElement.classList.add('popped');
+            this.popTimeout = 250;
+            // move an award up here.
+            this.award = pickAward();
+            var elem= document.querySelector('#awards .award.'+this.award);
+            var sprout = SPROUTS[this.award];
+            // do we already have this award?
+            if (sprout.size >= 0) {
+                // force the flex badge to fill in.
+                var flex = document.querySelector('#awards .award.flex');
+                flex.style.top = elem.offsetTop+'px';
+                flex.style.left = elem.offsetLeft+'px';
+                flex.style.display = 'block';
+                flex.className = 'award flex '+this.award;
+                elem = flex;
+                this.popTimeout = 750;
+            }
+            var offsetY = elem.offsetTop + elem.offsetParent.offsetTop;
+            var offsetX = elem.offsetLeft + elem.offsetParent.offsetLeft;
+            var x = Math.round(this.x - offsetX + 23 /* center on balloon */);
+            var y = Math.round(this.y - offsetY + 20 /* center on balloon */);
+            var transform = x+'px,'+y+'px';
+            elem.style.WebkitTransform=
+                'translate3d('+transform+',0)';
+            elem.style.MozTransform=
+                elem.style.transform=
+                'translate('+transform+')';
+            sprout.grow();
+            saveScore();
+        } else if (isSquirt) {
+            this.domElement.classList.add('squirt');
+            this.popTimeout = 2000; // ms
+        } else {
+            this.domElement.classList.add('popped');
+            this.popTimeout = 250; // ms
+        }
+    };
+
+    var SPROUT_SCALES = (function() {
+        var scales = [
+            [0.143, 0.078] // smallest  (34x69)
+        ];
+        var stepsTo = function(n, end) {
+            var i, sx, sy;
+            var start = scales[scales.length-1];
+            for (i=1; i<=n; i++) {
+                sx = (end[0] - start[0]) * i / n;
+                sy = (end[1] - start[1]) * i / n;
+                scales.push([start[0] + sx, start[1] + sy]);
+            }
+        };
+        // fill out table
+        stepsTo(1, [0.215, 0.118]); // small     (51x104)
+        stepsTo(1, [0.287, 0.156]); // orig size (68x138)
+        stepsTo(5, [0.857, 0.469]); // 3x size   (203x415) (~25px per step)
+        stepsTo(16,[1.000, 1.000]); // large               (~25px per step)
+
+        // HALVE THE NUMBER OF STEPS (original was too fine grained)
+        function decimateBy(n) {
+            var i;
+            for (i=0; n*i < scales.length; i++) {
+                scales[i] = scales[n*i];
+            }
+            scales.length = i;
+        }
+        decimateBy(2);
+        Object.freeze(scales);
+        return scales;
+    })();
+
+    var Sprout = function(awardClass) {
+        this.awardClass = awardClass;
+        this.domElement = document.querySelector('#sprouts .award.'+awardClass);
+        this.setSize(-1);
+    };
+    Sprout.prototype = {};
+    Sprout.prototype.grow = function() { this.setSize(this.size+1); };
+    Sprout.prototype.shrink = function() { this.setSize(this.size-1); };
+    Sprout.prototype.setSize = function(nsize) {
+        var transform, wktransform, scale;
+        nsize = Math.max(-1, Math.min(nsize, SPROUT_SCALES.length-1));
+        nsize = Math.round(nsize); // must be an integer
+        if (this.size === nsize) { return; /* no change */ }
+        this.size = nsize;
+        if (nsize < 0) {
+            this.domElement.classList.remove('show');
+            transform = wktransform = '';
+        } else {
+            this.domElement.classList.add('show');
+            scale = SPROUT_SCALES[nsize];
+            transform = 'scale('+scale[0]+','+scale[1]+')';
+            wktransform = 'translate3d(0,0,0) ' + transform;
+        }
+        this.domElement.style.WebkitTransform = wktransform;
+        this.domElement.style.MozTransform =
+            this.domElement.style.transform = transform;
+        this.setTime();
+    };
+    Sprout.prototype.setTime = function(time, delay) {
+        this.domElement.style.webkitTransitionDuration=
+            this.domElement.style.mozTransitionDuration=
+            this.domElement.style.transitionDuration=(time || '');
+        this.domElement.style.webkitTransitionDelay=
+            this.domElement.style.mozTransitionDelay=
+            this.domElement.style.transitionDelay=(delay || '');
+    };
+    SPROUTS = {};
+    AWARDS.forEach(function(a) {
+        SPROUTS[a[0]] = new Sprout(a[0]);
+    });
+    Object.freeze(SPROUTS);
+
+    // load recent score
+    var loadScore = function() {
+        if (!(score.recent && score.recent.length >= AWARDS.length)) {
+            return;
+        }
+        AWARDS.forEach(function(a, i) {
+            var sprout = SPROUTS[a[0]];
+            sprout.setSize(score.recent[i]);
+            if (sprout.size >= 0) {
+                var elem = document.querySelector('#awards .award.'+a[0]);
+                elem.classList.add('show');
+            }
+        });
+    };
+    var saveScore = function() {
+        var nscore = AWARDS.map(function(a) {
+            return SPROUTS[a[0]].size;
+        });
+        score.save(nscore);
+    };
+    //loadScore();
+
+    buttons = [];
+    var createButtons = function() {
+        // remove any existing buttons
+        while (buttons.length > 0) {
+            b = buttons.pop();
+            b.detach();
+            // XXX remove event handlers?
+        }
+        // now create four new buttons
+        var c = COLORS.slice(0); // make a copy
+        random.shuffle(c);
+        c.forEach(function(color) {
+            var b = new Button(color);
+            buttons.push(b);
+            // add event handlers
+        });
+    };
+    createButtons();
+    // multitouch hack
+    var handleMultitouch = function(event) {
+        var changedTouches = event.changedTouches, i, j;
+        for (i=0; i<changedTouches.length; i++) {
+            var touch = changedTouches[i];
+            for (j=0; j<buttons.length; j++) {
+                var button = buttons[j];
+                if (touch.target === button.domElement ||
+                    touch.target === button.domElement.firstChild) {
+                    if (event.type==='touchstart') {
+                        button.domElement.classList.add('hover');
+                        button.handleClick();
+                    } else {
+                        button.domElement.classList.remove('hover');
+                    }
+                }
+            }
+        }
+        event.stopPropagation();
+        event.preventDefault();
+        return false;
+    };
+    ['touchstart', 'touchend', 'touchcancel'].forEach(function(evname) {
+        document.getElementById('buttons').addEventListener(evname,
+                                                            handleMultitouch,
+                                                            true);
+    });
+
+    altitudeStars = [];
+    var createMenuTags = function() {
+        ALTITUDES.forEach(function(altitude) {
+            var s = new MenuTag(altitude);
+            s.attach(document.querySelector('#menu .awards > .'+altitude));
+            altitudeStars.push(s);
+        });
+    };
+    createMenuTags();
+
+
+    var balloons = [];
+    while (balloons.length < NUM_BALLOONS) {
+        balloons.push(new Balloon());
+        // xxx spread out y starting locations
+    }
+
+    // let accelerometer influence drift
+    var accelID = null;
+    var startAccelerometer = function() { return null; };
+    var stopAccelerometer = function() { };
+    var updateAcceleration = function(a) {
+        if (a.y < -4) {
+            balloons.forEach(function(b) { b.speedx -= 50; });
+        } else if (a.y > 4) {
+            balloons.forEach(function(b) { b.speedx += 50; });
+        }
+    };
+    if (navigator.accelerometer) {
+        startAccelerometer = function() {
+            return navigator.accelerometer.watchAcceleration(updateAcceleration,
+                                                             function() {},
+                                                             { frequency: 80 });
+        };
+        stopAccelerometer = function(id) {
+            navigator.accelerometer.clearWatch(id);
+        };
+    }
+
+    var music;
+    var playMusic = function(src) {
+        if (music && music.origSrc !== src) {
+            stopMusic();
+            music = null;
+        }
+        if (!music) {
+            // bug with ogg on firefox/android:
+            //  https://bugzilla.mozilla.org/show_bug.cgi?id=791017
+            // use webm on all platforms for now, save some space.
+            music = new Sound.Track({ url: src, formats: ['webm'/*,'ogg','mp3'*/] });
+            music.origSrc = src;
+        }
+        music.loop();
+    };
+    var stopMusic = function() {
+        if (music) {
+            music.unloop();
+        }
+    };
+
+    var loadSounds = function(sounds) {
+        return sounds.map(function(url) {
+            // bug with ogg on firefox/android:
+            //  https://bugzilla.mozilla.org/show_bug.cgi?id=791017
+            // use webm on all platforms for now, save some space.
+            return new Sound.Effect({url: url, instances: 2,
+                                     formats: ['webm'/*,'ogg','mp3'*/] });
+        });
+    };
+
+    var BURST_SOUNDS = loadSounds(['sounds/burst1',
+                                   'sounds/burst2',
+                                   'sounds/burst3',
+                                   'sounds/burst4',
+                                   'sounds/burst5',
+                                   'sounds/burst6',
+                                   'sounds/burst7']);
+    var SQUIRT_SOUNDS = loadSounds(['sounds/deflate1',
+                                    'sounds/deflate2']);
+    var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
+    var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
+    var AWARD_SOUNDS = loadSounds(['sounds/award']);
+    var LEVEL_SOUNDS = loadSounds(['sounds/levelwin'/*,
+                                   'sounds/levellose'*/]);
+
+    // utility method
+    var _switchClass = function(elem, from, to, optProp) {
+        var f = optProp ? (from && from[optProp]) : from;
+        var t = optProp ? to[optProp] : to;
+        if (f) { elem.classList.remove(f); }
+        elem.classList.add(t);
+        return to;
+    };
+
+    // ------------ game modes ---------------
+    var GameMode = function(bodyClass) {
+        this.bodyClass = bodyClass;
+        this.active = false;
+    };
+    GameMode.prototype = {};
+    GameMode.prototype.enter = function() {
+        this.resume();
+        document.body.classList.add(this.bodyClass);
+        this.active = true;
+    };
+    GameMode.prototype.leave = function() {
+        this.pause();
+        document.body.classList.remove(this.bodyClass);
+        this.active = false;
+    };
+    GameMode.prototype.pause = function() {
+        document.body.classList.add('paused');
+    };
+    GameMode.prototype.resume = function() {
+        document.body.classList.remove('paused');
+    };
+    GameMode.prototype.toJSON = function() {
+        return { mode: this.bodyClass };
+    };
+    // static properties
+    GameMode.currentMode = null;
+    GameMode.switchTo = function(mode) {
+        if (GameMode.currentMode) {
+            GameMode.currentMode.leave();
+        }
+        GameMode.currentMode = mode;
+        GameMode.currentMode.enter();
+    };
+
+    GameMode.Menu = new GameMode('menu');
+    GameMode.Menu.toJSON = function() {
+        return { mode: 'Menu', level: this.currentLevel.num };
+    };
+    GameMode.Menu.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            funf.record('mode', { name: 'menu' });
+            // sync the exposed altitudes from the current score object
+            this.syncExposed();
+        };
+    })(GameMode.Menu.enter);
+    GameMode.Menu.start = function(altitude) {
+        // allow resuming the current level w/o reset
+        if (GameMode.Playing.currentLevel !== this.currentLevel ||
+            GameMode.Playing.currentAltitude !== altitude) {
+            GameMode.Playing.switchLevel(this.currentLevel);
+            GameMode.Playing.switchAltitude(altitude);
+            GameMode.Playing.reset();
+        }
+        if (HTML5_HISTORY) { // update current menu level
+            history.replaceState(GameMode.currentMode.toJSON(),
+                                 DOCUMENT_TITLE+' | Menu', '#menu');
+        }
+        GameMode.switchTo(GameMode.Playing);
+        if (HTML5_HISTORY) { // Android/Honeycomb doesn't support this
+            history.pushState(GameMode.currentMode.toJSON(),
+                              DOCUMENT_TITLE + ' | Play!',
+                              '#play');
+        }
+        funf.record('mode', {
+            name: 'playing',
+            type: 'levelstart',
+            level: GameMode.Playing.currentLevel.num,
+            altitude: ALTITUDES.toNum(GameMode.Playing.currentAltitude)
+        });
+    };
+    GameMode.Menu.switchLevel = function(level) {
+        var levelElem = document.querySelector('#menu .level');
+        this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
+                                         'levelClass');
+        var dot = document.querySelector('#menu .levelnav .dot.on');
+        if (dot) { dot.classList.remove('on'); }
+        level.dot.classList.add('on');
+
+        var prev = document.querySelector('#menu .levelnav .prev');
+        prev.classList.remove('hidden');
+        if (!level.prevLevel) { prev.classList.add('hidden'); }
+
+        var next = document.querySelector('#menu .levelnav .next');
+        next.classList.remove('hidden');
+        if (!level.nextLevel) { next.classList.add('hidden'); }
+        // sync the exposed altitudes from the current score object
+        this.syncExposed();
+    };
+    GameMode.Menu.syncExposed = function() {
+        this.setExposed('none', 0);
+        if (this.currentLevel.prevLevel &&
+            !score.isCompleted(this.currentLevel.prevLevel.levelClass,
+                               ALTITUDES[ALTITUDES.length-1])) {
+            // this level isn't unlocked yet. hide everything.
+            return;
+        }
+        for (i=0; i < ALTITUDES.length; i++) {
+            var numStars =
+                score.numStars(this.currentLevel.levelClass, ALTITUDES[i]);
+            this.setExposed(ALTITUDES[i], numStars);
+            if (!score.isCompleted(this.currentLevel.levelClass, ALTITUDES[i])){
+                break;
+            }
+        }
+    };
+    GameMode.Menu.setExposed = function(altitude, stars) {
+        var shadeElem = document.querySelector('#menu .level');
+        var old = this.currentExposed && ('exposed-'+this.currentExposed);
+        _switchClass(shadeElem, old, 'exposed-'+altitude);
+        this.currentExposed = altitude;
+        if (altitude === 'none') { return; }
+        // set the # of stars
+        var starsElem = document.querySelector('#menu .awards > .'+altitude+' > .stars');
+        ['zero','one','two','three'].forEach(function(name, num) {
+            if (stars===num) {
+                starsElem.classList.add(name);
+            } else {
+                starsElem.classList.remove(name);
+            }
+        });
+    };
+    GameMode.Menu.prevClicked = function() {
+        if (!this.currentLevel.prevLevel) { return; }
+        this.switchLevel(this.currentLevel.prevLevel);
+    };
+    GameMode.Menu.nextClicked = function() {
+        if (!this.currentLevel.nextLevel) { return; }
+        this.switchLevel(this.currentLevel.nextLevel);
+    };
+    ['prev', 'next'].forEach(function(arrow) {
+        var e = new ClickableElement(arrow);
+        e.attach(document.querySelector('#menu .levelnav .inner'));
+        e.handleClick = GameMode.Menu[arrow+'Clicked'].bind(GameMode.Menu);
+        GameMode.Menu[arrow+'Arrow'] = e;
+    });
+    MenuTag.prototype.altitudeClicked =
+        GameMode.Menu.start.bind(GameMode.Menu);
+
+    GameMode.OverlayMode = function(bodyClass) {
+        GameMode.call(this, bodyClass);
+        this.underMode = null;
+    };
+    GameMode.OverlayMode.prototype = Object.create(GameMode.prototype);
+    GameMode.OverlayMode.prototype.setUnderMode = function(underMode) {
+        this.underMode = this.active ?
+            _switchClass(document.body, this.underMode, underMode, 'bodyClass'):
+            underMode;
+    };
+    GameMode.OverlayMode.prototype.push = function() {
+        this.lastMode = GameMode.currentMode;
+        this.setUnderMode(GameMode.currentMode.underMode ||
+                          GameMode.currentMode);
+        GameMode.switchTo(this);
+    };
+    GameMode.OverlayMode.prototype.pop = function() {
+        console.assert(GameMode.currentMode === this);
+        GameMode.switchTo(this.lastMode);
+    };
+    GameMode.OverlayMode.prototype.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            if (this.underMode)
+                document.body.classList.add(this.underMode.bodyClass);
+        };
+    })(GameMode.OverlayMode.prototype.enter);
+    GameMode.OverlayMode.prototype.leave = (function(superLeave) {
+        return function() {
+            superLeave.call(this);
+            if (this.underMode)
+                document.body.classList.remove(this.underMode.bodyClass);
+        };
+    })(GameMode.OverlayMode.prototype.leave);
+
+    GameMode.TransitionOverlayMode = function(bodyClass, delayMs) {
+        GameMode.OverlayMode.call(this, bodyClass);
+        this.delayMs = delayMs;
+        this.switchId = null;
+    };
+    GameMode.TransitionOverlayMode.prototype =
+        Object.create(GameMode.OverlayMode.prototype);
+    GameMode.TransitionOverlayMode.prototype.nextMode = function() { };
+    GameMode.TransitionOverlayMode.prototype.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            // in 5s, move to the next overlay
+            var isAndroid = window.device &&
+                (window.device.platform==='Android');
+
+            var dt = this.delayMs;
+            this.switchTime = Date.now() + dt;
+            this.switchId = setTimeout(this.switchMode.bind(this),
+                                       /* android's setTimeout takes its sweet
+                                        * time, so hack around it */
+                                       isAndroid && dt ? 250 : dt);
+        };
+    })(GameMode.TransitionOverlayMode.prototype.enter);
+    GameMode.TransitionOverlayMode.prototype.leave = (function(superLeave) {
+        return function() {
+            superLeave.call(this);
+            if (this.switchId === null) { return; }
+            clearTimeout(this.switchId);
+            this.switchId = null;
+        };
+    })(GameMode.TransitionOverlayMode.prototype.leave);
+    GameMode.TransitionOverlayMode.prototype.switchMode = function() {
+        // handle late-or-premature invocation on Android (sigh)
+        if (Date.now () < this.switchTime) {
+            this.switchId = setTimeout(this.switchMode.bind(this), 10);
+            return;
+        }
+        this.switchId = null;
+        // give subclass a chance to transition
+        if (!this.nextMode()) { this.pop(); }
+    };
+
+    GameMode.StarThrob = new GameMode.TransitionOverlayMode('starthrob', 5000);
+    GameMode.StarThrob.enter = (function(superEnter) {
+        return function() {
+            // tweak the timing if there are no stars to flash
+            this.delayMs = (Ruler.stars===0) ? 0 : 5000;
+            superEnter.call(this);
+        };
+    })(GameMode.StarThrob.enter);
+    GameMode.StarThrob.nextMode = function() {
+        // android massacres this animation, sigh.
+        var isAndroid = !!window.cordovaDetect;
+        // grow sprouts up to next level
+        AWARDS.forEach(function(a) {
+            var sprout = SPROUTS[a[0]];
+            if (sprout.size >= 0) {
+                if (!isAndroid) {
+                    sprout.setSize(SPROUT_SCALES.length);
+                    sprout.setTime('3s');
+                } else {
+                    sprout.setSize(-1);
+                }
+            }
+        });
+        if (isAndroid) { GameMode.SproutsGrow.delayMs = 0; }
+        GameMode.SproutsGrow.push(); // delay while sprouts grow
+        return true; // did my own transition
+    };
+
+    GameMode.SproutsGrow = new GameMode.TransitionOverlayMode('sproutsgrow',
+                                                              3000);
+    GameMode.SproutsGrow.nextMode = function() {
+        GameMode.Video.push();
+        return true;
+    };
+
+    GameMode.Video = new GameMode.OverlayMode('video');
+    GameMode.Video.enter = (function(superEnter) {
+        return function() {
+            superEnter.call(this);
+            this.maybeUnloadVideo();
+            // load the appropriate video and wait until ready to play
+            var level = GameMode.Playing.currentLevel;
+            var altitude = GameMode.Playing.currentAltitude;
+            var inner = document.querySelector('#video > .inner');
+            this.videoElement = document.createElement('video');
+            this.videoStartTime = this.videoEndTime = null;
+            this.lastSeek = this.playbackPercent = null;
+            if (false) {
+                /* these break appcache on firefox! */
+                // https://bugzilla.mozilla.org/show_bug.cgi?id=741351
+                this.videoElement.autobuffer = true;
+                this.videoElement.preload = 'auto';
+            } else {
+                // needed on desktop firefox (!)
+                this.videoElement.preload = 'none';
+            }
+            this.videoElement.volume = 1;
+            this.videoElement.muted = false; // xxx?
+            this.videoElement.poster = level.videoFor(altitude, 'jpg');
+            this.videoElement.addEventListener('canplay',
+                                               this.canPlay.bind(this), false);
+            this.videoElement.addEventListener('loadstart',/* for firefox =( */
+                                               this.canPlay.bind(this), false);
+            this.videoElement.addEventListener('ended',
+                                               this.playEnded.bind(this),false);
+            // XXX something's wrong with mp4 rendering on webkit.
+            // ... also on firefox:
+            //    https://bugzilla.mozilla.org/show_bug.cgi?id=790950
+            [/*'mp4',*/ 'webm'].forEach(function(videotype) {
+                var source = document.createElement('source');
+                source.type = 'video/' + videotype;
+                source.src = level.videoFor(altitude, videotype);
+                this.videoElement.appendChild(source);
+            }.bind(this));
+            inner.insertBefore(this.videoElement, inner.firstChild);
+            this.videoElement.load();
+        };
+    })(GameMode.Video.enter);
+    GameMode.Video.canPlay = function() {
+        // ready to play, let's do it!
+        this.videoElement.play();
+        document.querySelector('#video').classList.add('playing');
+        this.videoStartTime = Date.now();
+    };
+    GameMode.Video.playEnded = function() {
+        var video = document.querySelector('#video');
+        if (video.classList.contains('playing')) {
+            this.videoEndTime = Date.now();
+            video.classList.remove('playing');
+        }
+    };
+    GameMode.Video.maybeUnloadVideo = function() {
+        if (this.videoElement) {
+            // collect some playback metrics
+            this.lastSeek = this.videoElement.currentTime;
+            this.playbackPercent = 100 * this.lastSeek /
+                this.videoElement.duration;
+            // XXX could iterate through this.videoElement.played as well.
+            this.videoElement.parentElement.removeChild(this.videoElement);
+            this.videoElement = null;
+        }
+        this.playEnded(); // remove 'playing' attribute, record end time.
+    };
+    GameMode.Video.leave = (function(superLeave) {
+        return function() {
+            this.maybeUnloadVideo();
+            // record video playback duration for funf.
+            funf.record('videoplayback', {
+                duration: (this.videoStartTime && this.videoEndTime) ?
+                    (this.videoEndTime - this.videoStartTime) : null,
+                seek: this.lastSeek, /* another measure of playback time */
+                completion: this.playbackPercent,
+                level: GameMode.Playing.currentLevel.num,
+                altitude: ALTITUDES.toNum(GameMode.Playing.currentAltitude)
+            });
+            superLeave.call(this);
+        };
+    })(GameMode.Video.leave);
+    GameMode.Video.arrow = new ClickableElement('arrow');
+    GameMode.Video.arrow.attach(document.querySelector('#video > .inner'));
+    GameMode.Video.arrow.handleClick = function() {
+        GameMode.LevelDone.push();
+    };
+
+    GameMode.LevelDone = new GameMode.TransitionOverlayMode('leveldone', 0);
+    GameMode.LevelDone.nextMode = function() {
+        if (GameMode.Playing.nextAltitude()) {
+            GameMode.Playing.reset();
+            AWARDS.forEach(function(a) {
+                var sprout = SPROUTS[a[0]];
+                sprout.setTime('0s', '1s');
+            });
+            // reset sound to match new level
+            GameMode.switchTo(GameMode.Playing);
+            return true;
+        } else if (HTML5_HISTORY) {
+            this.currentLevel = GameMode.Playing.currentLevel;
+            history.back();
+            return true; // ???
+        } else {
+            GameMode.Menu.switchLevel(GameMode.Playing.currentLevel);
+            GameMode.switchTo(GameMode.Menu);
+            return true;
+        }
+    };
+
+    GameMode.Rotate = new GameMode.OverlayMode('rotate');
+
+    GameMode.Install = new GameMode.OverlayMode('install');
+    document.querySelector('#install .yes').addEventListener('click',function(){
+        GameMode.Install.maybeInstall(true);
+    }, false);
+    document.querySelector('#install .no').addEventListener('click',function(){
+        GameMode.Install.maybeInstall(false);
+    }, false);
+    GameMode.Install.maybeInstall = function(doInstall) {
+        var cb = function() { GameMode.Install.pop(); };
+        if (doInstall) {
+            GameMode.Install.doInstall(cb);
+        } else {
+            cb();
+        }
+    };
+
+    GameMode.Playing = new GameMode('game');
+    GameMode.Playing.toJSON = function() {
+        return {
+            mode: 'Playing',
+            level: this.currentLevel.num,
+            altitude: this.currentAltitude
+        };
+    };
+    GameMode.Playing.reset = function() {
+        initialBalloonSpeedY = MIN_BALLOON_SPEED_Y;
+        balloons.forEach(function(b, i) {
+            b.reset();
+            b.bornTimeout = 1000 + (i*BALLOON_SEPARATION_MS);
+            // race here with sizing of balloonselement, sigh.
+            // i hope balloons are never more than a thousand pixels big
+            b.x = balloonsElement.offsetWidth || -1000;
+            b.y = balloonsElement.offsetHeight || -1000;
+            b.refresh();
+        });
+        AWARDS.forEach(function(a) {
+            var sprout = SPROUTS[a[0]];
+            sprout.setSize(-1);
+            sprout.setTime('0s');
+        });
+        elForEach(document.querySelectorAll('#awards .award'), function(a) {
+            a.classList.remove('show');
+            a.style.WebkitTransform =
+                a.style.MozTransform =
+                a.style.transform = '';
+        });
+        var flex = document.querySelector('#awards .award.flex');
+        flex.style.display = 'none';
+
+        Ruler.reset();
+    };
+    GameMode.Playing.switchLevel = function(level) {
+        var levelElem = document.querySelector('#gamelevel.level');
+        if (this.currentLevel) { this.currentLevel.unloadSounds(); }
+        this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
+                                         'levelClass');
+        this.currentLevel.loadSounds();
+        // XXX re-randomize the button order?
+    };
+    GameMode.Playing.switchAltitude = function(altitude) {
+        var levelElem = document.querySelector('#gamelevel.level');
+        this.currentAltitude = _switchClass(levelElem,
+                                            this.currentAltitude, altitude);
+    };
+    GameMode.Playing.nextAltitude = function() {
+        var a = (ALTITUDES.toNum(this.currentAltitude) + 1) % ALTITUDES.length;
+        if (a === 0) {
+            var l = this.currentLevel.nextLevel;
+            if (l===null) {
+                return false; // no more levels.
+            }
+            this.switchLevel(l);
+        }
+        this.switchAltitude(ALTITUDES[a]);
+        return true;
+    };
+    GameMode.Playing.pause = (function(superPause) {
+        return function() {
+            superPause.call(this);
+            this.pauseTime = Date.now();
+            funf.record('status', 'pause');
+            stopMusic();
+            if (refresh.id !== null) {
+                Compat.cancelAnimationFrame(refresh.id);
+                refresh.id = null;
+            }
+            if (accelID !== null) {
+                stopAccelerometer();
+                accelID = null;
+            }
+            saveScore();
+            funf.archive();
+        };
+    })(GameMode.Playing.pause);
+    GameMode.Playing.resume = (function(superResume) {
+        return function() {
+            superResume.call(this);
+            var timePaused = this.pauseTime - Date.now();
+            funf.record('status', 'resume');
+            playMusic(this.currentLevel.audioUrl());
+            refresh.lastFrame = Date.now();
+            if (refresh.id === null) {
+                refresh.id = Compat.requestAnimationFrame(refresh);
+            }
+            if (accelID === null && ENABLE_ACCEL) {
+                accelID = startAccelerometer();
+            }
+            balloons.forEach(function(b) {
+                b.pauseTime += timePaused;
+            });
+        };
+    })(GameMode.Playing.resume);
+    GameMode.Playing.pauseTime = Date.now();
+
+    // loading reinforcement sounds ---------
+    var loadSoundTags = function(soundTags) {
+        var soundbank = {};
+        var load = function(filename) {
+            var key = '$' + filename;
+            if (!soundbank.hasOwnProperty(key)) {
+                soundbank[key] = new Sound.Effect({ url: 'sounds/'+filename,
+                                                    instances: 2,
+                                                    formats: ['webm'] });
+            }
+            return soundbank[key];
+        };
+        var st = {};
+        ALTITUDES.forEach(function(a) {
+            st[a] = {};
+            COLORS.forEach(function(c) {
+                st[a][c] = {};
+                BALLOON_VARIANTS.forEach(function(v) {
+                    var tags = soundTags[a][c] || [];
+                    // handle shorthand, if all variants aren't spec'ed
+                    if (tags[v]) { tags = tags[v]; }
+                    // handle shorthand: string instead of length-1 array
+                    if (typeof(tags)==='string') { tags = [ tags ]; }
+                    // HACK: chrome crashes if we load too many sounds!
+                    //       turn off feedback sounds.
+                    if (/ Chrome\//.test(window.navigator.userAgent)) {
+                        st[a][c][v] = [];
+                    } else {
+                        st[a][c][v] = tags.map(load);
+                    }
+                });
+            });
+        });
+        return st;
+    };
+
+    // ------------ game levels --------------
+    var GameLevel = function(levelClass, musicBase, soundTags) {
+        this.levelClass = levelClass;
+        this.musicBase = musicBase;
+        this.soundTags = soundTags;
+        this.sounds = null;
+    };
+    GameLevel.prototype = {};
+    GameLevel.prototype.audioUrl = function() {
+        return "sounds/"+this.musicBase;
+    };
+    GameLevel.prototype.videoFor = function(altitude, format) {
+        var url = "video/SpaceBalloon"+(1+this.num)+"-"+(1+ALTITUDES.toNum(altitude));
+        if (format==='mp4') {
+            return url + "-baseline.mp4";
+        } else if (format==='jpg') {
+            return url + '.jpg';
+        } else {
+            return url + "-256k32k.webm";
+        }
+    };
+    GameLevel.prototype.loadSounds = function() {
+        this.sounds = loadSoundTags(this.soundTags);
+    };
+    GameLevel.prototype.unloadSounds = function() {
+        this.sounds = null;
+    };
+    GameLevel.prototype.soundFor = function(altitude, color, variant) {
+        console.assert(this.sounds);
+        return this.sounds[altitude][color][variant];
+    };
+
+    var BAT_MAT_CAT_CAB = {
+        black: ['angela_bat', 'richard_bat', 'scott_bat', 'scott_b_a_t'],
+        lilac: ['angela_mat', 'richard_mat', 'scott_mat', 'scott_m_a_t'],
+        orange:['angela_cat', 'richard_cat', 'scott_cat', 'scott_c_a_t'],
+        yellow:['angela_cab', 'richard_cab', 'scott_cab', 'scott_c_a_b']
+    };
+    var LEVELS = [
+        // "grass" level
+        new GameLevel('level1', 'barrios-gavota', {
+            // no sounds for first level
+            ground: {},
+            troposphere: {},
+            stratosphere: {},
+            mesosphere: {}
+        }),
+        // "mountains" level
+        new GameLevel('level2', 'letting-go', {
+            ground:
+            { black: ['angela_name_b', 'richard_name_b' ],
+              lilac: ['angela_name_m', 'richard_name_m' ],
+              orange:['angela_name_t', 'richard_name_t' ],
+              yellow:['angela_name_c', 'richard_name_c' ]
+            },
+            troposphere:
+            { black: ['angela_sound_b', 'richard_sound_b'],
+              lilac: ['angela_sound_m', 'richard_sound_m'],
+              orange:['angela_sound_t', 'richard_sound_t'],
+              yellow:['angela_sound_c', 'richard_sound_c']
+            },
+            stratosphere: BAT_MAT_CAT_CAB,
+            mesosphere:   BAT_MAT_CAT_CAB
+        }),
+        // "sand" level
+        new GameLevel('level3', 'red-wing', {
+            ground:       BAT_MAT_CAT_CAB,
+            troposphere:  BAT_MAT_CAT_CAB,
+            stratosphere: BAT_MAT_CAT_CAB,
+            mesosphere:   BAT_MAT_CAT_CAB
+        }),
+        // "snow" level
+        new GameLevel('level4', 'arkansas-traveller', {
+            ground:
+            { black: { var1: 'scott_bat',     var2: 'scott_a_bat',
+                       var3: 'scott_the_bat', var4: 'scott_bats' },
+              lilac: { var1: 'scott_mat',     var2: 'scott_a_mat',
+                       var3: 'scott_the_mat', var4: 'scott_mats' },
+              orange:{ var1: 'scott_cat',     var2: 'scott_a_cat',
+                       var3: 'scott_the_cat', var4: 'scott_cats' },
+              yellow:{ var1: 'scott_cab',     var2: 'scott_a_cab',
+                       var3: 'scott_the_cab', var4: 'scott_cabs' } },
+            troposphere:
+            { black: { var1: 'scott_bat',     var2: 'scott_a_bat',
+                       var3: 'scott_the_bat', var4: 'scott_bats' },
+              lilac: { var1: 'scott_mat',     var2: 'scott_a_mat',
+                       var3: 'scott_the_mat', var4: 'scott_mats' },
+              orange:{ var1: 'scott_cat',     var2: 'scott_a_cat',
+                       var3: 'scott_the_cat', var4: 'scott_cats' },
+              yellow:{ var1: 'scott_cab',     var2: 'scott_a_cab',
+                       var3: 'scott_the_cab', var4: 'scott_cabs' } },
+            stratosphere:
+            { black: 'scott_bat', lilac: 'scott_bats',
+              orange: 'scott_cat', yellow: 'scott_cats' },
+            mesosphere:
+            { black: 'scott_mat', lilac: 'scott_mats',
+              orange: 'scott_cab', yellow: 'scott_cabs' }
+        })
+    ];
+    LEVELS.forEach(function(l, i) {
+        l.num = i;
+        l.prevLevel = LEVELS[i-1] || null;
+        l.nextLevel = LEVELS[i+1] || null;
+        l.dot = document.createElement('div');
+        l.dot.classList.add('dot');
+        document.querySelector('#menu .levelnav .inner').appendChild(l.dot);
+    });
+
+
+    // smoothing factor -- closer to 0 means more weight on present
+    var CORRECT_SMOOTHING = 0.8;
+    // number of correct answers as fraction of total (weighted average)
+    var correctFraction = 0;
+    // milliseconds per correct answer (weighted average)
+    var correctTime = 10000;
+
+    var adjustSpeeds = function(correctTime, correctFraction) {
+        // try to adjust speed such that:
+        // (a) correctFraction is about 80%
+        // (b) the balloon travels 90% up the screen in 'correctTime' ms.
+        var aspeed = Math.max(correctFraction/0.8, 0.8) * initialBalloonSpeedY;
+        var bspeed = (balloonsElement.offsetHeight * 0.9) / correctTime;
+        var avg = (aspeed + bspeed) / 2;
+        // only allow it to speed up/slow down by factor of 1.2 each time
+        var ADJ_FACTOR = 1.2;
+        var minnew = Math.max(initialBalloonSpeedY / ADJ_FACTOR,
+                              MIN_BALLOON_SPEED_Y);
+        var maxnew = Math.min(initialBalloonSpeedY * ADJ_FACTOR,
+                              MAX_BALLOON_SPEED_Y);
+        initialBalloonSpeedY = Math.max(minnew, Math.min(maxnew, avg));
+    };
+
+    var Ruler = {
+        SMOOTHING: 0.85,
+        domElement: document.querySelector('#ruler .foreground'),
+        reset: function() {
+            this.smoothedHeight = 1;
+            this.height = 1;
+            this.stars = 0;
+            this.streak = 0;
+            elForEach(document.querySelectorAll('#ruler .stars'), function(s) {
+                s.classList.remove('highlight');
+            });
+            this.domElement.style.height = '100%';
+        },
+        adjust: function(isCorrect, height /* 0-1 fraction */) {
+            var altitude = GameMode.Playing.currentAltitude;
+            var e;
+            // correct answer bonus
+            if (isCorrect) {
+                height -= 0.1;
+                this.streak++;
+            } else {
+                this.streak = 0;
+                height = 1;
+            }
+            // reflect current % on the ruler element
+            this.smoothedHeight =
+                Math.max(0, Math.min(1, Ruler.SMOOTHING * this.smoothedHeight +
+                                     (1 - Ruler.SMOOTHING) * height));
+            this.height = this.smoothedHeight *
+                Math.max(0.28, Math.pow(0.98, this.streak));
+
+            var pct = 25 * (this.height + ALTITUDES.toNum(altitude));
+            this.domElement.style.height = pct+'%';
+            // light up one, two, or three stars
+            var nStars = (this.height < 0.28) ? 3 :
+                (this.height < 0.54) ? 2 :
+                (this.height < 0.79) ? 1 : 0;
+
+            var efors = function(s) {
+                return document.querySelector('#ruler .'+altitude+' .stars.' +
+                                              ['zero','one','two','three'][s]);
+            };
+            if (nStars !== this.stars) {
+                e = efors(this.stars);
+                if (e) { e.classList.remove('highlight'); }
+                this.stars = nStars;
+                e = efors(this.stars);
+                if (e) { e.classList.add('highlight'); }
+            }
+        }
+    };
+    Ruler.reset();
+
+    var correctAnswer = function(color, balloonTime, balloonHeight) {
+        funf.record('correct', { color: color, time: balloonTime });
+        // maintain weighted averages
+        correctTime = CORRECT_SMOOTHING * correctTime +
+            (1-CORRECT_SMOOTHING) * balloonTime;
+        correctFraction = CORRECT_SMOOTHING * correctFraction +
+            (1-CORRECT_SMOOTHING);
+        // adjust speeds based on new fractions
+        adjustSpeeds(correctTime, correctFraction);
+        Ruler.adjust(true, balloonHeight);
+    };
+    var incorrectAnswer = function(how, balloonTime) {
+        funf.record('incorrect', { type: how, time: balloonTime });
+
+        // maintain weighted averages
+        // since this answer is incorrect, use the time only if it
+        // is greater than the current correctTime estimate.
+        var correctTimeCopy = correctTime;
+        if (balloonTime > correctTime) {
+            correctTimeCopy = CORRECT_SMOOTHING * correctTime +
+                (1 - CORRECT_SMOOTHING) * balloonTime;
+        }
+        correctFraction = CORRECT_SMOOTHING * correctFraction;
+
+        // adjust speeds based on new fractions
+        adjustSpeeds(correctTimeCopy, correctFraction);
+        Ruler.adjust(false, 1);
+    };
+
+    var wrongLockoutID = null;
+    var doubleTapLockoutID = null, doubleTapColor;
+    handleButtonPress = function(color) {
+        // remove the highest balloon of that color
+        var i, b, best=null;
+        for (i=0; i<balloons.length; i++) {
+            b = balloons[i];
+            if (b.color === color && b.born && !(b.isGone() || b.popped)) {
+                if (best===null || b.y < best.y) {
+                    best = b;
+                }
+            }
+        }
+        if (best===null) {
+            // prevent double taps from being registered as wrong answers
+            if (doubleTapLockoutID !== null && color == doubleTapColor) {
+                return; /* ignore */
+            }
+            // prevent too many wrong answers from being recorded close together
+            if (wrongLockoutID !== null) { return; }
+            // ok, process the wrong answer
+            random.choice(WRONG_SOUNDS).play();
+            incorrectAnswer('click.'+color, /* XXX use the escape time */
+                            Math.round(balloonsElement.offsetHeight /
+                                       initialBalloonSpeedY));
+            // lose an award (sigh)
+            loseAward(); saveScore();
+            wrongLockoutID = window.setTimeout(function() {
+                wrongLockoutID = null;
+            }, 500); // 0.5s time out after wrong answer
+        } else {
+            best.pop();
+            correctAnswer(color, (Date.now() - best.bornTime) - best.pauseTime,
+                          1-Math.max(0, best.y / balloonsElement.offsetHeight));
+            // try to prevent a double tap being registered as a wrong answer.
+            doubleTapColor = color;
+            if (doubleTapLockoutID) {
+                window.clearTimeout(doubleTapLockoutID);
+            }
+            doubleTapLockoutID = window.setTimeout(function() {
+                doubleTapLockoutID = null;
+            }, 500); // 0.5s double-tap lockout
+        }
+    };
+
+    var onPause = function() { GameMode.currentMode.pause(); };
+    var onResume = function() { GameMode.currentMode.resume(); };
+    // Set the name of the hidden property and the change event for visibility
+    var hidden="hidden", visibilityChange="visibilitychange";
+    if (typeof document.hidden !== "undefined") {
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+    } else if (typeof document.mozHidden !== "undefined") {
+        hidden = "mozHidden";
+        visibilityChange = "mozvisibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+    }
+    var onVisibilityChange = function() {
+        var wasHidden = true;
+        return function(e) {
+            var isHidden = document[hidden] || false;
+            if (wasHidden === isHidden) { return; }
+            wasHidden = isHidden;
+            if (isHidden) { onPause(); } else { onResume(); }
+        };
+    }();
+    document.addEventListener(visibilityChange, onVisibilityChange,
+                              false);
+
+    refresh = function() {
+        refresh.id = null;
+        var now = Date.now();
+        var isBorn = false, isEscape = false;
+        var i, b;
+        var dt = Math.max(0, Math.min(now - refresh.lastFrame, 100));
+        for (i=0; i<balloons.length; i++) {
+            b = balloons[i];
+            b.update(dt);
+            if (b.isGone()) {
+                if (!b.popped) {
+                    isEscape = true;
+                    incorrectAnswer('escape.'+b.color,
+                                    (now - b.bornTime) - b.pauseTime);
+                }
+                isBorn = true;
+                b.reset();
+                // enforce separation between balloons
+                if ((now - refresh.lastBorn) < BALLOON_SEPARATION_MS) {
+                    b.bornTimeout = BALLOON_SEPARATION_MS -
+                        (now - refresh.lastBorn);
+                    refresh.lastBorn += BALLOON_SEPARATION_MS;
+                } else {
+                    refresh.lastBorn = now;
+                }
+            }
+            b.refresh();
+        }
+        // play sounds down here so we only start one per frame.
+        if (isEscape) {
+            random.choice(ESCAPE_SOUNDS).play();
+        }
+        if (isBorn) {
+            // XXX inflation sound here was very noisy =(
+        }
+        refresh.lastFrame = now;
+        // keep playing (if we haven't changed modes)
+        if (GameMode.currentMode===GameMode.Playing) {
+            refresh.id = Compat.requestAnimationFrame(refresh);
+        }
+    };
+    refresh.id = null;
+    refresh.lastFrame = Date.now();
+    refresh.lastBorn = 0;
+
+    var handleNellTouch = function(ev) {
+        if (ev.type === 'touchstart') {
+            // prevent duplicate events
+            ev.target.removeEventListener('mousedown', handleNellTouch, false);
+        }
+        ev.preventDefault();
+        nell.switchColor();
+    };
+    ['mousedown','touchstart'].forEach(function(evname) {
+        // hacky workaround for android: removeEventListener('mousedown')
+        // doesn't work on android (sigh) so don't register it to begin with
+        var isAndroid = !!window.cordovaDetect;
+        if (isAndroid && evname[0]==='m') { return; }
+
+        elForEach(document.querySelectorAll('.nells > div > div'),
+                  function(nellElem) {
+                      nellElem.addEventListener(evname, handleNellTouch, false);
+                  });
+    });
+
+    var onPopState = function(event) {
+        var State = event.state;
+        if (!State) { return; }
+        if (!State.mode) { return; }
+        switch (State.mode) {
+        case 'Playing':
+            GameMode.Playing.switchLevel(LEVELS[State.level]);
+            GameMode.Playing.switchAltitude(LEVELS[State.altitude]);
+            GameMode.switchTo(GameMode.Playing);
+            break;
+        case 'Menu':
+            if (GameMode.currentMode.currentLevel) {
+                GameMode.Menu.switchLevel(GameMode.currentMode.currentLevel);
+            } else {
+                GameMode.Menu.switchLevel(LEVELS[State.level]);
+            }
+            GameMode.switchTo(GameMode.Menu);
+            break;
+        }
+    };
+
+    var processOrientation = function(isPortrait) {
+        if (!isPortrait) {
+            if (GameMode.currentMode !== GameMode.Rotate) {
+                GameMode.Rotate.push();
+                funf.record('orientation', 'landscape');
+            }
+        } else {
+            if (GameMode.currentMode === GameMode.Rotate) {
+                GameMode.Rotate.pop();
+                funf.record('orientation', 'portrait');
+            }
+        }
+    };
+    var onOrientationChange = function(event) {
+        // XXX this is xoom specific, we should really look at width/height
+        var isXoom = (window.device &&
+                      window.device.platform==='Android' &&
+                      window.device.name==='tervigon');
+        if (!isXoom) { return; }
+
+        var isPortrait = !(window.orientation === 0 ||
+                           window.orientation === 180);
+        // Android sometimes gives bogus values on startup, so if this is the
+        // first call to onOrientationChange, use document body size instead
+        // (but note that document.body size is generally changed *after*
+        // the orientationchange event is fired)
+        if (!event) {
+            isPortrait = (window.outerHeight >= window.outerWidth);
+        }
+        processOrientation(isPortrait);
+    };
+
+    function onDeviceReady() {
+        funf.record('startColor', nell.color);
+        funf.record('startVersion', version);
+
+        // scale viewport width to be at least 800px
+        var onResize = function() {
+            var body = document.body;
+            var width = body.parentElement.offsetWidth;
+            if (width >= 800) {
+                body.style.width =
+                    body.style.height =
+                    body.style.WebkitTransform =
+                    body.style.MozTransform =
+                    body.style.transform = '';
+            } else {
+                var scale = width / 800;
+                body.style.width = '800px';
+                body.style.height = (100/scale)+'%';
+                var transform = 'scale('+scale+')';
+                body.style.WebkitTransform = 'translate3d(0,0,0) '+transform;
+                body.style.MozTransform = body.style.transform = transform;
+            }
+        };
+        window.addEventListener('resize', onResize, false);
+        onResize();
+
+        // start in menu screen
+        window.GameMode = GameMode;
+        GameMode.Menu.switchLevel(LEVELS[0]);
+        GameMode.switchTo(GameMode.Menu);
+        if (HTML5_HISTORY) {
+            history.replaceState(GameMode.currentMode.toJSON(),
+                                 DOCUMENT_TITLE+' | Menu', '#menu');
+            window.addEventListener('popstate', onPopState, false);
+        }
+        // install webapp?
+        if (window && window.navigator &&
+            window.navigator.mozApps &&
+            window.navigator.mozApps.getSelf &&
+            window.navigator.mozApps.install) {
+            var request = window.navigator.mozApps.getSelf();
+            request.onsuccess = function() {
+                if (request.result) {
+                    /* we're already installed, do nothing */
+                    funf.record('installed', 'yes');
+                } else {
+                    /* not installed, prompt to install */
+                    funf.record('installed', 'no');
+                    GameMode.Install.doInstall = function(cb) {
+                        var request = window.navigator.mozApps.install(
+                            // XXX prefix not strictly required?
+                            'http://nell-balloons.github.cscott.net/'+
+                            'manifest.webapp');
+                        request.onsuccess = function() {
+                            funf.record('installed', 'success');
+                            cb(true);
+                        };
+                        request.onerror = function() {
+                            funf.record('installerror', this.error.name);
+                            cb(false);
+                        };
+                    };
+                    GameMode.Install.push();
+                }
+            };
+            request.onerror = function() {
+                funf.record('installerror', this.error.name);
+                console.log('Error checking installation status: ' +
+                            this.error.name);
+            };
+        }
+
+        // orientation
+        var isMobile = false;
+        if (window.cordovaDetect) { isMobile = true; }
+        else if (window.navigator) {
+            // Hacky!  Why isn't there a simple method to tell whether
+            // device orientation can change? (not portrait/landscape, but
+            // orientation)
+            var platform = window.navigator.platform.toLowerCase();
+            var userAgent = window.navigator.userAgent.toLowerCase();
+            if (platform.indexOf("android") >= 0 ||
+                userAgent.indexOf("android;") >= 0 ||
+                userAgent.indexOf(" android ") >= 0 ||
+                userAgent.indexOf("tablet;") >= 0 ||
+                userAgent.indexOf("fennec") >= 0) {
+                isMobile = true;
+            }
+        }
+        if (isMobile) {
+            // don't prompt to rotate screen on desktop browsers!
+            if (window.matchMedia) { // most reliable method
+                // (not supported by Honeycomb)
+                var mql = window.matchMedia(
+                    "screen and (orientation: landscape)");
+                var queryListener = function(m) {
+                    var isPortrait = !(m.matches);
+                    processOrientation(isPortrait);
+                };
+                mql.addListener(queryListener);
+                queryListener(mql);
+            } else if ('orientation' in window) { // works on xoom
+                window.addEventListener('orientationchange',
+                                        onOrientationChange, false);
+                onOrientationChange();
+            }
+        }
+
+        // phonegap
+        document.addEventListener("backbutton", function() {
+            if (HTML5_HISTORY) {
+                history.back();
+            } else { // hack!
+                if (GameMode.currentMode === GameMode.Playing) {
+                    GameMode.switchTo(GameMode.Menu);
+                }
+            }
+        }, false);
+        document.addEventListener('pause', onPause, false);
+        document.addEventListener('resume', onResume, false);
+        onVisibilityChange();
+        // add top-level "anim" class unless we're on xoom/honeycomb/phonegap
+        var isXoom = window.cordovaDetect && window.device &&
+            (window.device.platform==='Android') &&
+            //(window.device.version==='3.2.1') &&
+            (window.device.name==='tervigon');
+        if (!isXoom) { document.body.classList.add('anim'); }
+    }
+    if (window.cordovaDetect) {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    } else {
+        console.log('not on phonegap');
+        onDeviceReady();
+    }
+});

@@ -612,8 +612,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var WRONG_SOUNDS = loadSounds(['sounds/wrong1']);
     var ESCAPE_SOUNDS = loadSounds(['sounds/wrong2']);
     var AWARD_SOUNDS = loadSounds(['sounds/award']);
-    var LEVEL_SOUNDS = loadSounds(['sounds/levelwin',
-                                   'sounds/levellose']);
+    var LEVEL_SOUNDS = loadSounds(['sounds/levelwin'/*,
+                                   'sounds/levellose'*/]);
 
     // utility method
     var _switchClass = function(elem, from, to, optProp) {

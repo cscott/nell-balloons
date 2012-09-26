@@ -44,7 +44,7 @@ build-all: build/index.js
 	# apache support for HTML5 offline manifest
 	( echo "AddType text/cache-manifest .appcache" ; \
 	  echo "AddType application/x-web-app-manifest+json .webapp" ; \
-	  echo "AddType application/webm .webm" ; \
+	  echo "AddType video/webm .webm" ; \
 	  echo "AddType audio/ogg .ogg" ; \
 	  echo "AddType audio/mpeg .mp3" ) \
 	  > build/.htaccess

@@ -1134,7 +1134,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                     if (tags[v]) { tags = tags[v]; }
                     // handle shorthand: string instead of length-1 array
                     if (typeof(tags)==='string') { tags = [ tags ]; }
-                    st[a][c][v] = tags.map(load);
+                    // HACK: chrome crashes if we load too many sounds!
+                    //       turn off feedback sounds.
+                    if (/ Chrome\//.test(window.navigator.userAgent)) {
+                        st[a][c][v] = [];
+                    } else {
+                        st[a][c][v] = tags.map(load);
+                    }
                 });
             });
         });

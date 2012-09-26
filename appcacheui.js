@@ -27,7 +27,6 @@ var AppCacheUI = {
       info.id = INFO_ID;
       a.href = '';
       a.addEventListener('click', function (ev) {
-        console.log("AppCacheUI: Reload Button Clicked");
         ev.stopPropagation();
         window.location.reload();
       }, true /* useCapture */);

@@ -886,6 +886,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var altitude = GameMode.Playing.currentAltitude;
             var inner = document.querySelector('#video > .inner');
             this.videoElement = document.createElement('video');
+            this.videoStartTime = this.videoEndTime = null;
+            this.lastSeek = this.playbackPercent = null;
             if (false) {
                 /* these break appcache on firefox! */
                 // https://bugzilla.mozilla.org/show_bug.cgi?id=741351
@@ -921,20 +923,39 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         // ready to play, let's do it!
         this.videoElement.play();
         document.querySelector('#video').classList.add('playing');
+        this.videoStartTime = Date.now();
     };
     GameMode.Video.playEnded = function() {
-        document.querySelector('#video').classList.remove('playing');
+        var video = document.querySelector('#video');
+        if (video.classList.contains('playing')) {
+            this.videoEndTime = Date.now();
+            video.classList.remove('playing');
+        }
     };
     GameMode.Video.maybeUnloadVideo = function() {
         if (this.videoElement) {
+            // collect some playback metrics
+            this.lastSeek = this.videoElement.currentTime;
+            this.playbackPercent = 100 * this.lastSeek /
+                this.videoElement.duration;
+            // XXX could iterate through this.videoElement.played as well.
             this.videoElement.parentElement.removeChild(this.videoElement);
             this.videoElement = null;
         }
-        document.querySelector('#video').classList.remove('playing');
+        this.playEnded(); // remove 'playing' attribute, record end time.
     };
     GameMode.Video.leave = (function(superLeave) {
         return function() {
             this.maybeUnloadVideo();
+            // record video playback duration for funf.
+            funf.record('videoplayback', {
+                duration: (this.videoStartTime && this.videoEndTime) ?
+                    (this.videoEndTime - this.videoStartTime) : null,
+                seek: this.lastSeek, /* another measure of playback time */
+                completion: this.playbackPercent,
+                level: GameMode.Playing.currentLevel.num,
+                altitude: ALTITUDES.toNum(GameMode.Playing.currentAltitude)
+            });
             superLeave.call(this);
         };
     })(GameMode.Video.leave);

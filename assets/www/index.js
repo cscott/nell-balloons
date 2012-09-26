@@ -1102,20 +1102,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     GameMode.Playing.pauseTime = Date.now();
 
     // ------------ game levels --------------
-    var GameLevel = function(levelClass) {
+    var GameLevel = function(levelClass, musicBase) {
         this.levelClass = levelClass;
+        this.musicBase = musicBase;
     };
     GameLevel.prototype = {};
     GameLevel.prototype.audioUrl = function() {
-        var base = 'sounds/';
-        switch (this.num) {
-        default:
-        case 0: base += 'barrios_gavota'; break;
-        case 1: base += 'letting-go'; break;
-        case 2: base += 'red-wing'; break;
-        case 3: base += 'arkansas-traveller'; break;
-        }
-        return base;
+        return "sounds/"+this.musicBase;
     };
     GameLevel.prototype.videoFor = function(altitude, format) {
         var url = "video/SpaceBalloon"+(1+this.num)+"-"+(1+ALTITUDES.toNum(altitude));
@@ -1129,10 +1122,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
 
     var LEVELS = [
-        new GameLevel('level1'), // "grass"
-        new GameLevel('level2'), // "mountains"
-        new GameLevel('level3'), // "sand"
-        new GameLevel('level4')  // "snow"
+        // "grass" level
+        new GameLevel('level1', 'barrios-gavota'),
+        // "mountains" level
+        new GameLevel('level2', 'letting-go'),
+        // "sand" level
+        new GameLevel('level3', 'red-wing'),
+        // "snow" level
+        new GameLevel('level4', 'arkansas-traveller')
     ];
     LEVELS.forEach(function(l, i) {
         l.num = i;

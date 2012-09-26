@@ -603,7 +603,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             // bug with ogg on firefox/android:
             //  https://bugzilla.mozilla.org/show_bug.cgi?id=791017
             // use webm on all platforms for now, save some space.
-            return new Sound.Effect({url: url, instances: 2,
+            return new Sound.Effect({url: url, instances: 1,
                                      formats: ['webm'/*,'ogg','mp3'*/] });
         });
     };
@@ -1118,7 +1118,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             var key = '$' + filename;
             if (!soundbank.hasOwnProperty(key)) {
                 soundbank[key] = new Sound.Effect({ url: 'sounds/'+filename,
-                                                    instances: 2,
+                                                    instances: 1,
                                                     formats: ['webm'] });
             }
             return soundbank[key];

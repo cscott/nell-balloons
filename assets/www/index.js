@@ -248,7 +248,8 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         BALLOON_VARIANTS.forEach(function(v) {
             this.domElement.classList.remove(v);
         }.bind(this));
-        this.domElement.classList.add(random.choice(BALLOON_VARIANTS));
+        this.variant = random.choice(BALLOON_VARIANTS);
+        this.domElement.classList.add(this.variant);
         // reset other properties.
         this.born = false; this.bornTime = this.pauseTime = 0;
         this.bornTimeout = 0; // born immediately by default
@@ -348,6 +349,13 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             BURST_SOUNDS;
         random.choice(sounds).play();
         this.domElement.classList.add('payload-dropped');
+        // play the appropriate learning reinforcement sound
+        var level = GameMode.Playing.currentLevel;
+        var altitude = GameMode.Playing.currentAltitude;
+        var reinforcement = level.soundFor(altitude, this.color, this.variant);
+        if (reinforcement.length) {
+            random.choice(reinforcement).play();
+        }
 
         if (isAward) {
             this.domElement.classList.add('popped');
@@ -1042,8 +1050,10 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
     GameMode.Playing.switchLevel = function(level) {
         var levelElem = document.querySelector('#gamelevel.level');
+        if (this.currentLevel) { this.currentLevel.unloadSounds(); }
         this.currentLevel = _switchClass(levelElem, this.currentLevel, level,
                                          'levelClass');
+        this.currentLevel.loadSounds();
         // XXX re-randomize the button order?
     };
     GameMode.Playing.switchAltitude = function(altitude) {
@@ -1101,10 +1111,42 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     })(GameMode.Playing.resume);
     GameMode.Playing.pauseTime = Date.now();
 
+    // loading reinforcement sounds ---------
+    var loadSoundTags = function(soundTags) {
+        var soundbank = {};
+        var load = function(filename) {
+            var key = '$' + filename;
+            if (!soundbank.hasOwnProperty(key)) {
+                soundbank[key] = new Sound.Effect({ url: 'sounds/'+filename,
+                                                    instances: 2,
+                                                    formats: ['webm'] });
+            }
+            return soundbank[key];
+        };
+        var st = {};
+        ALTITUDES.forEach(function(a) {
+            st[a] = {};
+            COLORS.forEach(function(c) {
+                st[a][c] = {};
+                BALLOON_VARIANTS.forEach(function(v) {
+                    var tags = soundTags[a][c] || [];
+                    // handle shorthand, if all variants aren't spec'ed
+                    if (tags[v]) { tags = tags[v]; }
+                    // handle shorthand: string instead of length-1 array
+                    if (typeof(tags)==='string') { tags = [ tags ]; }
+                    st[a][c][v] = tags.map(load);
+                });
+            });
+        });
+        return st;
+    };
+
     // ------------ game levels --------------
-    var GameLevel = function(levelClass, musicBase) {
+    var GameLevel = function(levelClass, musicBase, soundTags) {
         this.levelClass = levelClass;
         this.musicBase = musicBase;
+        this.soundTags = soundTags;
+        this.sounds = null;
     };
     GameLevel.prototype = {};
     GameLevel.prototype.audioUrl = function() {
@@ -1120,16 +1162,98 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             return url + "-256k32k.webm";
         }
     };
+    GameLevel.prototype.loadSounds = function() {
+        this.sounds = loadSoundTags(this.soundTags);
+    };
+    GameLevel.prototype.unloadSounds = function() {
+        this.sounds = null;
+    };
+    GameLevel.prototype.soundFor = function(altitude, color, variant) {
+        console.assert(this.sounds);
+        return this.sounds[altitude][color][variant];
+    };
 
+    var B_M_C_T = {
+        black: ['angela_name_b', 'richard_name_b',
+                'angela_sound_b', 'richard_sound_b'],
+        lilac: ['angela_name_m', 'richard_name_m',
+                'angela_sound_m', 'richard_sound_m'],
+        orange:['angela_name_t', 'richard_name_t',
+                'angela_sound_t', 'richard_sound_t'],
+        yellow:['angela_name_c', 'richard_name_c',
+                'angela_sound_c', 'richard_sound_c']
+    };
+    var BAT_MAT_CAT_CAB = {
+        black: ['angela_bat', 'richard_bat', 'scott_bat'],
+        lilac: ['angela_mat', 'richard_mat', 'scott_mat'],
+        orange:['angela_cat', 'richard_cat', 'scott_cat'],
+        yellow:['angela_cab', 'richard_cab', 'scott_cab']
+    };
     var LEVELS = [
         // "grass" level
-        new GameLevel('level1', 'barrios-gavota'),
+        new GameLevel('level1', 'barrios-gavota', {
+            ground:
+            { black:  'scott_black',
+              lilac:  'scott_purple',
+              orange: 'scott_orange',
+              yellow: 'scott_yellow' },
+            troposphere:
+            { black: ['scott_bat', 'angela_bat', 'richard_bat'],
+              lilac: ['scott_mat', 'angela_mat', 'richard_mat'],
+              orange: 'scott_orange',
+              yellow: 'scott_banana' },
+            stratosphere:
+            { black:  'scott_bat',
+              lilac:  'scott_mat',
+              orange: 'scott_orange',
+              yellow: 'scott_banana' },
+            mesosphere:
+            { black:  'scott_bat',
+              lilac:  'scott_mat',
+              orange: 'scott_orange',
+              yellow: 'scott_banana' }
+        }),
         // "mountains" level
-        new GameLevel('level2', 'letting-go'),
+        new GameLevel('level2', 'letting-go', {
+            ground:       B_M_C_T,
+            troposphere:  B_M_C_T,
+            stratosphere: BAT_MAT_CAT_CAB,
+            mesosphere:   BAT_MAT_CAT_CAB
+        }),
         // "sand" level
-        new GameLevel('level3', 'red-wing'),
+        new GameLevel('level3', 'red-wing', {
+            ground:       BAT_MAT_CAT_CAB,
+            troposphere:  BAT_MAT_CAT_CAB,
+            stratosphere: BAT_MAT_CAT_CAB,
+            mesosphere:   BAT_MAT_CAT_CAB
+        }),
         // "snow" level
-        new GameLevel('level4', 'arkansas-traveller')
+        new GameLevel('level4', 'arkansas-traveller', {
+            ground:
+            { black: { var1: 'scott_bat',     var2: 'scott_a_bat',
+                       var3: 'scott_the_bat', var4: 'scott_bats' },
+              lilac: { var1: 'scott_mat',     var2: 'scott_a_mat',
+                       var3: 'scott_the_mat', var4: 'scott_mats' },
+              orange:{ var1: 'scott_cat',     var2: 'scott_a_cat',
+                       var3: 'scott_the_cat', var4: 'scott_cats' },
+              yellow:{ var1: 'scott_cab',     var2: 'scott_a_cab',
+                       var3: 'scott_the_cab', var4: 'scott_cabs' } },
+            troposphere:
+            { black: { var1: 'scott_bat',     var2: 'scott_a_bat',
+                       var3: 'scott_the_bat', var4: 'scott_bats' },
+              lilac: { var1: 'scott_mat',     var2: 'scott_a_mat',
+                       var3: 'scott_the_mat', var4: 'scott_mats' },
+              orange:{ var1: 'scott_cat',     var2: 'scott_a_cat',
+                       var3: 'scott_the_cat', var4: 'scott_cats' },
+              yellow:{ var1: 'scott_cab',     var2: 'scott_a_cab',
+                       var3: 'scott_the_cab', var4: 'scott_cabs' } },
+            stratosphere:
+            { black: 'scott_bat', lilac: 'scott_bats',
+              orange: 'scott_cat', yellow: 'scott_cats' },
+            mesosphere:
+            { black: 'scott_mat', lilac: 'scott_mats',
+              orange: 'scott_cab', yellow: 'scott_cabs' }
+        })
     ];
     LEVELS.forEach(function(l, i) {
         l.num = i;

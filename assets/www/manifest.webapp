@@ -1,5 +1,5 @@
 {
-  "version": "7.0",
+  "version": "@VERSION@.0",
   "name": "Nell's Balloons",
   "description": "Match letters and words as you pop balloons!",
   "icons": {

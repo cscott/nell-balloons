@@ -22,10 +22,14 @@ build-all: build/index.js
 	grep -v cordova assets/www/index.html | \
 	  sed -e 's/<html/<html manifest="manifest.appcache" /' \
 	  > build/index.html
+	for f in install.html manifest.webapp ; do \
+	  sed -e 's/@VERSION@/'`./print-version.js`'/g' \
+	    < assets/www/$$f > build/$$f ; \
+	done
 	cp res/drawable-mdpi/ic_launcher.png build/images/icon-48.png
-	cp assets/www/appcacheui.js assets/www/install.html build/
+	cp assets/www/appcacheui.js build/
 	cp assets/www/require.min.js build/require.js
-	cp assets/www/*.css assets/www/*.webapp build/
+	cp assets/www/*.css build/
 	cp assets/www/images/* build/images
 	cp assets/www/sounds/*.webm build/sounds
 	cp assets/www/video/*.jpg \
@@ -33,10 +37,10 @@ build-all: build/index.js
 	# offline manifest (everything!)
 	( echo "CACHE MANIFEST" ; \
 	  echo -n '# ' ; find build -type f | fgrep -v manifest | \
-	    fgrep -v install.html | xargs md5sum -b | md5sum; echo ; \
+	    fgrep -v install.html | sort | xargs md5sum -b | md5sum; echo ; \
 	  echo "CACHE:" ; \
 	  cd build ; find . -type f -print | fgrep -v manifest | \
-	    fgrep -v install.html ) > build/manifest.appcache
+	    fgrep -v install.html | sort ) > build/manifest.appcache
 	# domain name for github pages
 	echo nell-balloons.github.cscott.net > build/CNAME
 	# turn off jekyll for github pages

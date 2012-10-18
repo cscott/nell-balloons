@@ -2302,6 +2302,7 @@ body { background: #008; }
   top: 0; bottom: 0;
   background-repeat: no-repeat;
   background-position: center right;
+  background-size: contain;
 }
 #rotate > .background {
   background-image: url('images/xoom-rotate-bg.png');

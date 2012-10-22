@@ -650,9 +650,11 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     };
     GameMode.prototype.pause = function() {
         document.body.classList.add('paused');
+        funf.record('status', 'pause');
     };
     GameMode.prototype.resume = function() {
         document.body.classList.remove('paused');
+        funf.record('status', 'resume');
     };
     GameMode.prototype.toJSON = function() {
         return { mode: this.bodyClass };
@@ -896,6 +898,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             this.videoElement = document.createElement('video');
             this.videoStartTime = this.videoEndTime = null;
             this.lastSeek = this.playbackPercent = null;
+            this.videoPaused = false;
             if (false) {
                 /* these break appcache on firefox! */
                 // https://bugzilla.mozilla.org/show_bug.cgi?id=741351
@@ -927,11 +930,33 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             this.videoElement.load();
         };
     })(GameMode.Video.enter);
+    GameMode.Video.pause = (function(superPause) {
+        return function() {
+            superPause.call(this);
+            // pause video (if playing)
+            this.videoPaused = true;
+            if (this.videoStartTime !== null && this.videoEndTime === null) {
+                this.videoElement.pause();
+            }
+        };
+    })(GameMode.Video.pause);
+    GameMode.Video.resume = (function(superResume) {
+        return function() {
+            superResume.call(this);
+            // resume video (if loaded)
+            this.videoPaused = false;
+            if (this.videoStartTime !== null && this.videoEndTime === null) {
+                this.videoElement.play();
+            }
+        };
+    })(GameMode.Video.pause);
     GameMode.Video.canPlay = function() {
         // ready to play, let's do it!
-        this.videoElement.play();
         document.querySelector('#video').classList.add('playing');
         this.videoStartTime = Date.now();
+        if (!this.videoPaused) {
+            this.videoElement.play();
+        }
     };
     GameMode.Video.playEnded = function() {
         var video = document.querySelector('#video');
@@ -1077,7 +1102,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         return function() {
             superPause.call(this);
             this.pauseTime = Date.now();
-            funf.record('status', 'pause');
             stopMusic();
             if (refresh.id !== null) {
                 Compat.cancelAnimationFrame(refresh.id);
@@ -1095,7 +1119,6 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         return function() {
             superResume.call(this);
             var timePaused = this.pauseTime - Date.now();
-            funf.record('status', 'resume');
             playMusic(this.currentLevel.audioUrl());
             refresh.lastFrame = Date.now();
             if (refresh.id === null) {

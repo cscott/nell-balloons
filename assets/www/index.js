@@ -581,6 +581,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
     var playMusic = function(src) {
         if (music && music.origSrc !== src) {
             stopMusic();
+            music.release();
             music = null;
         }
         if (!music) {
@@ -1146,6 +1147,14 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
             }
             return soundbank[key];
         };
+        var unload = function() {
+            for (var key in soundbank) {
+                if (soundbank.hasOwnProperty(key)) {
+                    soundbank[key].release();
+                    delete soundbank[key];
+                }
+            }
+        };
         var st = {};
         ALTITUDES.forEach(function(a) {
             st[a] = {};
@@ -1167,6 +1176,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
                 });
             });
         });
+        st.unload = unload;
         return st;
     };
 
@@ -1195,6 +1205,7 @@ define(['domReady!', './alea', './compat', './funf', 'nell!', 'score!', 'sound',
         this.sounds = loadSoundTags(this.soundTags);
     };
     GameLevel.prototype.unloadSounds = function() {
+        if (this.sounds) { this.sounds.unload(); }
         this.sounds = null;
     };
     GameLevel.prototype.soundFor = function(altitude, color, variant) {

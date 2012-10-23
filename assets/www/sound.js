@@ -18,19 +18,35 @@ define([], function() {
         'm4a': 'audio/x-m4a'
     };
 
-    // Cross-browser Audio() constructor
-    var Audio = (function() {
-        return ('Audio' in window) ?
-            window.Audio :
-            function() {
-                return document.createElement('audio');
-            };
-    }());
+    // cache audio elements, rather than rely on garbage collection; this
+    // seems to help on Android since gc is not prompt
+    var AudioElementPool = (function() {
+        var pool = [];
+        // Cross-browser Audio() constructor
+        var Audio = (function() {
+            return ('Audio' in window) ?
+                window.Audio :
+                function() {
+                    return document.createElement('audio');
+                };
+        }());
+        return {
+            pop: function() {
+                return pool.length ? pool.pop() : new Audio();
+            },
+            push: function(audio) {
+                // we could recycle audio elements here, but
+                // firefox doesn't change the associated sound resources
+                // (and chrome crashes even if we recycle elements)
+                //pool.push(audio);
+            }
+        };
+    })();
 
     function nop(){}
 
     var AudioPool = function( url, formats, instances, callback, errback ) {
-        var audio = new Audio(),
+        var audio = AudioElementPool.pop(),
         cloningDone = false, // work around https://bugzilla.mozilla.org/show_bug.cgi?id=675986
         clones = [];
 
@@ -39,10 +55,13 @@ define([], function() {
         audio.preload = 'auto';
 
         // XXXhumph do we want to keep some kind of state to know if things worked?
-        audio.addEventListener('error', function() {
+        var onError = function() {
+            audio.removeEventListener(audio, onError, false);
             errback(audio.error);
-        }, false);
-        audio.addEventListener('canplaythrough', function() {
+        };
+        audio.addEventListener('error', onError, false);
+        var onPlayThrough = function() {
+            audio.removeEventListener('canplaythrough', onPlayThrough, false);
             if (cloningDone) {
                 return;
             }
@@ -51,7 +70,8 @@ define([], function() {
             }
             cloningDone = true;
             callback();
-        }, false);
+        };
+        audio.addEventListener('canplaythrough', onPlayThrough, false);
 
         var getExt = function(filename) {
             return filename.split('.').pop();
@@ -121,6 +141,23 @@ define([], function() {
                 console.log("AUDIO PROBLEM: "+e);
             }
         };
+        this.release = function() {
+            this.unloop();
+            // remove event listeners
+            audio.removeEventListener('canplaythrough', onPlayThrough, false);
+            audio.removeEventListener('error', onError, false);
+            // free clones
+            clones = null;
+            // remove <source> elements
+            while (audio.firstChild) {
+                audio.removeChild(audio.firstChild);
+            }
+            // remove attributes
+            audio.removeAttribute('preload');
+            audio.removeAttribute('autobuffer');
+            // push back into pool
+            AudioElementPool.push(audio);
+        };
     };
     if (window.cordovaDetect) {
         // use PhoneGap Media class.
@@ -180,6 +217,9 @@ define([], function() {
                     oloop.release();
                 }
             };
+            this.release = function() {
+                this.unloop();
+            };
             callback();
         };
     }
@@ -229,6 +269,7 @@ define([], function() {
         };
         this.loop = function() { pool.loop(); };
         this.unloop = function() { pool.unloop(); };
+        this.release = function() { pool.release(); };
     }
     Effect.load = function( options ) {
         load( Effect, options );

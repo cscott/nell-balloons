@@ -1,3 +1,7 @@
+@charset "utf-8";
+@import "base";
+@import "appcacheui";
+
 html,body {
  width:100%; height:100%; margin:0; padding: 0; border:none;
  overflow: hidden;
@@ -34,7 +38,7 @@ body { background: #008; }
  tap-highlight-color: rgba(0,0,0,0);
 }
 #buttons > a > span {
- background: url('images/button-overlay.png') no-repeat;
+ background: image-url('button-overlay.png') no-repeat;
 }
 #buttons > a.black  { background-color: #030303; }
 #buttons > a.lilac  { background-color: #ce72b9; }
@@ -43,7 +47,7 @@ body { background: #008; }
 #buttons > a.yellow { background-color: #ffff00; }
 
 #buttons > a.hover > span {
- background-image: url('images/button-overlay-hover.png');
+ background-image: image-url('button-overlay-hover.png');
 }
 
 #mask {
@@ -75,7 +79,7 @@ body { background: #008; }
 #video > .inner > a.arrow {
  display: inline-block;
  position: absolute;
- background-image: url('images/arrow-right.png');
+ background-image: image-url('arrow-right.png');
  width: 80px; height: 71px;
  bottom: 6px; right: 6px;
 }
@@ -83,7 +87,7 @@ body { background: #008; }
  opacity: 0.3
 }
 #video > .inner > a.arrow.hover {
- background-image: url('images/arrow-right-hover.png');
+ background-image: image-url('arrow-right-hover.png');
  opacity: 1;
 }
 .video #video > .inner > video { pointer-events: all; }
@@ -207,7 +211,7 @@ body { background: #008; }
 
 /* different backgrounds for each level */
 .level.level1 #background {
-  background-image: url('images/level1-back.png');
+  background-image: image-url('level1-back.png');
 }
 .anim .level.level1 #background {
   /* CSS3 gradient */
@@ -216,7 +220,7 @@ body { background: #008; }
   background-image:         linear-gradient(to top, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
 }
 .level.level2 #background {
-  background-image: url('images/level2-back.png');
+  background-image: image-url('level2-back.png');
 }
 .anim .level.level2 #background {
   background-image: -webkit-linear-gradient(bottom, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
@@ -224,7 +228,7 @@ body { background: #008; }
   background-image:         linear-gradient(to top, #fff, #fcffa5 10%, #0ff 38%, #00f 67%, #000 100%);
 }
 .level.level3 #background {
-  background-image: url('images/level3-back.png');
+  background-image: image-url('level3-back.png');
 }
 .anim .level.level3 #background {
   background-image: -webkit-linear-gradient(top, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
@@ -232,7 +236,7 @@ body { background: #008; }
   background-image:         linear-gradient(to bottom, #000, #8282ff 33%, #fff0be 62%, #fff6d5 85%, #fffef4 96%, #f9ff9f 100%);
 }
 .level.level4 #background {
-  background-image: url('images/level4-back.png');
+  background-image: image-url('level4-back.png');
 }
 .anim .level.level4 #background {
   background-image: -webkit-linear-gradient(top, #000, #005f9b 33%, #0090d8 62%, #19b1ff 77%, #005b94 96%, #005b94 100%);
@@ -252,23 +256,23 @@ body { background: #008; }
 
 #background .satellite1 {
   height: 362px;
-  background-image: url('images/satellite1.png');
+  background-image: image-url('satellite1.png');
   bottom: 25%;
 }
 #background .satellite2 {
   height: 117px;
-  background-image: url('images/satellite2.png');
+  background-image: image-url('satellite2.png');
   top: 25%;
 }
 .level.level3 #background .satellite2 {
   height: 216px;
-  background-image: url('images/shuttle.png');
+  background-image: image-url('shuttle.png');
   background-repeat: no-repeat;
   margin-top: -121px;
 }
 .level.level4 #background .satellite2 {
   width: 292px; min-width: 292px; height: 288px;
-  background: url('images/moon.png') no-repeat;
+  background: image-url('moon.png') no-repeat;
   left: 100px; margin-top: -50px;
   -webkit-animation-name: none;
      -moz-animation-name: none;
@@ -277,7 +281,7 @@ body { background: #008; }
 
 #background .cloud {
   height: 162px;
-  background-image: url('images/cloud-small.png');
+  background-image: image-url('cloud-small.png');
 }
 #background .c1 { background-position: 166px 0; bottom: 75%; }
 #background .c2 { background-position: -100px 0; bottom: 50%; }
@@ -286,11 +290,11 @@ body { background: #008; }
 #background .stars {
   position: absolute;
   top: 0; bottom: 0; left: 0; right: 0;
-  background: url('images/star-tile.png') repeat;
+  background: image-url('star-tile.png') repeat;
 }
 
 .level.level2 #background .cloud.c1 {
-  background: url('images/meteor.png') no-repeat;
+  background: image-url('meteor.png') no-repeat;
   height: 253px;
   margin-bottom: -125px;
   background-position: 100px 0;
@@ -306,39 +310,39 @@ body { background: #008; }
 }
 .level.level2 #background .mountain {
   height: 495px;
-  background-image: url('images/level2-mountains.png');
+  background-image: image-url('level2-mountains.png');
 }
 .level.level3 #background .mountain {
   height: 499px;
-  background-image: url('images/level3-sand.png');
+  background-image: image-url('level3-sand.png');
 }
 .level.level4 #background .mountain {
   height: 338px;
-  background-image: url('images/level4-snow.png');
+  background-image: image-url('level4-snow.png');
 }
 .level.level3 #background .troposphere > .sun {
   position: absolute;
   left: 85px; top: 25%;
   width: 278px; height: 174px;
-  background: url('images/level3-sun.png') no-repeat;
+  background: image-url('level3-sun.png') no-repeat;
   margin-top: -116px;
 }
 .level.level4 #background .ground > .tree {
   position: absolute;
   right: -39px; width: 100%; max-width: 681px;
   bottom: 0; height: 100%;
-  background-image: url('images/level4-tree.png');
+  background-image: image-url('level4-tree.png');
   background-size: 100% 100%;
 }
 .level.level4 #background > .snowflakes {
   bottom: 0; height: 75%;
-  background: url('images/level4-snowflakes.png') repeat;
+  background: image-url('level4-snowflakes.png') repeat;
   background-position: bottom center;
 }
 .level.level4 #nell .stratosphere > .ufo {
   position: absolute;
   width: 752px; height: 579px;
-  background: url('images/ufo.png') no-repeat;
+  background: image-url('ufo.png') no-repeat;
   bottom: 0; right: -60px;
   pointer-events: none;
 }
@@ -362,58 +366,58 @@ body { background: #008; }
 }
 #awards .award {
   height: 124px;
-  background-image: url('images/award.png'); /* blank fallback image */
+  background-image: image-url('award.png'); /* blank fallback image */
   -webkit-transform: translate3d(0,138px,0);
      -moz-transform: translate(0,138px);
           transform: translate(0,138px);
 }
 .level.level1 #awards .award.a1,
 .level.level3 #awards .award.a1 {
-  background-image: url('images/award1.png');
+  background-image: image-url('award1.png');
 }
 .level.level1 #awards .award.a2,
 .level.level3 #awards .award.a2 {
-  background-image: url('images/award2.png');
+  background-image: image-url('award2.png');
 }
 .level.level1 #awards .award.a3,
 .level.level3 #awards .award.a3 {
-  background-image: url('images/award3.png');
+  background-image: image-url('award3.png');
 }
 .level.level1 #awards .award.a4,
 .level.level3 #awards .award.a4 {
-  background-image: url('images/award4.png');
+  background-image: image-url('award4.png');
 }
 .level.level1 #awards .award.a5,
 .level.level3 #awards .award.a5 {
-  background-image: url('images/award5.png');
+  background-image: image-url('award5.png');
 }
 .level.level1 #awards .award.a6,
 .level.level3 #awards .award.a6 {
-  background-image: url('images/award6.png');
+  background-image: image-url('award6.png');
 }
 .level.level2 #awards .award.a1,
 .level.level4 #awards .award.a1 {
-  background-image: url('images/award7.png');
+  background-image: image-url('award7.png');
 }
 .level.level2 #awards .award.a2,
 .level.level4 #awards .award.a2 {
-  background-image: url('images/award8.png');
+  background-image: image-url('award8.png');
 }
 .level.level2 #awards .award.a3,
 .level.level4 #awards .award.a3 {
-  background-image: url('images/award9.png');
+  background-image: image-url('award9.png');
 }
 .level.level2 #awards .award.a4,
 .level.level4 #awards .award.a4 {
-  background-image: url('images/award10.png');
+  background-image: image-url('award10.png');
 }
 .level.level2 #awards .award.a5,
 .level.level4 #awards .award.a5 {
-  background-image: url('images/award11.png');
+  background-image: image-url('award11.png');
 }
 .level.level2 #awards .award.a6,
 .level.level4 #awards .award.a6 {
-  background-image: url('images/award12.png');
+  background-image: image-url('award12.png');
 }
 #awards .award.show {
   -webkit-transform: translate3d(0,0,0) !important;
@@ -437,7 +441,7 @@ body { background: #008; }
   display: none;
 }
 #sprouts .award {
-  background-image: url('images/sprout1-lg.png');
+  background-image: image-url('sprout1-lg.png');
   background-position: bottom right;
   width: 238px;
   /* bottom-justify a 885px box */
@@ -464,10 +468,10 @@ body { background: #008; }
   transform-origin: 70px bottom;
 }
 .level.level3 #sprouts .award {
-  background-image: url('images/sprout1-lg-level3.png');
+  background-image: image-url('sprout1-lg-level3.png');
 }
 .level.level4 #sprouts .award {
-  background-image: url('images/sprout1-lg-level4.png');
+  background-image: image-url('sprout1-lg-level4.png');
 }
 #sprouts .award.show {
   -webkit-transform: translate3d(0,0,0);
@@ -491,11 +495,11 @@ body { background: #008; }
 #ruler > .background > .foreground {
   position: absolute;
   bottom: 0; left: 0; width: 38px; height: 100%;
-  background: url('images/ruler-tile-dk.png') repeat-y bottom left;
+  background: image-url('ruler-tile-dk.png') repeat-y bottom left;
 }
 #ruler > .background > .foreground {
   height: 100%; /* override on element */
-  background-image: url('images/ruler-tile.png');
+  background-image: image-url('ruler-tile.png');
   -webkit-transition: height 1s ease;
      -moz-transition: height 1s ease;
           transition: height 1s ease;
@@ -507,7 +511,7 @@ body { background: #008; }
 #ruler .stars {
   position: absolute;
   left: 35px;
-  background: url('images/star-small-outline.png') repeat-x;
+  background: image-url('star-small-outline.png') repeat-x;
   height: 37px;
 }
 #ruler .stars.one {
@@ -523,7 +527,7 @@ body { background: #008; }
   width: 123px;
 }
 #ruler .stars.highlight {
-  background-image: url('images/star-small.png');
+  background-image: image-url('star-small.png');
 }
 
 @-webkit-keyframes leveldone-throb {
@@ -595,7 +599,7 @@ body { background: #008; }
 }
 .nells .hotair .foreground {
   position: absolute; top: 0; bottom: 0; left: 0; right: 0;
-  background: url('images/hotair.png') no-repeat;
+  background: image-url('hotair.png') no-repeat;
 }
 #nell > .troposphere > .hotair {
   position: absolute;
@@ -639,10 +643,10 @@ body { background: #008; }
 }
 
 .nells .jet > .background {
-  background-image: url('images/jet1.png');
+  background-image: image-url('jet1.png');
 }
 .nells .jet > .foreground {
-  background-image: url('images/jet2.png');
+  background-image: image-url('jet2.png');
 }
 #nell > .mesosphere {
   width: 255px; height: 626px;
@@ -681,10 +685,10 @@ body { background: #008; }
   background-repeat: no-repeat;
 }
 .nells .astronaut > .background {
-  background-image: url('images/astronaut1.png');
+  background-image: image-url('astronaut1.png');
 }
 .nells .astronaut > .foreground {
-  background-image: url('images/astronaut2.png');
+  background-image: image-url('astronaut2.png');
 }
 /* layout for nell parts */
 .nells .nell,
@@ -697,9 +701,9 @@ body { background: #008; }
   top: 0; bottom: 0;
   background-repeat: no-repeat;
 }
-.nells .nell > .hair { background-image: url('images/nell-hair.png'); }
-.nells .nell > .body { background-image: url('images/nell-body.png'); }
-.nells .nell > .head { background-image: url('images/nell-head.png'); }
+.nells .nell > .hair { background-image: image-url('nell-hair.png'); }
+.nells .nell > .body { background-image: image-url('nell-body.png'); }
+.nells .nell > .head { background-image: image-url('nell-head.png'); }
 
 .nells .nell > .body, /* default */
 .nells .nell > .head, /* default */
@@ -735,7 +739,7 @@ body { background: #008; }
 #clouds > div {
   position: absolute;
   left: 0; right: 0; height: 294px;
-  background: url('images/clouds.png') repeat-x;
+  background: image-url('clouds.png') repeat-x;
   background-position: -200px 0;
 }
 #clouds > .troposphere {
@@ -754,19 +758,19 @@ body { background: #008; }
   position: absolute;
   bottom: -152px; height: 388px;
   left: 227px; width: 151px;
-  background: url('images/level1-bug.png') no-repeat;
+  background: image-url('level1-bug.png') no-repeat;
 }
 .level.level1 #clouds > .grass {
   height: 243px; bottom: -152px;
-  background: url('images/level1-grass-front.png') repeat-x;
+  background: image-url('level1-grass-front.png') repeat-x;
 }
 .level.level2 #clouds > .grass {
   height: 224px; bottom: -152px;
-  background: url('images/level2-grass-front.png') repeat-x;
+  background: image-url('level2-grass-front.png') repeat-x;
 }
 #clouds > .stars {
   top: -300%;
-  background-image: url('images/star.png');
+  background-image: image-url('star.png');
   background-position: bottom left;
 }
 
@@ -788,73 +792,73 @@ body { background: #008; }
   width: 150px; height: 120px;
 }
 #balloons .payload /* default */ {
-  background-image: url('images/tag-white-empty.png');
+  background-image: image-url('tag-white-empty.png');
 }
 #balloons .balloon, /* default */
 #balloons > .white > .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 #balloons > .black > .balloon {
-  background-image: url('images/balloon-black.png');
+  background-image: image-url('balloon-black.png');
 }
 #balloons > .lilac > .balloon {
-  background-image: url('images/balloon-lilac.png');
+  background-image: image-url('balloon-lilac.png');
 }
 #balloons > .orange > .balloon {
-  background-image: url('images/balloon-orange.png');
+  background-image: image-url('balloon-orange.png');
 }
 #balloons > .yellow > .balloon {
-  background-image: url('images/balloon-yellow.png');
+  background-image: image-url('balloon-yellow.png');
 }
 #balloons > .popped > .balloon {
-  background-image: url('images/bang.png') !important;
+  background-image: image-url('bang.png') !important;
 }
 
 /* payloads for "grass" level */
 .level.level1.ground #balloons .payload { display: none; }
 .level.level1.troposphere #balloons .black > .payload {
-  background-image: url('images/tag-black-bat.png');
+  background-image: image-url('tag-black-bat.png');
 }
 .level.level1.troposphere #balloons .lilac > .payload {
-  background-image: url('images/tag-lilac-mat.png');
+  background-image: image-url('tag-lilac-mat.png');
 }
 .level.level1.troposphere #balloons .orange > .payload {
-  background-image: url('images/tag-orange-orange.png');
+  background-image: image-url('tag-orange-orange.png');
 }
 .level.level1.troposphere #balloons .yellow > .payload {
-  background-image: url('images/tag-yellow-banana.png');
+  background-image: image-url('tag-yellow-banana.png');
 }
 
 .level.level1.stratosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level1.stratosphere #balloons .black > .payload {
-  background-image: url('images/tag-white-bat.png');
+  background-image: image-url('tag-white-bat.png');
 }
 .level.level1.stratosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-mat.png');
+  background-image: image-url('tag-white-mat.png');
 }
 .level.level1.stratosphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-orange.png');
+  background-image: image-url('tag-white-orange.png');
 }
 .level.level1.stratosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-banana.png');
+  background-image: image-url('tag-white-banana.png');
 }
 
 .level.level1.mesosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level1.mesosphere #balloons .black > .payload {
-  background-image: url('images/tag-white-bat-bw.png');
+  background-image: image-url('tag-white-bat-bw.png');
 }
 .level.level1.mesosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-mat-bw.png');
+  background-image: image-url('tag-white-mat-bw.png');
 }
 .level.level1.mesosphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-orange-bw.png');
+  background-image: image-url('tag-white-orange-bw.png');
 }
 .level.level1.mesosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-banana-bw.png');
+  background-image: image-url('tag-white-banana-bw.png');
 }
 
 
@@ -863,95 +867,95 @@ body { background: #008; }
   background-color: #777;
 }
 .level.level2.ground #balloons .black > .payload {
-  background-image: url('images/tag-black-b.png');
+  background-image: image-url('tag-black-b.png');
 }
 .level.level2.ground #balloons .lilac > .payload {
-  background-image: url('images/tag-lilac-m.png');
+  background-image: image-url('tag-lilac-m.png');
 }
 .level.level2.ground #balloons .orange > .payload {
-  background-image: url('images/tag-orange-t.png');
+  background-image: image-url('tag-orange-t.png');
 }
 .level.level2.ground #balloons .yellow > .payload {
-  background-image: url('images/tag-yellow-c.png');
+  background-image: image-url('tag-yellow-c.png');
 }
 
 .level.level2.troposphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level2.troposphere #balloons .black > .payload {
-  background-image: url('images/tag-white-b.png');
+  background-image: image-url('tag-white-b.png');
 }
 .level.level2.troposphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-m.png');
+  background-image: image-url('tag-white-m.png');
 }
 .level.level2.troposphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-t.png');
+  background-image: image-url('tag-white-t.png');
 }
 .level.level2.troposphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-c.png');
+  background-image: image-url('tag-white-c.png');
 }
 
 .level.level2.ground #buttons > a.black,
 .level.level2.troposphere #buttons > a.black {
-  background-image: url('images/button-b.png');
+  background-image: image-url('button-b.png');
 }
 .level.level2.ground #buttons > a.lilac,
 .level.level2.troposphere #buttons > a.lilac {
-  background-image: url('images/button-m.png');
+  background-image: image-url('button-m.png');
 }
 .level.level2.ground #buttons > a.orange,
 .level.level2.troposphere #buttons > a.orange {
-  background-image: url('images/button-t.png');
+  background-image: image-url('button-t.png');
 }
 .level.level2.ground #buttons > a.yellow,
 .level.level2.troposphere #buttons > a.yellow {
-  background-image: url('images/button-c.png');
+  background-image: image-url('button-c.png');
 }
 
 .level.level2.stratosphere #balloons .black > .payload {
-  background-image: url('images/tag-black-word-bat.png');
+  background-image: image-url('tag-black-word-bat.png');
 }
 .level.level2.stratosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-lilac-word-mat.png');
+  background-image: image-url('tag-lilac-word-mat.png');
 }
 .level.level2.stratosphere #balloons .orange > .payload {
-  background-image: url('images/tag-orange-word-cat.png');
+  background-image: image-url('tag-orange-word-cat.png');
 }
 .level.level2.stratosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-yellow-word-cab.png');
+  background-image: image-url('tag-yellow-word-cab.png');
 }
 
 .level.level2.mesosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level2.mesosphere #balloons .black > .payload {
-  background-image: url('images/tag-white-word-bat.png');
+  background-image: image-url('tag-white-word-bat.png');
 }
 .level.level2.mesosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-word-mat.png');
+  background-image: image-url('tag-white-word-mat.png');
 }
 .level.level2.mesosphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-word-cat.png');
+  background-image: image-url('tag-white-word-cat.png');
 }
 .level.level2.mesosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-word-cab.png');
+  background-image: image-url('tag-white-word-cab.png');
 }
 
 .level.level2.stratosphere #buttons > a.black,
 .level.level2.mesosphere #buttons > a.black {
-  background-image: url('images/button-word-bat.png');
+  background-image: image-url('button-word-bat.png');
 }
 .level.level2.stratosphere #buttons > a.lilac,
 .level.level2.mesosphere #buttons > a.lilac {
-  background-image: url('images/button-word-mat.png');
+  background-image: image-url('button-word-mat.png');
 }
 .level.level2.stratosphere #buttons > a.orange,
 .level.level2.mesosphere #buttons > a.orange {
-  background-image: url('images/button-word-cat.png');
+  background-image: image-url('button-word-cat.png');
 }
 .level.level2.stratosphere #buttons > a.yellow,
 .level.level2.mesosphere #buttons > a.yellow {
-  background-image: url('images/button-word-cab.png');
+  background-image: image-url('button-word-cab.png');
 }
 
 /* payloads for "sand" level */
@@ -960,93 +964,93 @@ body { background: #008; }
 }
 .level.level3.ground #buttons > a.black,
 .level.level3.troposphere #buttons > a.black {
-  background-image: url('images/button-word-bat.png');
+  background-image: image-url('button-word-bat.png');
 }
 .level.level3.ground #buttons > a.lilac,
 .level.level3.troposphere #buttons > a.lilac {
-  background-image: url('images/button-word-mat.png');
+  background-image: image-url('button-word-mat.png');
 }
 .level.level3.ground #buttons > a.orange,
 .level.level3.troposphere #buttons > a.orange {
-  background-image: url('images/button-word-cat.png');
+  background-image: image-url('button-word-cat.png');
 }
 .level.level3.ground #buttons > a.yellow,
 .level.level3.troposphere #buttons > a.yellow {
-  background-image: url('images/button-word-cab.png');
+  background-image: image-url('button-word-cab.png');
 }
 .level.level3.stratosphere #buttons > a.black,
 .level.level3.mesosphere #buttons > a.black {
-  background-image: url('images/button-bat.png');
+  background-image: image-url('button-bat.png');
 }
 .level.level3.stratosphere #buttons > a.lilac,
 .level.level3.mesosphere #buttons > a.lilac {
-  background-image: url('images/button-mat.png');
+  background-image: image-url('button-mat.png');
 }
 .level.level3.stratosphere #buttons > a.orange,
 .level.level3.mesosphere #buttons > a.orange {
-  background-image: url('images/button-cat.png');
+  background-image: image-url('button-cat.png');
 }
 .level.level3.stratosphere #buttons > a.yellow,
 .level.level3.mesosphere #buttons > a.yellow {
-  background-image: url('images/button-cab.png');
+  background-image: image-url('button-cab.png');
 }
 
 .level.level3.ground #balloons .black > .payload {
-  background-image: url('images/tag-black-bat.png');
+  background-image: image-url('tag-black-bat.png');
 }
 .level.level3.ground #balloons .lilac > .payload {
-  background-image: url('images/tag-lilac-mat.png');
+  background-image: image-url('tag-lilac-mat.png');
 }
 .level.level3.ground #balloons .orange > .payload {
-  background-image: url('images/tag-orange-cat.png');
+  background-image: image-url('tag-orange-cat.png');
 }
 .level.level3.ground #balloons .yellow > .payload {
-  background-image: url('images/tag-yellow-cab.png');
+  background-image: image-url('tag-yellow-cab.png');
 }
 
 .level.level3.troposphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level3.troposphere #balloons .black > .payload {
-  background-image: url('images/tag-white-bat-bw.png');
+  background-image: image-url('tag-white-bat-bw.png');
 }
 .level.level3.troposphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-mat-bw.png');
+  background-image: image-url('tag-white-mat-bw.png');
 }
 .level.level3.troposphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-cat-bw.png');
+  background-image: image-url('tag-white-cat-bw.png');
 }
 .level.level3.troposphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-cab-bw.png');
+  background-image: image-url('tag-white-cab-bw.png');
 }
 
 .level.level3.stratosphere #balloons .black > .payload {
-  background-image: url('images/tag-black-word-bat.png');
+  background-image: image-url('tag-black-word-bat.png');
 }
 .level.level3.stratosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-lilac-word-mat.png');
+  background-image: image-url('tag-lilac-word-mat.png');
 }
 .level.level3.stratosphere #balloons .orange > .payload {
-  background-image: url('images/tag-orange-word-cat.png');
+  background-image: image-url('tag-orange-word-cat.png');
 }
 .level.level3.stratosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-yellow-word-cab.png');
+  background-image: image-url('tag-yellow-word-cab.png');
 }
 
 .level.level3.mesosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level3.mesosphere #balloons .black > .payload {
-  background-image: url('images/tag-white-word-bat.png');
+  background-image: image-url('tag-white-word-bat.png');
 }
 .level.level3.mesosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-word-mat.png');
+  background-image: image-url('tag-white-word-mat.png');
 }
 .level.level3.mesosphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-word-cat.png');
+  background-image: image-url('tag-white-word-cat.png');
 }
 .level.level3.mesosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-word-cab.png');
+  background-image: image-url('tag-white-word-cab.png');
 }
 
 /* payloads for "snow" level */
@@ -1054,201 +1058,201 @@ body { background: #008; }
   background-color: #777;
 }
 .level.level4.ground #buttons > a.black {
-  background-image: url('images/button-word-bat.png');
+  background-image: image-url('button-word-bat.png');
 }
 .level.level4.ground #buttons > a.lilac {
-  background-image: url('images/button-word-mat.png');
+  background-image: image-url('button-word-mat.png');
 }
 .level.level4.ground #buttons > a.orange {
-  background-image: url('images/button-word-cat.png');
+  background-image: image-url('button-word-cat.png');
 }
 .level.level4.ground #buttons > a.yellow {
-  background-image: url('images/button-word-cab.png');
+  background-image: image-url('button-word-cab.png');
 }
 .level.level4.troposphere #buttons > a.black {
-  background-image: url('images/button-bat.png');
+  background-image: image-url('button-bat.png');
 }
 .level.level4.troposphere #buttons > a.lilac {
-  background-image: url('images/button-mat.png');
+  background-image: image-url('button-mat.png');
 }
 .level.level4.troposphere #buttons > a.orange {
-  background-image: url('images/button-cat.png');
+  background-image: image-url('button-cat.png');
 }
 .level.level4.troposphere #buttons > a.yellow {
-  background-image: url('images/button-cab.png');
+  background-image: image-url('button-cab.png');
 }
 .level.level4.stratosphere #buttons > a.black {
-  background-image: url('images/button-bat.png');
+  background-image: image-url('button-bat.png');
 }
 .level.level4.stratosphere #buttons > a.lilac {
-  background-image: url('images/button-bats.png');
+  background-image: image-url('button-bats.png');
   background-color: #777;
 }
 .level.level4.stratosphere #buttons > a.orange {
-  background-image: url('images/button-cat.png');
+  background-image: image-url('button-cat.png');
 }
 .level.level4.stratosphere #buttons > a.yellow {
-  background-image: url('images/button-cats.png');
+  background-image: image-url('button-cats.png');
   background-color: #ef7c11; /* orange */
 }
 .level.level4.mesosphere #buttons > a {
   background-color: #cacaca; /* white button background */
 }
 .level.level4.mesosphere #buttons > a.black {
-  background-image: url('images/button-mat.png');
+  background-image: image-url('button-mat.png');
 }
 .level.level4.mesosphere #buttons > a.lilac {
-  background-image: url('images/button-mats.png');
+  background-image: image-url('button-mats.png');
 }
 .level.level4.mesosphere #buttons > a.orange {
-  background-image: url('images/button-cab.png');
+  background-image: image-url('button-cab.png');
 }
 .level.level4.mesosphere #buttons > a.yellow {
-  background-image: url('images/button-cabs.png');
+  background-image: image-url('button-cabs.png');
 }
 
 .level.level4.ground #balloons .black > .payload,
 .level.level4.ground #balloons .black.var1 > .payload {
-  background-image: url('images/tag-black-word-bat.png');
+  background-image: image-url('tag-black-word-bat.png');
 }
 .level.level4.ground #balloons .black.var2 > .payload {
-  background-image: url('images/tag-black-word-a-bat.png');
+  background-image: image-url('tag-black-word-a-bat.png');
 }
 .level.level4.ground #balloons .black.var3 > .payload {
-  background-image: url('images/tag-black-word-the-bat.png');
+  background-image: image-url('tag-black-word-the-bat.png');
 }
 .level.level4.ground #balloons .black.var4 > .payload {
-  background-image: url('images/tag-black-word-bats.png');
+  background-image: image-url('tag-black-word-bats.png');
 }
 .level.level4.ground #balloons .lilac > .payload,
 .level.level4.ground #balloons .lilac.var1 > .payload {
-  background-image: url('images/tag-lilac-word-mat.png');
+  background-image: image-url('tag-lilac-word-mat.png');
 }
 .level.level4.ground #balloons .lilac.var2 > .payload {
-  background-image: url('images/tag-lilac-word-a-mat.png');
+  background-image: image-url('tag-lilac-word-a-mat.png');
 }
 .level.level4.ground #balloons .lilac.var3 > .payload {
-  background-image: url('images/tag-lilac-word-the-mat.png');
+  background-image: image-url('tag-lilac-word-the-mat.png');
 }
 .level.level4.ground #balloons .lilac.var4 > .payload {
-  background-image: url('images/tag-lilac-word-mats.png');
+  background-image: image-url('tag-lilac-word-mats.png');
 }
 .level.level4.ground #balloons .orange > .payload,
 .level.level4.ground #balloons .orange.var1 > .payload {
-  background-image: url('images/tag-orange-word-cat.png');
+  background-image: image-url('tag-orange-word-cat.png');
 }
 .level.level4.ground #balloons .orange.var2 > .payload {
-  background-image: url('images/tag-orange-word-a-cat.png');
+  background-image: image-url('tag-orange-word-a-cat.png');
 }
 .level.level4.ground #balloons .orange.var3 > .payload {
-  background-image: url('images/tag-orange-word-the-cat.png');
+  background-image: image-url('tag-orange-word-the-cat.png');
 }
 .level.level4.ground #balloons .orange.var4 > .payload {
-  background-image: url('images/tag-orange-word-cats.png');
+  background-image: image-url('tag-orange-word-cats.png');
 }
 .level.level4.ground #balloons .yellow > .payload,
 .level.level4.ground #balloons .yellow.var1 > .payload {
-  background-image: url('images/tag-yellow-word-cab.png');
+  background-image: image-url('tag-yellow-word-cab.png');
 }
 .level.level4.ground #balloons .yellow.var2 > .payload {
-  background-image: url('images/tag-yellow-word-a-cab.png');
+  background-image: image-url('tag-yellow-word-a-cab.png');
 }
 .level.level4.ground #balloons .yellow.var3 > .payload {
-  background-image: url('images/tag-yellow-word-the-cab.png');
+  background-image: image-url('tag-yellow-word-the-cab.png');
 }
 .level.level4.ground #balloons .yellow.var4 > .payload {
-  background-image: url('images/tag-yellow-word-cabs.png');
+  background-image: image-url('tag-yellow-word-cabs.png');
 }
 
 .level.level4.troposphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level4.troposphere #balloons .black > .payload,
 .level.level4.troposphere #balloons .black.var1 > .payload {
-  background-image: url('images/tag-white-word-bat.png');
+  background-image: image-url('tag-white-word-bat.png');
 }
 .level.level4.troposphere #balloons .black.var2 > .payload {
-  background-image: url('images/tag-white-word-a-bat.png');
+  background-image: image-url('tag-white-word-a-bat.png');
 }
 .level.level4.troposphere #balloons .black.var3 > .payload {
-  background-image: url('images/tag-white-word-the-bat.png');
+  background-image: image-url('tag-white-word-the-bat.png');
 }
 .level.level4.troposphere #balloons .black.var4 > .payload {
-  background-image: url('images/tag-white-word-bats.png');
+  background-image: image-url('tag-white-word-bats.png');
 }
 .level.level4.troposphere #balloons .lilac > .payload,
 .level.level4.troposphere #balloons .lilac.var1 > .payload {
-  background-image: url('images/tag-white-word-mat.png');
+  background-image: image-url('tag-white-word-mat.png');
 }
 .level.level4.troposphere #balloons .lilac.var2 > .payload {
-  background-image: url('images/tag-white-word-a-mat.png');
+  background-image: image-url('tag-white-word-a-mat.png');
 }
 .level.level4.troposphere #balloons .lilac.var3 > .payload {
-  background-image: url('images/tag-white-word-the-mat.png');
+  background-image: image-url('tag-white-word-the-mat.png');
 }
 .level.level4.troposphere #balloons .lilac.var4 > .payload {
-  background-image: url('images/tag-white-word-mats.png');
+  background-image: image-url('tag-white-word-mats.png');
 }
 .level.level4.troposphere #balloons .orange > .payload,
 .level.level4.troposphere #balloons .orange.var1 > .payload {
-  background-image: url('images/tag-white-word-cat.png');
+  background-image: image-url('tag-white-word-cat.png');
 }
 .level.level4.troposphere #balloons .orange.var2 > .payload {
-  background-image: url('images/tag-white-word-a-cat.png');
+  background-image: image-url('tag-white-word-a-cat.png');
 }
 .level.level4.troposphere #balloons .orange.var3 > .payload {
-  background-image: url('images/tag-white-word-the-cat.png');
+  background-image: image-url('tag-white-word-the-cat.png');
 }
 .level.level4.troposphere #balloons .orange.var4 > .payload {
-  background-image: url('images/tag-white-word-cats.png');
+  background-image: image-url('tag-white-word-cats.png');
 }
 .level.level4.troposphere #balloons .yellow > .payload,
 .level.level4.troposphere #balloons .yellow.var1 > .payload {
-  background-image: url('images/tag-white-word-cab.png');
+  background-image: image-url('tag-white-word-cab.png');
 }
 .level.level4.troposphere #balloons .yellow.var2 > .payload {
-  background-image: url('images/tag-white-word-a-cab.png');
+  background-image: image-url('tag-white-word-a-cab.png');
 }
 .level.level4.troposphere #balloons .yellow.var3 > .payload {
-  background-image: url('images/tag-white-word-the-cab.png');
+  background-image: image-url('tag-white-word-the-cab.png');
 }
 .level.level4.troposphere #balloons .yellow.var4 > .payload {
-  background-image: url('images/tag-white-word-cabs.png');
+  background-image: image-url('tag-white-word-cabs.png');
 }
 
 .level.level4.stratosphere #balloons .black > .payload {
-  background-image: url('images/tag-black-word-bat.png');
+  background-image: image-url('tag-black-word-bat.png');
 }
 .level.level4.stratosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-black-word-bats.png');
+  background-image: image-url('tag-black-word-bats.png');
 }
 .level.level4.stratosphere #balloons > .lilac > .balloon {
-  background-image: url('images/balloon-black.png');
+  background-image: image-url('balloon-black.png');
 }
 .level.level4.stratosphere #balloons .orange > .payload {
-  background-image: url('images/tag-orange-word-cat.png');
+  background-image: image-url('tag-orange-word-cat.png');
 }
 .level.level4.stratosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-orange-word-cats.png');
+  background-image: image-url('tag-orange-word-cats.png');
 }
 .level.level4.stratosphere #balloons > .yellow > .balloon {
-  background-image: url('images/balloon-orange.png');
+  background-image: image-url('balloon-orange.png');
 }
 
 .level.level4.mesosphere #balloons .balloon {
-  background-image: url('images/balloon-white.png');
+  background-image: image-url('balloon-white.png');
 }
 .level.level4.mesosphere #balloons .black > .payload {
-  background-image: url('images/tag-white-word-mat.png');
+  background-image: image-url('tag-white-word-mat.png');
 }
 .level.level4.mesosphere #balloons .lilac > .payload {
-  background-image: url('images/tag-white-word-mats.png');
+  background-image: image-url('tag-white-word-mats.png');
 }
 .level.level4.mesosphere #balloons .orange > .payload {
-  background-image: url('images/tag-white-word-cab.png');
+  background-image: image-url('tag-white-word-cab.png');
 }
 .level.level4.mesosphere #balloons .yellow > .payload {
-  background-image: url('images/tag-white-word-cabs.png');
+  background-image: image-url('tag-white-word-cabs.png');
 }
 
 /* ------------------ balloon animations ------------------- */
@@ -1903,16 +1907,16 @@ body { background: #008; }
   background-color: #000;
 }
 #menu .level.level1 > .background {
-  background-image: url('images/level1-back.png');
+  background-image: image-url('level1-back.png');
 }
 #menu .level.level2 > .background {
-  background-image: url('images/level2-menu-back.png');
+  background-image: image-url('level2-menu-back.png');
 }
 #menu .level.level3 > .background {
-  background-image: url('images/level3-back.png');
+  background-image: image-url('level3-back.png');
 }
 #menu .level.level4 > .background {
-  background-image: url('images/level4-back.png');
+  background-image: image-url('level4-back.png');
 }
 .anim #menu .level.level1 > .background {
   background-image: -webkit-linear-gradient(bottom, #0ff, #0ff 9%, #00f 17%, #00f 28%, #008 50%, #000 100%);
@@ -1940,7 +1944,7 @@ body { background: #008; }
 #menu .level.level3 > .background .stars,
 #menu .level.level4 > .background .stars {
   position: absolute; left: 0; top: 0; height: 100%; width: 100%;
-  background: url('images/star-tile.png') repeat;
+  background: image-url('star-tile.png') repeat;
 }
 #menu .level > .background .mountains {
   position: absolute; left: -25%; right: -25%; bottom: 0;
@@ -1956,23 +1960,23 @@ body { background: #008; }
 }
 #menu .level.level2 > .background .mountains {
   height: 495px;
-  background-image: url('images/level2-mountains.png');
+  background-image: image-url('level2-mountains.png');
   /* scale the whole thing from 2400px to 1600px (66%) */
 }
 #menu .level.level3 > .background .mountains {
   height: 499px;
-  background-image: url('images/level3-sand.png');
+  background-image: image-url('level3-sand.png');
   /* scale the whole thing down from 2200px (let's say 66%) */
 }
 #menu .level.level4 > .background .mountains {
   height: 338px;
-  background-image: url('images/level4-snow.png');
+  background-image: image-url('level4-snow.png');
   /* scale the whole thing down from 1200px (let's say 66%) */
 }
 #menu .level.level3 > .background .sun {
   position: absolute;
   width: 278px; height: 174px;
-  background: url('images/level3-sun.png') no-repeat;
+  background: image-url('level3-sun.png') no-repeat;
   top: -50px; left: 140px;
   /* scale the whole thing down (let's say 66%) */
   -webkit-transform: scale3d(.667,.667,1);
@@ -1985,7 +1989,7 @@ body { background: #008; }
 #menu .level.level4 > .background .sun {
   position: absolute;
   width: 292px; height: 288px;
-  background: url('images/moon.png') no-repeat;
+  background: image-url('moon.png') no-repeat;
   top: -80px; left: 160px;
   /* scale the whole thing down (let's say 60%) */
   -webkit-transform: scale3d(.6,.6,1);
@@ -2037,15 +2041,15 @@ body { background: #008; }
 }
 #menu .sprout {
   position: absolute;
-  background-image: url('images/sprout1-lgr.png');
+  background-image: image-url('sprout1-lgr.png');
   width: 326px; height: 1207px;
   bottom: 30px; left: 13px;
 }
 #menu .level.level3 .sprout {
-  background-image: url('images/sprout1-lgr-level3.png');
+  background-image: image-url('sprout1-lgr-level3.png');
 }
 #menu .level.level4 .sprout {
-  background-image: url('images/sprout1-lgr-level4.png');
+  background-image: image-url('sprout1-lgr-level4.png');
   bottom: 0px;
 }
 #menu .clouds .grass {
@@ -2059,7 +2063,7 @@ body { background: #008; }
 #menu .level.level1 .clouds .grass {
   width: 200%;
   height: 243px;
-  background-image: url('images/level1-grass-front.png');
+  background-image: image-url('level1-grass-front.png');
   -webkit-transform: scale3d(0.5,0.5,1);
      -moz-transform: scale(0.5,0.5);
           transform: scale(0.5,0.5);
@@ -2067,7 +2071,7 @@ body { background: #008; }
 #menu .level.level2 .clouds .grass {
   width: 150%;
   height: 224px;
-  background-image: url('images/level2-grass-front.png');
+  background-image: image-url('level2-grass-front.png');
   -webkit-transform: scale3d(0.667,0.667,1);
      -moz-transform: scale(0.667,0.667);
           transform: scale(0.667,0.667);
@@ -2091,13 +2095,13 @@ body { background: #008; }
 #menu .exposed-mesosphere   .clouds > .cloudshade { height: 0;   }
 #menu .clouds > .cloudshade > .top {
   top: 0; bottom: 225px;
-  background: url('images/cloud-tile.png') repeat;
+  background: image-url('cloud-tile.png') repeat;
   background-position: bottom left;
 }
 #menu .clouds > .cloudshade > .bottom {
   /* overhang bottom of element a little bit */
   bottom: -25px; height: 250px;
-  background: url('images/cloud-tile-bottom.png') repeat-x;
+  background: image-url('cloud-tile-bottom.png') repeat-x;
 }
 
 #menu .awards > * {
@@ -2129,7 +2133,7 @@ body { background: #008; }
   display: inline-block;
   width: 102px; height: 92px;
   margin: 0 14px;
-  background: url('images/star-outline.png') no-repeat;
+  background: image-url('star-outline.png') no-repeat;
 }
 #menu .awards .stars.one .star:first-child,
 #menu .awards .stars.two .star:first-child,
@@ -2137,13 +2141,13 @@ body { background: #008; }
 #menu .awards .stars.three .star:first-child,
 #menu .awards .stars.three .star:first-child + .star,
 #menu .awards .stars.three .star:first-child + .star + .star {
-  background-image: url('images/star.png');
+  background-image: image-url('star.png');
 }
 #menu .awards .tag {
   position: absolute; bottom: 50%; left: 27px;
   width: 150px; height: 120px;
   margin-bottom: -65px; /* cheat down 5px */
-  background: url('images/tag-white-empty.png') no-repeat;
+  background: image-url('tag-white-empty.png') no-repeat;
   display: block;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   tap-highlight-color: rgba(0,0,0,0);
@@ -2160,55 +2164,55 @@ body { background: #008; }
 }
 /* tags from grass level */
 #menu .level.level1 .awards .ground .tag {
-  background-image: url('images/tag-orange-solid.png');
+  background-image: image-url('tag-orange-solid.png');
 }
 #menu .level.level1 .awards .troposphere .tag {
-  background-image: url('images/tag-orange-orange.png');
+  background-image: image-url('tag-orange-orange.png');
 }
 #menu .level.level1 .awards .stratosphere .tag {
-  background-image: url('images/tag-white-orange.png');
+  background-image: image-url('tag-white-orange.png');
 }
 #menu .level.level1 .awards .mesosphere .tag {
-  background-image: url('images/tag-white-orange-bw.png');
+  background-image: image-url('tag-white-orange-bw.png');
 }
 /* tags from mountains level */
 #menu .level.level2 .awards .ground .tag {
-  background-image: url('images/tag-orange-t.png');
+  background-image: image-url('tag-orange-t.png');
 }
 #menu .level.level2 .awards .troposphere .tag {
-  background-image: url('images/tag-white-t.png');
+  background-image: image-url('tag-white-t.png');
 }
 #menu .level.level2 .awards .stratosphere .tag {
-  background-image: url('images/tag-orange-word-cat.png');
+  background-image: image-url('tag-orange-word-cat.png');
 }
 #menu .level.level2 .awards .mesosphere .tag {
-  background-image: url('images/tag-white-word-cat.png');
+  background-image: image-url('tag-white-word-cat.png');
 }
 /* tags from desert level */
 #menu .level.level3 .awards .ground .tag {
-  background-image: url('images/tag-yellow-cab.png');
+  background-image: image-url('tag-yellow-cab.png');
 }
 #menu .level.level3 .awards .troposphere .tag {
-  background-image: url('images/tag-white-cab-bw.png');
+  background-image: image-url('tag-white-cab-bw.png');
 }
 #menu .level.level3 .awards .stratosphere .tag {
-  background-image: url('images/tag-yellow-word-cab.png');
+  background-image: image-url('tag-yellow-word-cab.png');
 }
 #menu .level.level3 .awards .mesosphere .tag {
-  background-image: url('images/tag-white-word-cab.png');
+  background-image: image-url('tag-white-word-cab.png');
 }
 /* tags from snow level */
 #menu .level.level4 .awards .ground .tag {
-  background-image: url('images/tag-lilac-word-a-mat.png');
+  background-image: image-url('tag-lilac-word-a-mat.png');
 }
 #menu .level.level4 .awards .troposphere .tag {
-  background-image: url('images/tag-white-word-the-mat.png');
+  background-image: image-url('tag-white-word-the-mat.png');
 }
 #menu .level.level4 .awards .stratosphere .tag {
-  background-image: url('images/tag-black-word-bats.png');
+  background-image: image-url('tag-black-word-bats.png');
 }
 #menu .level.level4 .awards .mesosphere .tag {
-  background-image: url('images/tag-white-word-mats.png');
+  background-image: image-url('tag-white-word-mats.png');
 }
 /* pulse the tags to make it clear they are touchable */
 @-webkit-keyframes menu-tag-throb {
@@ -2257,28 +2261,28 @@ body { background: #008; }
   display: none;
 }
 #menu .levelnav > .inner > .prev {
-  background-image: url('images/arrow-left.png');
+  background-image: image-url('arrow-left.png');
   left: 0;
 }
 #menu .levelnav > .inner > .prev.hover {
-  background-image: url('images/arrow-left-hover.png');
+  background-image: image-url('arrow-left-hover.png');
 }
 #menu .levelnav > .inner > .next {
-  background-image: url('images/arrow-right.png');
+  background-image: image-url('arrow-right.png');
   right: 0;
 }
 #menu .levelnav > .inner > .next.hover {
-  background-image: url('images/arrow-right-hover.png');
+  background-image: image-url('arrow-right-hover.png');
 }
 #menu .levelnav > .inner > .dot {
   display: inline-block;
   width: 26px; height: 26px;
   margin-top: 22px;
   margin-left: 5px; margin-right: 4px; /* 9px spacing between dots */
-  background-image: url('images/dot-off.png');
+  background-image: image-url('dot-off.png');
 }
 #menu .levelnav > .inner > .dot.on {
-  background-image: url('images/dot-on.png');
+  background-image: image-url('dot-on.png');
 }
 
 #menu .clouds,
@@ -2305,10 +2309,10 @@ body { background: #008; }
   background-size: contain;
 }
 #rotate > .background {
-  background-image: url('images/xoom-rotate-bg.png');
+  background-image: image-url('xoom-rotate-bg.png');
 }
 #rotate > .foreground {
-  background-image: url('images/xoom-rotate-fg.png');
+  background-image: image-url('xoom-rotate-fg.png');
 }
 @-webkit-keyframes rotate-throb {
   0% {
@@ -2363,7 +2367,7 @@ body { background: #008; }
 #download {
   position: absolute;
   width: 62px; height: 62px;
-  background: url('images/download-icon.png');
+  background: image-url('download-icon.png');
   bottom: 5px; right: 20px;
   display: none;
 }

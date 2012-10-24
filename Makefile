@@ -14,11 +14,20 @@ assets/www/images/nell-head.png: \
 #OPT=optimize=none
 OPT=
 
+COMPASS=compass
+STYLES=assets/www/style/index.css
+
 build/index.js: assets/www/index.js # and other stuff
 	mkdir -p build
 	node r.js -o name=index out=$@ baseUrl=assets/www $(OPT)
-build-all: build/index.js
-	mkdir -p build/images build/sounds build/video
+
+# requires compass 0.13 and sass 3.2.1
+css: $(STYLES)
+$(STYLES): assets/www/sass/*.scss
+	$(COMPASS) compile -e production --force $(abspath assets/www)
+
+build-all: build/index.js $(STYLES)
+	mkdir -p build/images build/sounds build/video build/style
 	grep -v cordova assets/www/index.html | \
 	  sed -e 's/<html/<html manifest="manifest.appcache" /' \
 	  > build/index.html
@@ -29,7 +38,7 @@ build-all: build/index.js
 	cp res/drawable-mdpi/ic_launcher.png build/images/icon-48.png
 	cp assets/www/appcacheui.js build/
 	cp assets/www/require.min.js build/require.js
-	cp assets/www/*.css build/
+	cp $(STYLES) build/style/
 	cp assets/www/images/* build/images
 	cp assets/www/sounds/*.webm build/sounds
 	cp assets/www/video/*.jpg \

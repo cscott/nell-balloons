@@ -1,8 +1,7 @@
 CACHE MANIFEST
-# ee9cd98e9c3d87274fc8c2bf2a584d32  -
+# b0fa0fffc2795e27930f3529f44e5a42  -
 
 CACHE:
-./appcacheui.css
 ./appcacheui.js
 ./images/arrow-left-hover.png
 ./images/arrow-left.png
@@ -231,7 +230,7 @@ CACHE:
 ./sounds/scott_the_mat.webm
 ./sounds/wrong1.webm
 ./sounds/wrong2.webm
-./style.css
+./style/index.css
 ./video/SpaceBalloon1-1-256k32k.webm
 ./video/SpaceBalloon1-1.jpg
 ./video/SpaceBalloon1-2-256k32k.webm
